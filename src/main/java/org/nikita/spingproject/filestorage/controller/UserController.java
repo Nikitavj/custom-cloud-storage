@@ -3,8 +3,8 @@ package org.nikita.spingproject.filestorage.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.nikita.spingproject.filestorage.dto.UserDto;
+import org.nikita.spingproject.filestorage.service.UserAlreadyExistException;
 import org.nikita.spingproject.filestorage.service.UserServiceImpl;
-import org.nikita.spingproject.filestorage.utils.UserValidator;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequiredArgsConstructor
 public class UserController {
     private final UserServiceImpl userService;
-    private final UserValidator userValidator;
 
     @GetMapping
     public String userPage(Model model) {
@@ -35,12 +34,17 @@ public class UserController {
     @PostMapping("/registration")
     public String registerUserAccount(@ModelAttribute("user") @Valid UserDto userDto,
                                       BindingResult bindingResult) {
-        userValidator.validate(userDto, bindingResult);
+
+        try {
+            userService.registerNewUserAccount(userDto);
+        } catch (UserAlreadyExistException e) {
+            bindingResult.rejectValue("email", "", e.getMessage());
+        }
+
         if (bindingResult.hasErrors()) {
             return "registration";
         }
 
-        userService.registerNewUserAccount(userDto);
         return "redirect:user";
     }
 }

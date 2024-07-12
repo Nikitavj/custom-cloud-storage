@@ -4,17 +4,22 @@ import lombok.RequiredArgsConstructor;
 import org.nikita.spingproject.filestorage.User;
 import org.nikita.spingproject.filestorage.UserRepository;
 import org.nikita.spingproject.filestorage.dto.UserDto;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-@RequiredArgsConstructor
 public class UserServiceImpl implements UserService{
-    private final UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
     @Override
     public UserDto registerNewUserAccount(UserDto userDto) {
+
+        if(userExist(userDto)) {
+            throw new UserAlreadyExistException("User " + userDto.getEmail() + " already exist");
+        }
 
         User user = userRepository.save(buildUser(userDto));
         return builUserDto(user);

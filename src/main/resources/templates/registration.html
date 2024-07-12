@@ -13,7 +13,6 @@
         <input id="email" type="email" th:field="*{email}"/>
         <p th:each="error : ${#fields.errors('email')}"
            th:text="${error}">Validation error</p>
-        <P th:if="${message != null}" th:text="${message}"></P>
     </div>
     <div>
         <label for="password">password</label>
