@@ -1,5 +1,6 @@
-package org.nikita.spingproject.filestorage;
+package org.nikita.spingproject.filestorage.repository;
 
+import org.nikita.spingproject.filestorage.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

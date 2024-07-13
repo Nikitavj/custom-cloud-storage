@@ -1,11 +1,10 @@
 package org.nikita.spingproject.filestorage.service;
 
-import lombok.RequiredArgsConstructor;
-import org.nikita.spingproject.filestorage.User;
-import org.nikita.spingproject.filestorage.UserRepository;
+import org.nikita.spingproject.filestorage.model.User;
+import org.nikita.spingproject.filestorage.repository.UserRepository;
 import org.nikita.spingproject.filestorage.dto.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,34 +13,34 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserServiceImpl implements UserService{
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Override
     public UserDto registerNewUserAccount(UserDto userDto) {
+        User user = buildUser(userDto);
 
-        if(userExist(userDto)) {
+        if(userExist(user)) {
             throw new UserAlreadyExistException("User " + userDto.getEmail() + " already exist");
         }
 
-        User user = userRepository.save(buildUser(userDto));
-        return builUserDto(user);
+        user.setRole("ROLE_USER");
+        return builUserDto(userRepository.save(user));
     }
 
     @Transactional(readOnly = true)
-    protected boolean userExist(UserDto user) {
+    protected boolean userExist(User user) {
         return userRepository.existsUserByEmail(user.getEmail());
     }
 
     private User buildUser(UserDto userDto) {
         return new User()
                 .setEmail(userDto.getEmail())
-                .setPassword(passwordEncoder(userDto.getPassword()));
+                .setPassword(passwordEncoder.encode(userDto.getPassword()));
     }
 
     private UserDto builUserDto(User user) {
         return new UserDto()
                 .setEmail(user.getEmail());
-    }
-
-    private String passwordEncoder(String password) {
-        return new BCryptPasswordEncoder().encode(password);
     }
 }

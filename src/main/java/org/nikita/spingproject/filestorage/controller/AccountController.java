@@ -1,5 +1,7 @@
 package org.nikita.spingproject.filestorage.controller;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.nikita.spingproject.filestorage.dto.UserDto;
@@ -20,15 +22,13 @@ public class AccountController {
     private final UserServiceImpl userService;
 
     @GetMapping("/log-up")
-    public String showRegistrationForm(Model model) {
-        UserDto userDto = new UserDto();
-        model.addAttribute("user", userDto);
+    public String showRegistrationForm(@ModelAttribute("user") UserDto user) {
         return "logup";
     }
 
     @PostMapping("/log-up")
-    public String registerUserAccount(@ModelAttribute("user") @Valid UserDto userDto,
-                                      BindingResult bindingResult) {
+    public String registerUserAccount(HttpServletRequest request, @ModelAttribute("user") @Valid UserDto userDto,
+                                      BindingResult bindingResult) throws ServletException {
 
         try {
             userService.registerNewUserAccount(userDto);
@@ -40,11 +40,17 @@ public class AccountController {
             return "logup";
         }
 
+        request.login(userDto.getEmail(), userDto.getPassword());
         return "redirect:/";
     }
 
     @GetMapping("/log-in")
     public String showLoginForm() {
         return "login";
+    }
+
+    @GetMapping("/admin")
+    public String adminPage() {
+        return "admin";
     }
 }

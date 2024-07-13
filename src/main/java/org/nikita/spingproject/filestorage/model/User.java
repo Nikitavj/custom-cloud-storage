@@ -1,4 +1,4 @@
-package org.nikita.spingproject.filestorage;
+package org.nikita.spingproject.filestorage.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -20,4 +20,7 @@ public class User {
 
     @Column(nullable = false)
     private String password;
+
+    @Column(nullable = false)
+    private String role;
 }
