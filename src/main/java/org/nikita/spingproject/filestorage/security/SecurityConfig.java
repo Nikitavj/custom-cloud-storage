@@ -34,9 +34,13 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth.requestMatchers("user/registration").permitAll()
-                        .requestMatchers("/user").authenticated())
-                .formLogin(AbstractAuthenticationFilterConfigurer::permitAll)
+                .authorizeHttpRequests(
+                        auth -> auth.requestMatchers("log-up", "log-in").permitAll()
+                                .anyRequest().authenticated())
+                .formLogin(login -> login.loginPage("/log-in")
+                        .loginProcessingUrl("/login_process")
+                        .defaultSuccessUrl("/", true)
+                        .failureForwardUrl("/log-in?error"))
                 .build();
     }
 

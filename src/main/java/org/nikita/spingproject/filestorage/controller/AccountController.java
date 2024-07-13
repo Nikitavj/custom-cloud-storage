@@ -14,24 +14,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/user")
+@RequestMapping
 @RequiredArgsConstructor
-public class UserController {
+public class AccountController {
     private final UserServiceImpl userService;
 
-    @GetMapping
-    public String userPage(Model model) {
-        return "user";
-    }
-
-    @GetMapping("/registration")
+    @GetMapping("/log-up")
     public String showRegistrationForm(Model model) {
         UserDto userDto = new UserDto();
         model.addAttribute("user", userDto);
-        return "registration";
+        return "logup";
     }
 
-    @PostMapping("/registration")
+    @PostMapping("/log-up")
     public String registerUserAccount(@ModelAttribute("user") @Valid UserDto userDto,
                                       BindingResult bindingResult) {
 
@@ -42,9 +37,14 @@ public class UserController {
         }
 
         if (bindingResult.hasErrors()) {
-            return "registration";
+            return "logup";
         }
 
-        return "redirect:user";
+        return "redirect:/";
+    }
+
+    @GetMapping("/log-in")
+    public String showLoginForm() {
+        return "login";
     }
 }
