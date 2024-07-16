@@ -5,10 +5,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.nikita.spingproject.filestorage.dto.UserDto;
-import org.nikita.spingproject.filestorage.service.UserAlreadyExistException;
+import org.nikita.spingproject.filestorage.exception.UserAlreadyExistException;
 import org.nikita.spingproject.filestorage.service.UserServiceImpl;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -27,8 +26,9 @@ public class AccountController {
     }
 
     @PostMapping("/log-up")
-    public String registerUserAccount(HttpServletRequest request, @ModelAttribute("user") @Valid UserDto userDto,
-                                      BindingResult bindingResult) throws ServletException {
+    public String registerUserAccount(HttpServletRequest request,
+                                      @ModelAttribute("user") @Valid UserDto userDto,
+                                      BindingResult bindingResult) {
 
         try {
             userService.registerNewUserAccount(userDto);
@@ -40,7 +40,12 @@ public class AccountController {
             return "logup";
         }
 
-        request.login(userDto.getEmail(), userDto.getPassword());
+        try {
+            request.login(userDto.getEmail(), userDto.getPassword());
+        } catch (ServletException e) {
+            return "login";
+        }
+
         return "redirect:/";
     }
 

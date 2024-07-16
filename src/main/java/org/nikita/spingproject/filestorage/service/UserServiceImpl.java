@@ -1,5 +1,6 @@
 package org.nikita.spingproject.filestorage.service;
 
+import org.nikita.spingproject.filestorage.exception.UserAlreadyExistException;
 import org.nikita.spingproject.filestorage.model.User;
 import org.nikita.spingproject.filestorage.repository.UserRepository;
 import org.nikita.spingproject.filestorage.dto.UserDto;
