@@ -1,0 +1,32 @@
+version: '2.27.0'
+services:
+  service_db:
+    image: mysql
+    container_name: mysql-storage-db
+    environment:
+      - MYSQL_DATABASE
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MYSQL_ROOT_PASSWORD
+    ports:
+      - 3306:3306
+    volumes:
+      - mysql_volume:/var/lib/mysql
+
+  minio:
+    image: quay.io/minio/minio
+    container_name: minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: user
+      MINIO_ROOT_PASSWORD: rootroot
+    volumes:
+      - minio:/data
+    command: server /data --console-address ":9001"
+volumes:
+  mysql_volume:
+  minio:
+
+
