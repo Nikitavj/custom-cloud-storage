@@ -14,6 +14,7 @@ import org.nikita.spingproject.filestorage.utils.ValidEmail;
 @Accessors(chain = true)
 @PasswordMatches
 public class UserDto {
+    private int id;
     @NotNull
     @NotEmpty(message = "Empty field")
     @ValidEmail

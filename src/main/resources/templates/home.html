@@ -10,5 +10,9 @@
     <input type="submit" value="Log-out"/>
 </form>
 
+<div th:each="name:${files.keySet()}">
+<span th:text="${name}"></span>
+</div>
+
 </body>
 </html>

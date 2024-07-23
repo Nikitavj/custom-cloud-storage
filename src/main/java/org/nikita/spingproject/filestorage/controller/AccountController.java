@@ -1,5 +1,6 @@
 package org.nikita.spingproject.filestorage.controller;
 
+import io.minio.errors.*;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -13,6 +14,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 @Controller
 @RequestMapping
@@ -28,7 +33,7 @@ public class AccountController {
     @PostMapping("/log-up")
     public String registerUserAccount(HttpServletRequest request,
                                       @ModelAttribute("user") @Valid UserDto userDto,
-                                      BindingResult bindingResult) {
+                                      BindingResult bindingResult) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
 
         try {
             userService.registerNewUserAccount(userDto);
