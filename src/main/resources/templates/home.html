@@ -11,7 +11,15 @@
 </form>
 
 <div th:each="name:${files.keySet()}">
-<span th:text="${name}"></span>
+<span >
+    <a th:text="${name}" th:href="@{http://localhost:8080(path=${files.get(name)})}"></a>
+
+    <form th:method="post" th:action="@{/download}">
+        <input name="pathFile" th:value="${files.get(name)}" type="text">
+        <input name="targetFile" type="text">
+        <input type="submit" name="Download" value="Download">
+    </form>
+</span>
 </div>
 
 </body>

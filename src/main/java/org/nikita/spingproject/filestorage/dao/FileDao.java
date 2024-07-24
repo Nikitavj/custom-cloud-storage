@@ -27,20 +27,21 @@ public class FileDao {
                 .build());
     }
 
-    public InputStream getObject(String pathFile) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-        return minioClient.getObject(GetObjectArgs
-                .builder()
-                .bucket(BUCKET_NAME)
-                .object(pathFile)
-                .build());
-    }
-
     public Iterable<Result<Item>> getObjectsOfPath(String pathDirectory) {
         return minioClient.listObjects(ListObjectsArgs
                 .builder()
                 .bucket(BUCKET_NAME)
                 .recursive(false)
                 .prefix(pathDirectory)
+                .build());
+    }
+
+    public void downloadObject(String fileName, String targetPath) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        minioClient.downloadObject(DownloadObjectArgs
+                .builder()
+                .bucket(BUCKET_NAME)
+                .object(fileName)
+                .filename(targetPath)
                 .build());
     }
 }

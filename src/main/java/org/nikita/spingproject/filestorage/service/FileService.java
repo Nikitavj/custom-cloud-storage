@@ -14,9 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -36,16 +34,20 @@ public class FileService {
                 createPathFile(
                         uplDto.getUserName(),
                         uplDto.getPathFile(),
-                        uplDto.getMultipartFile().getOriginalFilename()
-                )
-        );
+                        uplDto.getMultipartFile().getOriginalFilename()));
     }
 
-    public Map<String, String> findFilesOfDirectory(String userName, String pathDirectory) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-        Iterable<Result<Item>> iterable = fileDao.getObjectsOfPath(
-                createPathDirectory(userName, pathDirectory));
-        Map<String, String> files = new HashMap<>();
+    public void downloadFile(String userName, String filePath, String targetPath) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        fileDao.downloadObject(createPathDir(userName, filePath), targetPath);
+    }
 
+
+
+    public Map<String, String> findFilesOfDirectory(String userName, String pathDir) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        Iterable<Result<Item>> iterable = fileDao.getObjectsOfPath(
+                createPathDir(userName, pathDir));
+
+        Map<String, String> files = new HashMap<>();
         for (Result<Item> result : iterable) {
             Item item = result.get();
 
@@ -72,7 +74,7 @@ public class FileService {
         return links[links.length - 1];
     }
 
-    private String createPathDirectory(String userName, String pathFile) {
+    private String createPathDir(String userName, String pathFile) {
         int userId = userRepository.findUserByEmail(userName)
                 .orElseThrow(() -> new EntityNotFoundException("User " + userName + " not found"))
                 .getId();
@@ -84,6 +86,6 @@ public class FileService {
     }
 
     private String createPathFile(String userName, String pathFile, String fileName) {
-        return createPathDirectory(userName, pathFile) + fileName;
+        return createPathDir(userName, pathFile) + fileName;
     }
 }
