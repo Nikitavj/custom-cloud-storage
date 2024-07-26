@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Home</title>
@@ -10,8 +11,30 @@
     <input type="submit" value="Log-out"/>
 </form>
 
+<br>
+
+Create new folder
+<form method="post" th:action="@{/directory}">
+    <input type="hidden" name="path" th:value="${path}">
+    <input type="text" name="name_folder">
+    <input type="submit" name="create" value="Create">
+</form>
+
+<br>
+
+<form th:method="post" enctype="multipart/form-data" th:action="@{/}">
+    File to upload:
+    <input type="file" name="file">
+    <input name="pathFile" type="hidden" th:value="${path}">
+    <br/>
+    <input type="submit" value="Upload">
+</form>
+
+<br>
+
 <div th:each="name:${files.keySet()}">
-<span >
+
+<span>
     <a th:text="${name}" th:href="@{http://localhost:8080(path=${files.get(name)})}"></a>
 
     <form th:method="post" th:action="@{/download}">
@@ -19,6 +42,12 @@
         <input name="targetFile" type="text">
         <input type="submit" name="Download" value="Download">
     </form>
+
+    <form th:method="DELETE" th:action="@{http://localhost:8080(path=${files.get(name)})}">
+       <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden">
+        <input type="submit" name="delete" value="Delete">
+    </form>
+
 </span>
 </div>
 

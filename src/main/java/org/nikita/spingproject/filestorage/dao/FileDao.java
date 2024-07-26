@@ -6,10 +6,13 @@ import io.minio.messages.Item;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+
+import static java.util.Arrays.stream;
 
 
 @Service
@@ -42,6 +45,22 @@ public class FileDao {
                 .bucket(BUCKET_NAME)
                 .object(fileName)
                 .filename(targetPath)
+                .build());
+    }
+
+    public void deleteObject(String pathFile) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        minioClient.removeObject(RemoveObjectArgs
+                .builder()
+                .bucket(BUCKET_NAME)
+                .object(pathFile)
+                .build());
+    }
+
+    public void createDirectory(String pathDir) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        minioClient.putObject(PutObjectArgs.builder()
+                .bucket(BUCKET_NAME)
+                .object(pathDir)
+                .stream(new ByteArrayInputStream(new byte[]{}), 0, -1)
                 .build());
     }
 }

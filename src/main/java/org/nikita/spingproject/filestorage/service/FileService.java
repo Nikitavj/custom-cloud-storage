@@ -41,7 +41,9 @@ public class FileService {
         fileDao.downloadObject(createPathDir(userName, filePath), targetPath);
     }
 
-
+    public void deleteFile(String userName, String filePath) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        fileDao.deleteObject(createPathDir(userName, filePath));
+    }
 
     public Map<String, String> findFilesOfDirectory(String userName, String pathDir) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         Iterable<Result<Item>> iterable = fileDao.getObjectsOfPath(
@@ -62,6 +64,11 @@ public class FileService {
             }
         }
         return files;
+    }
+
+    public void createFolder(String userName, String pathDir, String nameFolder) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        String pathFolder = createPathFile(userName, pathDir, nameFolder);
+        fileDao.createDirectory("/"+ pathFolder+"/");
     }
 
     private String getNameFileOrDir(String path) {
