@@ -21,17 +21,17 @@ public class DirectoryController {
     @Autowired
     private DirectoryService directoryService;
 
-    @PostMapping("/directory")
+    @PostMapping
     public String createNewFolder(@AuthenticationPrincipal UserDetails userDetails,
-                                  @RequestParam String currentPath,
+                                  @RequestParam(name="current_path", required = false) String currentPath,
                                   @RequestParam("name_folder") String nameFolder) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
 
 
-        String pathFolder = directoryService.createNewFolder(new FolderDto()
+        Folder folder = directoryService.createNewFolder(new FolderDto()
                 .setName(nameFolder)
                 .setPath(currentPath)
                 .setUserName(userDetails.getUsername()));
 
-        return "redirect:/" + "?path=" + pathFolder;
+        return "redirect:/" + "?path=" + folder.getPath();
     }
 }

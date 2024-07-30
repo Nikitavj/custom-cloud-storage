@@ -15,7 +15,7 @@
 
 Create new folder
 <form method="post" th:action="@{/directory}">
-    <input type="hidden" name="path" th:value="${path}">
+    <input type="hidden" name="current_path" th:value="${current_path}">
     <input type="text" name="name_folder">
     <input type="submit" name="create" value="Create">
 </form>
@@ -25,14 +25,14 @@ Create new folder
 <form th:method="post" enctype="multipart/form-data" th:action="@{/}">
     File to upload:
     <input type="file" name="file">
-    <input name="pathFile" type="hidden" th:value="${path}">
+    <input name="pathFile" type="hidden" th:value="${current_path}">
     <br/>
     <input type="submit" value="Upload">
 </form>
 
 <br>
 
-<div th:each="folder:${objectsDir.folders}">
+<div th:each="folder:${objects_dir.folders}">
 
 <span>
     <a th:text="${folder.name}" th:href="@{http://localhost:8080(path=${folder.path})}"></a>
@@ -51,7 +51,7 @@ Create new folder
 </span>
 </div>
 
-<div th:each="file:${objectsDir.files}">
+<div th:each="file:${objects_dir.files}">
 
 <span>
     <a th:text="${file.name}" th:href="@{http://localhost:8080(path=${file.path})}"></a>

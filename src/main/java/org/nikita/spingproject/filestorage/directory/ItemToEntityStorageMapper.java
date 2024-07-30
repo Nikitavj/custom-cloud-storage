@@ -8,25 +8,25 @@ public class ItemToEntityStorageMapper {
     public static File mappToFile(Item item) {
         String path = item.objectName();
         return new File(
-                getName(path),
-                getPath(path));
+                createNameFromPath(path),
+                createLinkForPath(path));
     }
 
     public static Folder mappToFolder(Item item) {
         String path = item.objectName();
-        String path1 = getPath(path);
+        String path1 = createLinkForPath(path);
         String newPath = path1.substring(0, path1.length()-1);
         return new Folder(
-                getName(path),
+                createNameFromPath(path),
                 newPath);
     }
 
-    private static String getPath(String path) {
+    private static String createLinkForPath(String path) {
         String[] arrayPaths = path.split("/", 2);
         return arrayPaths[arrayPaths.length -1];
     }
 
-    private static String getName(String path) {
+    private static String createNameFromPath(String path) {
         String[] arrayNames = path.split("/");
         return arrayNames[arrayNames.length -1];
     }

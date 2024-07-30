@@ -11,7 +11,6 @@ import org.nikita.spingproject.filestorage.directory.ItemToEntityStorageMapper;
 import org.nikita.spingproject.filestorage.directory.dao.DirectoryDao;
 import org.nikita.spingproject.filestorage.directory.dto.FolderDto;
 import org.nikita.spingproject.filestorage.directory.dto.ObjectsDirectoryDto;
-import org.nikita.spingproject.filestorage.file.File;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +24,6 @@ public class DirectoryServiceImpl implements DirectoryService {
     private DirectoryDao directoryDao;
     @Autowired
     private UserRepository userRepository;
-
 
     @Override
     public ObjectsDirectoryDto listDirectoryObjects(FolderDto dto) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
@@ -51,24 +49,26 @@ public class DirectoryServiceImpl implements DirectoryService {
     }
 
     @Override
-    public String createNewFolder(FolderDto dto) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    public Folder createNewFolder(FolderDto dto) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         String pathFolder = createPathNewFolder(
                 dto.getPath(),
                 dto.getName(),
                 dto.getUserName());
+
         directoryDao.createFolder(new Folder(
-                pathFolder,
-                dto.getName()));
-        return pathFolder;
+                dto.getName(),
+                pathFolder));
+
+        return new Folder(
+                dto.getName(),
+                createFolderLinkFromPath(pathFolder));
     }
 
     private String createPathNewFolder(String currentPath, String nameFolder, String nameUser) {
-        if (currentPath.equals("/")) {
-            currentPath = "";
-        }
-        return String.format("%s/%s/%s/",
-                createRootPathForUser(nameUser),
-                currentPath,
+        String path = createPathFolder(currentPath, nameUser);
+
+        return String.format("%s%s/",
+                path,
                 nameFolder);
     }
 
@@ -91,5 +91,11 @@ public class DirectoryServiceImpl implements DirectoryService {
                     createRootPathForUser(nameUser),
                     pathFolder);
         }
+    }
+
+    private String createFolderLinkFromPath(String path) {
+        String[] paths = path.split("/", 2);
+        String pathWithSlesh = paths[paths.length - 1];
+        return pathWithSlesh.substring(0, pathWithSlesh.length() - 1);
     }
 }
