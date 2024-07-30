@@ -1,8 +1,6 @@
-package org.nikita.spingproject.filestorage.service;
+package org.nikita.spingproject.filestorage.account;
 
 import io.minio.errors.*;
-import org.nikita.spingproject.filestorage.dto.UserDto;
-import org.nikita.spingproject.filestorage.model.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

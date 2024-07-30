@@ -1,4 +1,4 @@
-package org.nikita.spingproject.filestorage.model;
+package org.nikita.spingproject.filestorage.account;
 
 import jakarta.persistence.*;
 import lombok.Getter;

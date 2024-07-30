@@ -1,4 +1,4 @@
-package org.nikita.spingproject.filestorage.dto;
+package org.nikita.spingproject.filestorage.account;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;

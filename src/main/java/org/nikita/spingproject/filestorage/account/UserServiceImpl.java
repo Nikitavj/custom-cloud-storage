@@ -1,11 +1,8 @@
-package org.nikita.spingproject.filestorage.service;
+package org.nikita.spingproject.filestorage.account;
 
 import io.minio.errors.*;
 import jakarta.persistence.EntityNotFoundException;
 import org.nikita.spingproject.filestorage.exception.UserAlreadyExistException;
-import org.nikita.spingproject.filestorage.model.User;
-import org.nikita.spingproject.filestorage.repository.UserRepository;
-import org.nikita.spingproject.filestorage.dto.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

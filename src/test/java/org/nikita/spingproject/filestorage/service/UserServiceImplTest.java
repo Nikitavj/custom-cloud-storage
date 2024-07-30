@@ -1,9 +1,10 @@
 package org.nikita.spingproject.filestorage.service;
 
 import org.junit.jupiter.api.Test;
-import org.nikita.spingproject.filestorage.dto.UserDto;
-import org.nikita.spingproject.filestorage.model.User;
-import org.nikita.spingproject.filestorage.repository.UserRepository;
+import org.nikita.spingproject.filestorage.account.UserDto;
+import org.nikita.spingproject.filestorage.account.UserServiceImpl;
+import org.nikita.spingproject.filestorage.account.User;
+import org.nikita.spingproject.filestorage.account.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;

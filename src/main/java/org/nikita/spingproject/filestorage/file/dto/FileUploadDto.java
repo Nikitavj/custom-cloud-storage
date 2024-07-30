@@ -1,4 +1,4 @@
-package org.nikita.spingproject.filestorage.dto;
+package org.nikita.spingproject.filestorage.file.dto;
 
 import lombok.Getter;
 import lombok.Setter;

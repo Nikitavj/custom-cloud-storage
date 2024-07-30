@@ -1,13 +1,11 @@
-package org.nikita.spingproject.filestorage.controller;
+package org.nikita.spingproject.filestorage.account;
 
 import io.minio.errors.*;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.nikita.spingproject.filestorage.dto.UserDto;
 import org.nikita.spingproject.filestorage.exception.UserAlreadyExistException;
-import org.nikita.spingproject.filestorage.service.UserServiceImpl;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;

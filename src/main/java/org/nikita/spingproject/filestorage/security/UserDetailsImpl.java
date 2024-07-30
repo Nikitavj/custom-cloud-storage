@@ -1,7 +1,7 @@
 package org.nikita.spingproject.filestorage.security;
 
 import lombok.RequiredArgsConstructor;
-import org.nikita.spingproject.filestorage.model.User;
+import org.nikita.spingproject.filestorage.account.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

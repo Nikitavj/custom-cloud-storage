@@ -32,18 +32,37 @@ Create new folder
 
 <br>
 
-<div th:each="name:${files.keySet()}">
+<div th:each="folder:${objectsDir.folders}">
 
 <span>
-    <a th:text="${name}" th:href="@{http://localhost:8080(path=${files.get(name)})}"></a>
+    <a th:text="${folder.name}" th:href="@{http://localhost:8080(path=${folder.path})}"></a>
 
     <form th:method="post" th:action="@{/download}">
-        <input name="pathFile" th:value="${files.get(name)}" type="text">
+        <input name="pathFile" th:value="${folder.path}" type="text">
         <input name="targetFile" type="text">
         <input type="submit" name="Download" value="Download">
     </form>
 
-    <form th:method="DELETE" th:action="@{http://localhost:8080(path=${files.get(name)})}">
+    <form th:method="DELETE" th:action="@{http://localhost:8080(path=${folder.path})}">
+       <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden">
+        <input type="submit" name="delete" value="Delete">
+    </form>
+
+</span>
+</div>
+
+<div th:each="file:${objectsDir.files}">
+
+<span>
+    <a th:text="${file.name}" th:href="@{http://localhost:8080(path=${file.path})}"></a>
+
+    <form th:method="post" th:action="@{/download}">
+        <input name="pathFile" th:value="${file.path}" type="text">
+        <input name="targetFile" type="text">
+        <input type="submit" name="Download" value="Download">
+    </form>
+
+    <form th:method="DELETE" th:action="@{http://localhost:8080(path=${file.path})}">
        <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden">
         <input type="submit" name="delete" value="Delete">
     </form>

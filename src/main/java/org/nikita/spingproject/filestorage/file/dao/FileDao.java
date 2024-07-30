@@ -1,4 +1,4 @@
-package org.nikita.spingproject.filestorage.dao;
+package org.nikita.spingproject.filestorage.file.dao;
 
 import io.minio.*;
 import io.minio.errors.*;

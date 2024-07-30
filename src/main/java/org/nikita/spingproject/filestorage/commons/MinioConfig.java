@@ -1,4 +1,4 @@
-package org.nikita.spingproject.filestorage.service;
+package org.nikita.spingproject.filestorage.commons;
 
 import io.minio.BucketExistsArgs;
 import io.minio.MakeBucketArgs;

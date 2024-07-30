@@ -4,9 +4,9 @@ import io.minio.Result;
 import io.minio.errors.*;
 import io.minio.messages.Item;
 import jakarta.persistence.EntityNotFoundException;
-import org.nikita.spingproject.filestorage.dao.FileDao;
-import org.nikita.spingproject.filestorage.dto.FileUploadDto;
-import org.nikita.spingproject.filestorage.repository.UserRepository;
+import org.nikita.spingproject.filestorage.file.dao.FileDao;
+import org.nikita.spingproject.filestorage.file.dto.FileUploadDto;
+import org.nikita.spingproject.filestorage.account.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

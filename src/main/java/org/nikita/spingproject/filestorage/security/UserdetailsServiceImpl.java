@@ -1,8 +1,8 @@
 package org.nikita.spingproject.filestorage.security;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.nikita.spingproject.filestorage.model.User;
-import org.nikita.spingproject.filestorage.repository.UserRepository;
+import org.nikita.spingproject.filestorage.account.User;
+import org.nikita.spingproject.filestorage.account.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

@@ -2,7 +2,7 @@ package org.nikita.spingproject.filestorage.utils;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import org.nikita.spingproject.filestorage.dto.UserDto;
+import org.nikita.spingproject.filestorage.account.UserDto;
 
 public class PasswordMatchesValidator implements ConstraintValidator<PasswordMatches, Object> {
 
