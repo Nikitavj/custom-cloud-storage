@@ -2,7 +2,7 @@ package org.nikita.spingproject.filestorage.file.dao;
 
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
-import io.minio.UploadObjectArgs;
+import io.minio.RemoveObjectArgs;
 import io.minio.errors.*;
 import org.nikita.spingproject.filestorage.file.File;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +25,14 @@ public class FileDaoImpl implements FileDao {
                 .bucket(BUCKET_NAME)
                 .object(file.getPath())
                 .stream(file.getInputStream(), file.getInputStream().available(), -1)
+                .build());
+    }
+
+    @Override
+    public void deleteFile(File file) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        minioClient.removeObject(RemoveObjectArgs.builder()
+                .bucket(BUCKET_NAME)
+                .object(file.getPath())
                 .build());
     }
 }

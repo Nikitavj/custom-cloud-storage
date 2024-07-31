@@ -1,6 +1,7 @@
 package org.nikita.spingproject.filestorage.file;
 
 import io.minio.errors.*;
+import org.nikita.spingproject.filestorage.file.dto.FileDto;
 import org.nikita.spingproject.filestorage.file.dto.FileUploadDto;
 import org.nikita.spingproject.filestorage.service.FileServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,5 +31,15 @@ public class FileController {
                 .setUserName(userDetails.getUsername()));
 
         return "redirect:/" + "?path=" + path;
+    }
+
+    @DeleteMapping
+    public String deleteFile(@AuthenticationPrincipal UserDetails userDetails,
+                             @RequestParam String path) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+
+        fileServiceImpl.deleteFile(new FileDto()
+                .setPath(path)
+                .setNameUser(userDetails.getUsername()));
+        return "redirect:/";
     }
 }

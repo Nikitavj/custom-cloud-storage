@@ -6,6 +6,7 @@ import org.nikita.spingproject.filestorage.account.User;
 import org.nikita.spingproject.filestorage.account.UserRepository;
 import org.nikita.spingproject.filestorage.file.File;
 import org.nikita.spingproject.filestorage.file.dao.FileDao;
+import org.nikita.spingproject.filestorage.file.dto.FileDto;
 import org.nikita.spingproject.filestorage.file.dto.FileUploadDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,19 @@ public class FileServiceImpl implements FileService {
         file.setInputStream(dto.getMultipartFile().getInputStream());
 
         fileDao.putFile(file);
+    }
+
+    @Override
+    public void deleteFile(FileDto dto) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        File file = new File();
+        file.setPath(createPathForFile(dto.getPath(), dto.getNameUser()));
+        fileDao.deleteFile(file);
+    }
+
+    private String createPathForFile(String path, String nameUser) {
+        return String.format("%s/%s",
+                createRootPathForUser(nameUser),
+                path);
     }
 
     private String createPathForNewFile(String path, String nameFile, String nameUser) {
