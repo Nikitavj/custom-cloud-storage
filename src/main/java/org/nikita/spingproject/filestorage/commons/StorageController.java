@@ -29,10 +29,6 @@ public class StorageController {
                 .setUserName(userDetails.getUsername())
                 .setPath(path));
         model.addAttribute("objects_dir", objectsDir);
-
-//        if (path == null) {
-//            path = "/";
-//        }
         model.addAttribute("current_path", path);
         return "home";
     }

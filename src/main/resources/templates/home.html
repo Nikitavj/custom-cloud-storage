@@ -22,10 +22,10 @@ Create new folder
 
 <br>
 
-<form th:method="post" enctype="multipart/form-data" th:action="@{/}">
+<form th:method="post" enctype="multipart/form-data" th:action="@{/file}">
     File to upload:
     <input type="file" name="file">
-    <input name="pathFile" type="hidden" th:value="${current_path}">
+    <input name="path" type="hidden" th:value="${current_path}">
     <br/>
     <input type="submit" value="Upload">
 </form>
