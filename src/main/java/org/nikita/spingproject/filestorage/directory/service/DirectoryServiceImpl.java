@@ -61,7 +61,17 @@ public class DirectoryServiceImpl implements DirectoryService {
 
         return new Folder(
                 dto.getName(),
-                createFolderLinkFromPath(pathFolder));
+                createLinkFolderFromPath(pathFolder));
+    }
+
+    @Override
+    public void deleteFolder(FolderDto dto) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        Folder folder = new Folder();
+        folder.setPath(createPathFolder(
+                dto.getPath(),
+                dto.getUserName()));
+
+        directoryDao.deleteFolder(folder);
     }
 
     private String createPathNewFolder(String currentPath, String nameFolder, String nameUser) {
@@ -93,7 +103,7 @@ public class DirectoryServiceImpl implements DirectoryService {
         }
     }
 
-    private String createFolderLinkFromPath(String path) {
+    private String createLinkFolderFromPath(String path) {
         String[] paths = path.split("/", 2);
         String pathWithSlesh = paths[paths.length - 1];
         return pathWithSlesh.substring(0, pathWithSlesh.length() - 1);

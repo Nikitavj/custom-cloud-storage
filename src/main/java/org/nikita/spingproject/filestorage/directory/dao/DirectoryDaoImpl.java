@@ -1,9 +1,6 @@
 package org.nikita.spingproject.filestorage.directory.dao;
 
-import io.minio.ListObjectsArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
-import io.minio.Result;
+import io.minio.*;
 import io.minio.errors.*;
 import io.minio.messages.Item;
 import org.nikita.spingproject.filestorage.directory.Folder;
@@ -17,7 +14,7 @@ import java.security.NoSuchAlgorithmException;
 
 @Repository
 public class DirectoryDaoImpl implements DirectoryDao {
-    private static  String BUCKET_NAME = "user-files";
+    private static String BUCKET_NAME = "user-files";
 
     @Autowired
     private MinioClient minioClient;
@@ -39,6 +36,15 @@ public class DirectoryDaoImpl implements DirectoryDao {
                 .bucket(BUCKET_NAME)
                 .recursive(false)
                 .prefix(folder.getPath())
+                .build());
+    }
+
+    @Override
+    public void deleteFolder(Folder folder) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        minioClient.removeObject(RemoveObjectArgs
+                .builder()
+                .bucket(BUCKET_NAME)
+                .object(folder.getPath())
                 .build());
     }
 }

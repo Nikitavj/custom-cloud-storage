@@ -43,7 +43,7 @@ Create new folder
         <input type="submit" name="Download" value="Download">
     </form>
 
-    <form th:method="DELETE" th:action="@{http://localhost:8080(path=${folder.path})}">
+    <form th:method="DELETE" th:action="@{http://localhost:8080/directory(path=${folder.path})}">
        <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden">
         <input type="submit" name="delete" value="Delete">
     </form>
