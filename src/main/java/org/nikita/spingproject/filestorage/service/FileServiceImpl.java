@@ -1,19 +1,19 @@
 package org.nikita.spingproject.filestorage.service;
 
-import io.minio.errors.*;
+import io.minio.StatObjectResponse;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.SneakyThrows;
 import org.nikita.spingproject.filestorage.account.User;
 import org.nikita.spingproject.filestorage.account.UserRepository;
-import org.nikita.spingproject.filestorage.file.File;
 import org.nikita.spingproject.filestorage.file.dao.FileDao;
+import org.nikita.spingproject.filestorage.file.dto.FileDownloadDto;
 import org.nikita.spingproject.filestorage.file.dto.FileDto;
 import org.nikita.spingproject.filestorage.file.dto.FileUploadDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class FileServiceImpl implements FileService {
@@ -23,23 +23,56 @@ public class FileServiceImpl implements FileService {
     UserRepository userRepository;
 
     @Override
-    public void uploadFile(FileUploadDto dto) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-        File file = new File();
-        String pathNewFile = createPathForNewFile(
-                dto.getPathFile(),
-                dto.getMultipartFile().getOriginalFilename(),
+    @SneakyThrows
+    public void uploadFile(FileUploadDto dto) {
+        String pathNewFile = createPathForSaveNewFile(
+                dto.getPath(),
+                dto.getName(),
                 dto.getUserName());
-        file.setPath(pathNewFile);
-        file.setInputStream(dto.getMultipartFile().getInputStream());
 
-        fileDao.putFile(file);
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put("name", dto.getName());
+        metadata.put("link", createLink(dto.getPath(), dto.getName()));
+
+        fileDao.putFile(
+                metadata,
+                pathNewFile,
+                dto.getInputStream());
     }
 
     @Override
-    public void deleteFile(FileDto dto) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-        File file = new File();
-        file.setPath(createPathForFile(dto.getPath(), dto.getNameUser()));
-        fileDao.deleteFile(file);
+    @SneakyThrows
+    public void deleteFile(FileDto dto) {
+        String path = createPathForFile(
+                dto.getPath(),
+                dto.getUserName());
+
+        fileDao.deleteFile(path);
+    }
+
+    @Override
+    @SneakyThrows
+    public FileDownloadDto downloadFile(FileDto dto) {
+        String path = createPathForFile(
+                dto.getPath(),
+                dto.getUserName());
+
+//        StatObjectResponse sor = fileDao.getStatFile(path);
+//
+//        String name = sor.headers().get("x-amz-meta-name");
+
+        return new FileDownloadDto()
+                .setInputStream(fileDao.downloadFile(path));
+    }
+
+    private String createLink(String path, String name) {
+        if(path == null
+                || path.equals("/")
+                || path.isBlank()) {
+            return name;
+        } else {
+            return String.format("%s/%s", path, name);
+        }
     }
 
     private String createPathForFile(String path, String nameUser) {
@@ -48,7 +81,7 @@ public class FileServiceImpl implements FileService {
                 path);
     }
 
-    private String createPathForNewFile(String path, String nameFile, String nameUser) {
+    private String createPathForSaveNewFile(String path, String nameFile, String nameUser) {
         if (path == null || path.equals("/") || path.isBlank()) {
             path = "";
         } else {

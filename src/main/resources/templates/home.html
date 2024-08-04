@@ -33,42 +33,56 @@ Create new folder
 <br>
 
 <div th:each="folder:${objects_dir.folders}">
-
-<span>
-    <a th:text="${folder.name}" th:href="@{http://localhost:8080(path=${folder.path})}"></a>
+    <a th:text="${folder.name}" th:href="@{http://localhost:8080(path=${folder.getLink})}"></a>
 
     <form th:method="post" th:action="@{/download}">
-        <input name="pathFile" th:value="${folder.path}" type="text">
+        <input name="pathFile" th:value="${folder.getLink}" type="text">
         <input name="targetFile" type="text">
         <input type="submit" name="Download" value="Download">
     </form>
 
-    <form th:method="DELETE" th:action="@{/directory(path=${folder.path})}">
-       <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden">
+    <form th:method="DELETE" th:action="@{/directory(path=${folder.getLink})}">
+        <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden">
         <input type="submit" name="delete" value="Delete">
     </form>
-
-</span>
+    <br>
 </div>
 
 <div th:each="file:${objects_dir.files}">
+    <a th:text="${file.name}" th:href="@{/file(path=${file.getLink})}">Name file</a>
 
-<span>
-    <a th:text="${file.name}" th:href="@{/file(path=${file.path})}"></a>
+    <button th:data-path="${file.getLink}"
+            th:data-name="${file.name}"
+            th:onclick="downloadFile(this.getAttribute('data-path'), this.getAttribute('data-name'))">Download</button>
 
-    <form th:method="post" th:action="@{/file}">
-        <input name="pathFile" th:value="${file.path}" type="text">
-        <input name="targetFile" type="text">
-        <input type="submit" name="Download" value="Download">
-    </form>
-
-    <form th:method="DELETE" th:action="@{/file(path=${file.path})}">
-       <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden">
+    <form th:method="DELETE" th:action="@{/file(path=${file.getLink})}">
+        <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden">
         <input type="submit" name="delete" value="Delete">
     </form>
-
-</span>
+    <br>
 </div>
-
 </body>
+
+<script th:inline="javascript">
+    function downloadFile(path, name) {
+        fetch("/file?path=" + path)
+            .then(response => {
+                if (response.ok) {
+                    return response.blob();
+                }
+                throw new Error('Network response was not ok.');
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = name; // Укажите имя файла
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(error => console.error('There has been a problem with your fetch operation:', error));
+    }
+</script>
 </html>

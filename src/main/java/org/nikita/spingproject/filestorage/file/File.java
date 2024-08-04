@@ -12,7 +12,7 @@ import java.io.InputStream;
 public class File extends EntityStorage {
     private InputStream inputStream;
 
-    public File(String name, String path) {
-        super(name, path);
+    public File(String name, String link) {
+        super(name, link);
     }
 }

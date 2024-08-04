@@ -1,16 +1,13 @@
 package org.nikita.spingproject.filestorage.file.dao;
 
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
-import io.minio.RemoveObjectArgs;
-import io.minio.errors.*;
-import org.nikita.spingproject.filestorage.file.File;
+import io.minio.*;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
+import java.io.InputStream;
+import java.util.Map;
+
 
 @Repository
 public class FileDaoImpl implements FileDao {
@@ -19,20 +16,42 @@ public class FileDaoImpl implements FileDao {
     private MinioClient minioClient;
 
     @Override
-    public void putFile(File file) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-
+    @SneakyThrows
+    public void putFile(Map<String, String> metaData, String path, InputStream is) {
         minioClient.putObject(PutObjectArgs.builder()
                 .bucket(BUCKET_NAME)
-                .object(file.getPath())
-                .stream(file.getInputStream(), file.getInputStream().available(), -1)
+                .object(path)
+                .stream(is, is.available(), -1)
+                .userMetadata(metaData)
                 .build());
     }
 
     @Override
-    public void deleteFile(File file) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    @SneakyThrows
+    public void deleteFile(String path) {
         minioClient.removeObject(RemoveObjectArgs.builder()
                 .bucket(BUCKET_NAME)
-                .object(file.getPath())
+                .object(path)
+                .build());
+    }
+
+    @Override
+    @SneakyThrows
+    public InputStream downloadFile(String path) {
+        return minioClient.getObject(GetObjectArgs
+                .builder()
+                .bucket(BUCKET_NAME)
+                .object(path)
+                .build());
+    }
+
+    @Override
+    @SneakyThrows
+    public StatObjectResponse getStatFile(String path) {
+        return minioClient.statObject(StatObjectArgs
+                .builder()
+                .bucket(BUCKET_NAME)
+                .object(path)
                 .build());
     }
 }

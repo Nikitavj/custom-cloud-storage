@@ -32,7 +32,7 @@ public class DirectoryController {
                 .setPath(currentPath)
                 .setUserName(userDetails.getUsername()));
 
-        return "redirect:/" + "?path=" + folder.getPath();
+        return "redirect:/" + "?path=" + folder.getLink();
     }
 
     @DeleteMapping

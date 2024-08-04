@@ -1,18 +1,19 @@
 package org.nikita.spingproject.filestorage.file;
 
-import io.minio.errors.*;
+import lombok.SneakyThrows;
+import org.nikita.spingproject.filestorage.file.dto.FileDownloadDto;
 import org.nikita.spingproject.filestorage.file.dto.FileDto;
 import org.nikita.spingproject.filestorage.file.dto.FileUploadDto;
 import org.nikita.spingproject.filestorage.service.FileServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 
 @Controller
 @RequestMapping("/file")
@@ -20,26 +21,42 @@ public class FileController {
     @Autowired
     private FileServiceImpl fileServiceImpl;
 
+    @SneakyThrows
     @PostMapping
     public String uploadFile(@AuthenticationPrincipal UserDetails userDetails,
-                             @RequestParam("file") MultipartFile multiFile,
-                             @RequestParam String path) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+                             @RequestParam("file") MultipartFile multFile,
+                             @RequestParam String path) {
 
         fileServiceImpl.uploadFile(new FileUploadDto()
-                .setMultipartFile(multiFile)
-                .setPathFile(path)
+                .setInputStream(multFile.getInputStream())
+                .setName(multFile.getOriginalFilename())
+                .setPath(path)
                 .setUserName(userDetails.getUsername()));
 
         return "redirect:/" + "?path=" + path;
     }
 
+    @SneakyThrows
+    @GetMapping
+    public ResponseEntity<InputStreamResource> downloadFile(@AuthenticationPrincipal UserDetails userDetails,
+                                                            @RequestParam String path) {
+        FileDownloadDto dto = fileServiceImpl.downloadFile(new FileDto()
+                .setUserName(userDetails.getUsername())
+                .setPath(path));
+
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(new InputStreamResource(dto.getInputStream()));
+    }
+
     @DeleteMapping
     public String deleteFile(@AuthenticationPrincipal UserDetails userDetails,
-                             @RequestParam String path) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+                             @RequestParam String path) {
 
         fileServiceImpl.deleteFile(new FileDto()
                 .setPath(path)
-                .setNameUser(userDetails.getUsername()));
+                .setUserName(userDetails.getUsername()));
         return "redirect:/";
     }
 }

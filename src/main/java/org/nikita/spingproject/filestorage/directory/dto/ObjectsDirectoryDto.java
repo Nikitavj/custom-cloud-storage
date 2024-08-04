@@ -8,9 +8,16 @@ import org.nikita.spingproject.filestorage.file.File;
 import java.util.ArrayList;
 import java.util.List;
 
-@Setter
 @Getter
 public class ObjectsDirectoryDto {
     private List<File> files = new ArrayList<>();
     private List<Folder> folders = new ArrayList<>();
+
+    public void addFile(File file) {
+        files.add(file);
+    }
+
+    public void addFolder(Folder folder) {
+        folders.add(folder);
+    }
 }
