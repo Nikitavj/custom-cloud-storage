@@ -28,7 +28,7 @@ public class StorageController {
         ObjectsDirectoryDto objectsDir = directoryService.listDirectoryObjects(new FolderDto()
                 .setUserName(userDetails.getUsername())
                 .setPath(path));
-        model.addAttribute("objects_dir", objectsDir);
+        model.addAttribute("objects_dir", objectsDir.getList());
         model.addAttribute("current_path", path);
         return "home";
     }

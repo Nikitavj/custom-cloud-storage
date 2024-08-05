@@ -37,12 +37,13 @@ public class DirectoryController {
 
     @DeleteMapping
     public String deleteFolder(@AuthenticationPrincipal UserDetails userDetails,
+                               @RequestParam(name="current_path", required = false) String currentPath,
                                @RequestParam String path) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
 
         directoryService.deleteFolder(new FolderDto()
                 .setUserName(userDetails.getUsername())
                 .setPath(path));
 
-        return "redirect:/";
+        return "redirect:/" + "?path=" + currentPath;
     }
 }

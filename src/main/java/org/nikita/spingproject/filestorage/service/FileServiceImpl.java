@@ -1,6 +1,5 @@
 package org.nikita.spingproject.filestorage.service;
 
-import io.minio.StatObjectResponse;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.SneakyThrows;
 import org.nikita.spingproject.filestorage.account.User;
@@ -11,7 +10,6 @@ import org.nikita.spingproject.filestorage.file.dto.FileDto;
 import org.nikita.spingproject.filestorage.file.dto.FileUploadDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,6 +31,7 @@ public class FileServiceImpl implements FileService {
         Map<String, String> metadata = new HashMap<>();
         metadata.put("name", dto.getName());
         metadata.put("link", createLink(dto.getPath(), dto.getName()));
+        metadata.put("File", "");
 
         fileDao.putFile(
                 metadata,
@@ -56,10 +55,6 @@ public class FileServiceImpl implements FileService {
         String path = createPathForFile(
                 dto.getPath(),
                 dto.getUserName());
-
-//        StatObjectResponse sor = fileDao.getStatFile(path);
-//
-//        String name = sor.headers().get("x-amz-meta-name");
 
         return new FileDownloadDto()
                 .setInputStream(fileDao.downloadFile(path));

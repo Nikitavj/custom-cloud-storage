@@ -52,11 +52,12 @@ public class FileController {
 
     @DeleteMapping
     public String deleteFile(@AuthenticationPrincipal UserDetails userDetails,
+                             @RequestParam(name="current_path", required = false) String currentPath,
                              @RequestParam String path) {
 
         fileServiceImpl.deleteFile(new FileDto()
                 .setPath(path)
                 .setUserName(userDetails.getUsername()));
-        return "redirect:/";
+        return "redirect:/" + "?path=" + currentPath;
     }
 }

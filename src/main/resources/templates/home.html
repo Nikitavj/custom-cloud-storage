@@ -32,33 +32,40 @@ Create new folder
 
 <br>
 
-<div th:each="folder:${objects_dir.folders}">
-    <a th:text="${folder.name}" th:href="@{http://localhost:8080(path=${folder.getLink})}"></a>
+<div th:each="entity:${objects_dir}">
+    <span th:if="${!entity.isDir()}" th:text="File">Type</span>
+    <span th:if="${entity.isDir()}" th:text="Folder">Type</span>
 
-    <form th:method="post" th:action="@{/download}">
-        <input name="pathFile" th:value="${folder.getLink}" type="text">
-        <input name="targetFile" type="text">
-        <input type="submit" name="Download" value="Download">
-    </form>
+    <div th:if="${!entity.isDir()}" th:text="${entity.name}">File name</div>
 
-    <form th:method="DELETE" th:action="@{/directory(path=${folder.getLink})}">
-        <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden">
-        <input type="submit" name="delete" value="Delete">
-    </form>
-    <br>
-</div>
+    <div th:if="${entity.isDir()}">
+        <a th:text="${entity.name}" th:href="@{/(path=${entity.getLink})}">Folder Name</a>
+    </div>
 
-<div th:each="file:${objects_dir.files}">
-    <a th:text="${file.name}" th:href="@{/file(path=${file.getLink})}">Name file</a>
+    <div th:if="${!entity.isDir()}">
+        <button th:data-path="${entity.getLink}"
+                th:data-name="${entity.name}"
+                th:onclick="downloadFile(this.getAttribute('data-path'), this.getAttribute('data-name'))">
+            Download
+        </button>
+    </div>
 
-    <button th:data-path="${file.getLink}"
-            th:data-name="${file.name}"
-            th:onclick="downloadFile(this.getAttribute('data-path'), this.getAttribute('data-name'))">Download</button>
+    <div th:if="${!entity.isDir()}">
+        <form th:method="DELETE" th:action="@{/file(path=${entity.getLink})}">
+            <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden">
+            <input type="hidden" name="current_path" th:value="${current_path}">
+            <input type="submit" name="delete" value="Delete">
+        </form>
+    </div>
 
-    <form th:method="DELETE" th:action="@{/file(path=${file.getLink})}">
-        <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden">
-        <input type="submit" name="delete" value="Delete">
-    </form>
+    <div th:if="${entity.isDir()}">
+        <form th:method="DELETE" th:action="@{/directory(path=${entity.getLink})}">
+            <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden">
+            <input type="hidden" name="current_path" th:value="${current_path}">
+            <input type="submit" name="delete" value="Delete">
+        </form>
+    </div>
+
     <br>
 </div>
 </body>
