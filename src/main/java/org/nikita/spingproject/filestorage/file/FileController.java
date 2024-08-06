@@ -3,6 +3,7 @@ package org.nikita.spingproject.filestorage.file;
 import lombok.SneakyThrows;
 import org.nikita.spingproject.filestorage.file.dto.FileDownloadDto;
 import org.nikita.spingproject.filestorage.file.dto.FileDto;
+import org.nikita.spingproject.filestorage.file.dto.FileRenameDto;
 import org.nikita.spingproject.filestorage.file.dto.FileUploadDto;
 import org.nikita.spingproject.filestorage.service.FileServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,19 @@ public class FileController {
         return "redirect:/" + "?path=" + path;
     }
 
+    @PutMapping
+    public String renameFile(@AuthenticationPrincipal UserDetails userDetails,
+                             @RequestParam("new_name") String newName,
+                             @RequestParam String path,
+                             @RequestParam(name = "current_path", required = false) String currentPath) {
+        fileServiceImpl.renameFile(new FileRenameDto()
+                .setNewName(newName)
+                .setPath(path)
+                .setUserName(userDetails.getUsername()));
+
+        return "redirect:/" + "?path=" + currentPath;
+    }
+
     @SneakyThrows
     @GetMapping
     public ResponseEntity<InputStreamResource> downloadFile(@AuthenticationPrincipal UserDetails userDetails,
@@ -52,7 +66,7 @@ public class FileController {
 
     @DeleteMapping
     public String deleteFile(@AuthenticationPrincipal UserDetails userDetails,
-                             @RequestParam(name="current_path", required = false) String currentPath,
+                             @RequestParam(name = "current_path", required = false) String currentPath,
                              @RequestParam String path) {
 
         fileServiceImpl.deleteFile(new FileDto()

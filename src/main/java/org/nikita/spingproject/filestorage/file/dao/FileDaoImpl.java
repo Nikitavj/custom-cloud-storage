@@ -47,6 +47,22 @@ public class FileDaoImpl implements FileDao {
 
     @Override
     @SneakyThrows
+    public void renameFile(String path, String newPath, Map<String, String> metaData) {
+        minioClient.copyObject(CopyObjectArgs
+                .builder()
+                .bucket(BUCKET_NAME)
+                .object(newPath)
+                .source(CopySource.builder()
+                        .bucket(BUCKET_NAME)
+                        .object(path)
+                        .build())
+                .metadataDirective(Directive.REPLACE)
+                .userMetadata(metaData)
+                .build());
+    }
+
+    @Override
+    @SneakyThrows
     public StatObjectResponse getStatFile(String path) {
         return minioClient.statObject(StatObjectArgs
                 .builder()

@@ -19,5 +19,8 @@ public interface FileDao {
 
     InputStream downloadFile(String path);
 
+    void renameFile(String path, String newPath, Map<String, String> metaData);
+
     StatObjectResponse getStatFile(String path);
+
 }

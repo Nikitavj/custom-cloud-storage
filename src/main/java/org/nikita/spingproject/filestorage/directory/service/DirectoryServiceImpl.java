@@ -43,7 +43,7 @@ public class DirectoryServiceImpl implements DirectoryService {
         List<EntityStorage> entities = items.stream()
                 .map(ItemToEntityStorageMapper::map)
                 .collect(Collectors.toList());
-        return new ObjectsDirectoryDto(entities);
+            return new ObjectsDirectoryDto(entities);
     }
 
     @Override

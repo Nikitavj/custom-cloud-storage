@@ -4,7 +4,6 @@ import io.minio.messages.Item;
 import org.nikita.spingproject.filestorage.commons.EntityStorage;
 import org.nikita.spingproject.filestorage.file.File;
 
-import javax.swing.text.html.parser.Entity;
 import java.util.Map;
 
 public class ItemToEntityStorageMapper {
@@ -24,21 +23,4 @@ public class ItemToEntityStorageMapper {
                     true);
         }
     }
-
-
-
-
-
-//    public static File mappToFile(Item item) {
-//        return new File(
-//                item.userMetadata().get("X-Amz-Meta-Name"),
-//                item.userMetadata().get("X-Amz-Meta-Link"));
-//
-//    }
-//
-//    public static Folder mappToFolder(Item item) {
-//        return new Folder(
-//                item.userMetadata().get("X-Amz-Meta-Name"),
-//                item.userMetadata().get("X-Amz-Meta-Link"));
-//    }
 }
