@@ -1,8 +1,6 @@
 package org.nikita.spingproject.filestorage.commons;
 
-import io.minio.errors.*;
-import org.nikita.spingproject.filestorage.directory.dto.FolderDto;
-import org.nikita.spingproject.filestorage.directory.dto.ObjectsDirectoryDto;
+import org.nikita.spingproject.filestorage.directory.dto.ObjectsDirDto;
 import org.nikita.spingproject.filestorage.directory.service.DirectoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -11,9 +9,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
+
+import java.util.List;
 
 @Controller
 public class StorageController {
@@ -23,12 +20,13 @@ public class StorageController {
     @GetMapping
     public String index(@AuthenticationPrincipal UserDetails userDetails,
                         @RequestParam(name = "path", required = false) String path,
-                        Model model) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+                        Model model) {
+        if (path == null || path.isBlank()) {
+            path = "/";
+        }
 
-        ObjectsDirectoryDto objectsDir = directoryService.listDirectoryObjects(new FolderDto()
-                .setUserName(userDetails.getUsername())
-                .setPath(path));
-        model.addAttribute("objects_dir", objectsDir.getList());
+        List<EntityStorageDto> entities = directoryService.listDirectoryObjects(new ObjectsDirDto(path, userDetails.getUsername()));
+        model.addAttribute("objects_dir", entities);
         model.addAttribute("current_path", path);
         return "home";
     }

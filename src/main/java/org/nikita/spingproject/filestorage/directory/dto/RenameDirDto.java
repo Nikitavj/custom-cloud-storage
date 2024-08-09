@@ -4,11 +4,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+@Accessors(chain = true)
 @Setter
 @Getter
-@Accessors(chain=true)
-public class FolderDto {
-    private String name;
-    private String path;
+public class RenameDirDto {
+    private String previousPath;
+    private String newName;
     private String userName;
 }

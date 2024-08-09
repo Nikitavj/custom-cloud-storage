@@ -1,23 +1,21 @@
 package org.nikita.spingproject.filestorage.directory.service;
 
-import io.minio.errors.*;
-import org.nikita.spingproject.filestorage.directory.Folder;
-import org.nikita.spingproject.filestorage.directory.dto.FolderDto;
-import org.nikita.spingproject.filestorage.directory.dto.ObjectsDirectoryDto;
+import lombok.SneakyThrows;
+import org.nikita.spingproject.filestorage.commons.EntityStorageDto;
+import org.nikita.spingproject.filestorage.directory.dto.*;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 @Service
 public interface DirectoryService {
 
-    ObjectsDirectoryDto listDirectoryObjects(FolderDto dto) throws InsufficientDataException, ServerException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException;
+    List<EntityStorageDto> listDirectoryObjects(ObjectsDirDto dto);
 
-    Folder createNewFolder(FolderDto dto) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException;
+    DirDto createNewDirectory(NewDirDto dto);
 
-    void deleteFolder(FolderDto dto) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException;
+    void deleteDirectory(DeleteDirDto dto);
 
+    void renameDirectory(RenameDirDto dto);
 }
 

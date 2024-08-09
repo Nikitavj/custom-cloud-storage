@@ -1,20 +1,17 @@
 package org.nikita.spingproject.filestorage.directory;
 
-import io.minio.errors.*;
-import org.nikita.spingproject.filestorage.directory.dto.FolderDto;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import org.nikita.spingproject.filestorage.directory.dto.DeleteDirDto;
+import org.nikita.spingproject.filestorage.directory.dto.DirDto;
+import org.nikita.spingproject.filestorage.directory.dto.NewDirDto;
+import org.nikita.spingproject.filestorage.directory.dto.RenameDirDto;
 import org.nikita.spingproject.filestorage.directory.service.DirectoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/directory")
@@ -25,24 +22,45 @@ public class DirectoryController {
     @PostMapping
     public String createNewFolder(@AuthenticationPrincipal UserDetails userDetails,
                                   @RequestParam(name="current_path", required = false) String currentPath,
-                                  @RequestParam("name_folder") String nameFolder) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+                                  @RequestParam("name_folder") @NotNull @NotEmpty String nameFolder) {
 
-        Folder folder = directoryService.createNewFolder(new FolderDto()
-                .setName(nameFolder)
-                .setPath(currentPath)
-                .setUserName(userDetails.getUsername()));
+        if (currentPath == null || currentPath.isBlank()) {
+            currentPath = "/";
+        }
 
-        return "redirect:/" + "?path=" + folder.getLink();
+        DirDto newDirectory = directoryService.createNewDirectory(new NewDirDto(currentPath, nameFolder, userDetails.getUsername()));
+
+        return "redirect:/" + "?path=" + newDirectory.getRelativePath();
     }
 
     @DeleteMapping
     public String deleteFolder(@AuthenticationPrincipal UserDetails userDetails,
                                @RequestParam(name="current_path", required = false) String currentPath,
-                               @RequestParam String path) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+                               @RequestParam("path") @NotNull @NotEmpty String relPath) {
 
-        directoryService.deleteFolder(new FolderDto()
+        if (currentPath == null || currentPath.isBlank()) {
+            currentPath = "/";
+        }
+
+        directoryService.deleteDirectory(new DeleteDirDto(relPath, userDetails.getUsername()));
+
+        return "redirect:/" + "?path=" + currentPath;
+    }
+
+    @PutMapping
+    public String renameDirectory(@AuthenticationPrincipal UserDetails userDetails,
+                                  @RequestParam("new_name") @NotNull @NotEmpty String newName,
+                                  @RequestParam("path") @NotNull @NotEmpty String relPath,
+                                  @RequestParam(name = "current_path", required = false) String currentPath) {
+
+        if (currentPath == null || currentPath.isBlank()) {
+            currentPath = "/";
+        }
+
+        directoryService.renameDirectory(new RenameDirDto()
+                .setNewName(newName)
                 .setUserName(userDetails.getUsername())
-                .setPath(path));
+                .setPreviousPath(relPath));
 
         return "redirect:/" + "?path=" + currentPath;
     }

@@ -5,7 +5,7 @@ import org.nikita.spingproject.filestorage.file.dto.FileDownloadDto;
 import org.nikita.spingproject.filestorage.file.dto.FileDto;
 import org.nikita.spingproject.filestorage.file.dto.FileRenameDto;
 import org.nikita.spingproject.filestorage.file.dto.FileUploadDto;
-import org.nikita.spingproject.filestorage.service.FileServiceImpl;
+import org.nikita.spingproject.filestorage.file.service.FileServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;

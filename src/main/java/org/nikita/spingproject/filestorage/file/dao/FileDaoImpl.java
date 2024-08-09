@@ -1,13 +1,10 @@
 package org.nikita.spingproject.filestorage.file.dao;
-
 import io.minio.*;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
 import java.io.InputStream;
 import java.util.Map;
-
 
 @Repository
 public class FileDaoImpl implements FileDao {
@@ -47,7 +44,7 @@ public class FileDaoImpl implements FileDao {
 
     @Override
     @SneakyThrows
-    public void renameFile(String path, String newPath, Map<String, String> metaData) {
+    public void copyFile(String path, String newPath, Map<String, String> metaData) {
         minioClient.copyObject(CopyObjectArgs
                 .builder()
                 .bucket(BUCKET_NAME)

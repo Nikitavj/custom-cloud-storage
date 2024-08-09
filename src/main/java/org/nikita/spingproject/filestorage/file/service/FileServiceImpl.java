@@ -1,4 +1,4 @@
-package org.nikita.spingproject.filestorage.service;
+package org.nikita.spingproject.filestorage.file.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.SneakyThrows;
@@ -12,7 +12,6 @@ import org.nikita.spingproject.filestorage.file.dto.FileRenameDto;
 import org.nikita.spingproject.filestorage.file.dto.FileUploadDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -73,7 +72,7 @@ public class FileServiceImpl implements FileService {
         metadata.put("link", createRenameLink(path, dto.getNewName()));
         metadata.put("File", "");
 
-        fileDao.renameFile(
+        fileDao.copyFile(
                 path,
                 newPath,
                 metadata);

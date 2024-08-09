@@ -1,14 +1,8 @@
 package org.nikita.spingproject.filestorage.file.dao;
 
 import io.minio.StatObjectResponse;
-import io.minio.errors.*;
-import lombok.SneakyThrows;
-import org.nikita.spingproject.filestorage.file.File;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
 public interface FileDao {
@@ -19,7 +13,7 @@ public interface FileDao {
 
     InputStream downloadFile(String path);
 
-    void renameFile(String path, String newPath, Map<String, String> metaData);
+    void copyFile(String path, String newPath, Map<String, String> metaData);
 
     StatObjectResponse getStatFile(String path);
 

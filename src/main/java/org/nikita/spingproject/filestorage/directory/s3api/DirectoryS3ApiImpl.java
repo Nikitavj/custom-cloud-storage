@@ -1,4 +1,4 @@
-package org.nikita.spingproject.filestorage.directory.dao;
+package org.nikita.spingproject.filestorage.directory.s3api;
 
 import io.minio.*;
 import io.minio.messages.DeleteError;
@@ -7,12 +7,13 @@ import io.minio.messages.Item;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
 import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Map;
 
 @Repository
-public class DirectoryDaoImpl implements DirectoryDao {
+public class DirectoryS3ApiImpl implements DirectoryS3Api {
     private static String BUCKET_NAME = "user-files";
 
     @Autowired
@@ -20,7 +21,17 @@ public class DirectoryDaoImpl implements DirectoryDao {
 
     @SneakyThrows
     @Override
-    public void createFolder(Map<String, String> metaData, String path) {
+    public StatObjectResponse getInfoDirectory(String path) {
+        return minioClient.statObject(StatObjectArgs
+                .builder()
+                .bucket(BUCKET_NAME)
+                .object(path)
+                .build());
+    }
+
+    @SneakyThrows
+    @Override
+    public void createDirectory(Map<String, String> metaData, String path) {
         minioClient.putObject(PutObjectArgs
                 .builder()
                 .bucket(BUCKET_NAME)
