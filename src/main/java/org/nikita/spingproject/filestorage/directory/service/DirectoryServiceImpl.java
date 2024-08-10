@@ -4,11 +4,11 @@ import io.minio.Result;
 import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
 import lombok.SneakyThrows;
-import org.nikita.spingproject.filestorage.commons.EntityStorageDto;
+import org.nikita.spingproject.filestorage.commons.ObjectStorageDto;
 import org.nikita.spingproject.filestorage.directory.DirPathService;
 import org.nikita.spingproject.filestorage.directory.Directory;
 import org.nikita.spingproject.filestorage.directory.ItemToEntityStorageMapper;
-import org.nikita.spingproject.filestorage.directory.repository.DirectoryRepositoryImpl;
+import org.nikita.spingproject.filestorage.directory.repository.DirectoryDaoImpl;
 import org.nikita.spingproject.filestorage.directory.s3api.DirectoryS3Api;
 import org.nikita.spingproject.filestorage.directory.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,28 +26,23 @@ public class DirectoryServiceImpl implements DirectoryService {
     @Autowired
     private RenameDirectoryService renameDirectoryService;
     @Autowired
-    private DirectoryRepositoryImpl directRepo;
+    private DirectoryDaoImpl directoryDao;
 
     @Override
-    @SneakyThrows
-    public List<EntityStorageDto> listDirectoryObjects(ObjectsDirDto dto) {
 
-        String path = dirPathService.createFullPath(
+    @SneakyThrows
+    public List<ObjectStorageDto> listObjectsDirectory(ObjectsDirDto dto) {
+        String absolutPath = dirPathService.createAbsolutPath(
                 dto.getRelativePath(),
                 dto.getUserName());
 
-        Iterable<Result<Item>> list = directoryS3Api.getObjectsDirectory(path);
-        ArrayList<Item> items = new ArrayList<>();
-        for (Result<Item> itemResult : list) {
-            Item item = itemResult.get();
-            if (!item.isDir()) {
-                items.add(item);
-            }
-        }
-        List<EntityStorageDto> entities = items.stream()
+        Directory directory = directoryDao.get(absolutPath);
+
+
+        List<ObjectStorageDto> entities = items.stream()
                 .map(ItemToEntityStorageMapper::map)
                 .collect(Collectors.toList());
-            return entities;
+        return entities;
     }
 
     @Override
@@ -60,7 +55,7 @@ public class DirectoryServiceImpl implements DirectoryService {
                 .absolutePath(absolutePath)
                 .relativePath(relativePath)
                 .build();
-        directRepo.add(directory);
+        directoryDao.add(directory);
 
         return new DirDto(dto.getName(), relativePath);
     }
@@ -68,7 +63,7 @@ public class DirectoryServiceImpl implements DirectoryService {
     @Override
     @SneakyThrows
     public void deleteDirectory(DeleteDirDto dto) {
-        String fullPath = dirPathService.createFullPath(
+        String fullPath = dirPathService.createAbsolutPath(
                 dto.getRelativePath(),
                 dto.getUserName());
 
@@ -94,21 +89,5 @@ public class DirectoryServiceImpl implements DirectoryService {
         renameDirectoryService.rename(dto.getPreviousPath(), dto.getNewName(), dto.getUserName());
 
 
-
-
-
-
-
-
-
-
-    }
-
-    private Map<String, String> createMetaData(String name, String relPath) {
-        Map<String, String> metaData = new HashMap<>();
-        metaData.put("name", name);
-        metaData.put("link", relPath);
-        metaData.put("folder", "");
-        return metaData;
     }
 }

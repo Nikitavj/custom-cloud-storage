@@ -1,19 +1,17 @@
 package org.nikita.spingproject.filestorage.file;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.nikita.spingproject.filestorage.commons.EntityStorage;
+import lombok.*;
+import org.nikita.spingproject.filestorage.commons.EntityS3;
 
 import java.io.InputStream;
 
-@Data
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class File extends EntityStorage {
+@Builder
+public class File extends EntityS3 {
     private InputStream inputStream;
-
-    public File(String name, String link, boolean isDir) {
-        super(name, link, isDir);
-    }
+    private String name;
+    private String absolutePath;
+    private String relativePath;
 }

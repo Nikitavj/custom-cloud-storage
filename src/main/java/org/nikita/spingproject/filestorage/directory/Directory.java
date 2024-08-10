@@ -1,6 +1,7 @@
 package org.nikita.spingproject.filestorage.directory;
 
 import lombok.*;
+import org.nikita.spingproject.filestorage.commons.EntityS3;
 import org.nikita.spingproject.filestorage.file.File;
 import java.util.List;
 
@@ -9,7 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Directory{
+public class Directory extends EntityS3 {
     private String name;
     private String absolutePath;
     private String relativePath;

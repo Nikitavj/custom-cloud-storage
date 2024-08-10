@@ -20,10 +20,10 @@ public class RenameDirectoryService {
 
     @SneakyThrows
     public void rename(String previousRelPath, String newName, String userName) {
-        String prevAbsolutPath = dirPathService.createFullPath(previousRelPath, userName);
+        String prevAbsolutPath = dirPathService.createAbsolutPath(previousRelPath, userName);
 
         String targetRelativePath = dirPathService.createRelativePathRenameDir(previousRelPath, newName);
-        String targetAbsolutPath = dirPathService.createFullPath(targetRelativePath, userName);
+        String targetAbsolutPath = dirPathService.createAbsolutPath(targetRelativePath, userName);
 
         List<Item> objectsPaths = new ArrayList<>();
         Iterable<Result<Item>> results = directoryS3Api.getObjectsDirectoryRecursive(prevAbsolutPath);

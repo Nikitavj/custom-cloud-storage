@@ -18,7 +18,7 @@ public class DirPathService {
         return String.format("user-%s-files", user.getId());
     }
 
-    public String createFullPath(String relativePath, String userName) {
+    public String createAbsolutPath(String relativePath, String userName) {
         String rootPath = createRootPathForUser(userName);
         if (relativePath.equals("/")) {
             return String.format("%s/", rootPath);

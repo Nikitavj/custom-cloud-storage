@@ -1,16 +1,13 @@
 package org.nikita.spingproject.filestorage.commons;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
-public class EntityStorageDto {
+@Builder
+public class EntityS3 {
     private String name;
+    private String absolutePath;
     private String relativePath;
     private boolean isDir;
 }
