@@ -9,7 +9,7 @@ import java.util.List;
 @Service
 public interface DirectoryService {
 
-    List<ObjectStorageDto> listObjectsDirectory(ObjectsDirDto dto);
+    List<ObjectStorageDto> getObjectsDirectory(ObjectsDirDto dto);
 
     DirDto createNewDirectory(NewDirDto dto);
 

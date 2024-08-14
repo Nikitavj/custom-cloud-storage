@@ -21,7 +21,7 @@ public class DirectoryController {
 
     @PostMapping
     public String createNewFolder(@AuthenticationPrincipal UserDetails userDetails,
-                                  @RequestParam(name="current_path", required = false) String currentPath,
+                                  @RequestParam(name = "current_path", required = false) String currentPath,
                                   @RequestParam("name_folder") @NotNull @NotEmpty String nameFolder) {
 
         if (currentPath == null || currentPath.isBlank()) {
@@ -35,7 +35,7 @@ public class DirectoryController {
 
     @DeleteMapping
     public String deleteFolder(@AuthenticationPrincipal UserDetails userDetails,
-                               @RequestParam(name="current_path", required = false) String currentPath,
+                               @RequestParam(name = "current_path", required = false) String currentPath,
                                @RequestParam("path") @NotNull @NotEmpty String relPath) {
 
         if (currentPath == null || currentPath.isBlank()) {

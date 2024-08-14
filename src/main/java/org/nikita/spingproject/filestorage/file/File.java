@@ -9,7 +9,7 @@ import java.io.InputStream;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class File extends EntityS3 {
+public class File{
     private InputStream inputStream;
     private String name;
     private String absolutePath;

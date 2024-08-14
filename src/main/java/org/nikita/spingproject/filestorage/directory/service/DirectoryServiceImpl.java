@@ -1,54 +1,49 @@
 package org.nikita.spingproject.filestorage.directory.service;
 
-import io.minio.Result;
-import io.minio.messages.DeleteObject;
-import io.minio.messages.Item;
 import lombok.SneakyThrows;
 import org.nikita.spingproject.filestorage.commons.ObjectStorageDto;
-import org.nikita.spingproject.filestorage.directory.DirPathService;
+import org.nikita.spingproject.filestorage.directory.PathDirectoryService;
 import org.nikita.spingproject.filestorage.directory.Directory;
-import org.nikita.spingproject.filestorage.directory.ItemToEntityStorageMapper;
-import org.nikita.spingproject.filestorage.directory.repository.DirectoryDaoImpl;
-import org.nikita.spingproject.filestorage.directory.s3api.DirectoryS3Api;
 import org.nikita.spingproject.filestorage.directory.dto.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.nikita.spingproject.filestorage.directory.repository.DirectoryDaoImpl;
+import org.nikita.spingproject.filestorage.file.File;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class DirectoryServiceImpl implements DirectoryService {
-    @Autowired
-    private DirectoryS3Api directoryS3Api;
-    @Autowired
-    private DirPathService dirPathService;
-    @Autowired
+    private PathDirectoryService pathDirectoryService;
     private RenameDirectoryService renameDirectoryService;
-    @Autowired
     private DirectoryDaoImpl directoryDao;
 
+    public DirectoryServiceImpl(PathDirectoryService pathDirectoryService, RenameDirectoryService renameDirectoryService, DirectoryDaoImpl directoryDao) {
+        this.pathDirectoryService = pathDirectoryService;
+        this.renameDirectoryService = renameDirectoryService;
+        this.directoryDao = directoryDao;
+    }
+
     @Override
-
     @SneakyThrows
-    public List<ObjectStorageDto> listObjectsDirectory(ObjectsDirDto dto) {
-        String absolutPath = dirPathService.createAbsolutPath(
-                dto.getRelativePath(),
-                dto.getUserName());
+    public List<ObjectStorageDto> getObjectsDirectory(ObjectsDirDto dto) {
+        String absolutePath = pathDirectoryService.absolutPath(dto.getRelativePath(), dto.getUserName());
+        Directory directory = directoryDao.get(absolutePath);
 
-        Directory directory = directoryDao.get(absolutPath);
-
-
-        List<ObjectStorageDto> entities = items.stream()
-                .map(ItemToEntityStorageMapper::map)
-                .collect(Collectors.toList());
-        return entities;
+        List<ObjectStorageDto> objects = new ArrayList<>();
+        for (Directory dir: directory.getDirectories()) {
+            objects.add(mapDirToObjStorage(dir));
+        }
+        for (File file: directory.getFiles()) {
+            objects.add(mapFileToObjStorage(file));
+        }
+        return objects;
     }
 
     @Override
     public DirDto createNewDirectory(NewDirDto dto) {
-        String absolutePath = dirPathService.createFullPathNewDir(dto.getCurrentPath(), dto.getName(), dto.getUserName());
-        String relativePath = dirPathService.createRelativePath(dto.getCurrentPath(), dto.getName());
+        String absolutePath = pathDirectoryService.absolutePathNewDir(dto.getCurrentPath(), dto.getName(), dto.getUserName());
+        String relativePath = pathDirectoryService.relativePath(dto.getCurrentPath(), dto.getName());
 
         Directory directory = Directory.builder()
                 .name(dto.getName())
@@ -63,31 +58,37 @@ public class DirectoryServiceImpl implements DirectoryService {
     @Override
     @SneakyThrows
     public void deleteDirectory(DeleteDirDto dto) {
-        String fullPath = dirPathService.createAbsolutPath(
-                dto.getRelativePath(),
-                dto.getUserName());
-
-        List<DeleteObject> deleteObjects = new LinkedList<>();
-        Iterable<Result<Item>> results = directoryS3Api.getObjectsDirectoryRecursive(fullPath);
-        for (Result<Item> result : results) {
-            deleteObjects.add(
-                    new DeleteObject(
-                            result.get().objectName()));
-        }
-        directoryS3Api.deleteObjects(deleteObjects);
-
-        String pathMetaDataObject = dirPathService.createPathMetaDataObject(
-                dto.getRelativePath(),
-                dto.getUserName());
-        directoryS3Api.deleteObject(pathMetaDataObject);
+        String absolutePath = pathDirectoryService.absolutPath(dto.getRelativePath(), dto.getUserName());
+        directoryDao.remove(absolutePath);
     }
 
     @Override
     @SneakyThrows
     public void renameDirectory(RenameDirDto dto) {
+        String previousAbsolutePath = pathDirectoryService.absolutPath(dto.getPreviousPath(), dto.getUserName());
+        String newAbsolutePath = pathDirectoryService.renameAbsolutePath(previousAbsolutePath, dto.getNewName());
+        String newRelativePath = pathDirectoryService.renameRelativePath(dto.getPreviousPath(), dto.getNewName());
+        directoryDao.rename(
+                previousAbsolutePath,
+                newAbsolutePath,
+                dto.getPreviousPath(),
+                newRelativePath,
+                dto.getNewName());
+    }
 
-        renameDirectoryService.rename(dto.getPreviousPath(), dto.getNewName(), dto.getUserName());
+    private ObjectStorageDto mapFileToObjStorage(File file) {
+        return ObjectStorageDto.builder()
+                .name(file.getName())
+                .relativePath(file.getRelativePath())
+                .isDir(false)
+                .build();
+    }
 
-
+    private ObjectStorageDto mapDirToObjStorage(Directory directory) {
+        return ObjectStorageDto.builder()
+                .name(directory.getName())
+                .relativePath(directory.getRelativePath())
+                .isDir(true)
+                .build();
     }
 }

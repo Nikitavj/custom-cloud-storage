@@ -32,8 +32,8 @@ public class FileServiceImpl implements FileService {
 
         Map<String, String> metadata = new HashMap<>();
         metadata.put("name", dto.getName());
-        metadata.put("link", createLink(dto.getPath(), dto.getName()));
-        metadata.put("File", "");
+        metadata.put("rel_path", createLink(dto.getPath(), dto.getName()));
+        metadata.put("file", "");
 
         fileDao.putFile(
                 metadata,
@@ -69,8 +69,8 @@ public class FileServiceImpl implements FileService {
 
         Map<String, String> metadata = new HashMap<>();
         metadata.put("name", dto.getNewName());
-        metadata.put("link", createRenameLink(path, dto.getNewName()));
-        metadata.put("File", "");
+        metadata.put("rel_path", createRenameLink(path, dto.getNewName()));
+        metadata.put("file", "");
 
         fileDao.copyFile(
                 path,

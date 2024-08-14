@@ -10,7 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Directory extends EntityS3 {
+public class Directory{
     private String name;
     private String absolutePath;
     private String relativePath;

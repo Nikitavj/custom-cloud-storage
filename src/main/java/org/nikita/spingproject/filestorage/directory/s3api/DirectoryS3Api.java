@@ -12,15 +12,17 @@ import java.util.Map;
 @Repository
 public interface DirectoryS3Api {
 
-    StatObjectResponse getInfoDirectory(String path);
+    StatObjectResponse getInfo(String path);
 
-    void createDirectory(Map<String, String> metaData, String path);
+    void create(Map<String, String> metaData, String path);
 
-    Iterable<Result<Item>> getObjectsDirectory(String path);
+    Iterable<Result<Item>> getObjects(String path);
 
-    Iterable<Result<Item>> getObjectsDirectoryRecursive(String path);
+    Iterable<Result<Item>> getObjectsRecursive(String path);
 
     void deleteObjects(List<DeleteObject> objects);
 
     void deleteObject(String path);
+
+    void copyObject(String path, String newPath, Map<String, String> metaData);
 }

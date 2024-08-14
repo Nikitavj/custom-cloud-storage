@@ -21,7 +21,7 @@ public class DirectoryS3ApiImpl implements DirectoryS3Api {
 
     @SneakyThrows
     @Override
-    public StatObjectResponse getInfoDirectory(String path) {
+    public StatObjectResponse getInfo(String path) {
         return minioClient.statObject(StatObjectArgs
                 .builder()
                 .bucket(BUCKET_NAME)
@@ -31,7 +31,7 @@ public class DirectoryS3ApiImpl implements DirectoryS3Api {
 
     @SneakyThrows
     @Override
-    public void createDirectory(Map<String, String> metaData, String path) {
+    public void create(Map<String, String> metaData, String path) {
         minioClient.putObject(PutObjectArgs
                 .builder()
                 .bucket(BUCKET_NAME)
@@ -42,7 +42,7 @@ public class DirectoryS3ApiImpl implements DirectoryS3Api {
     }
 
     @Override
-    public Iterable<Result<Item>> getObjectsDirectory(String path) {
+    public Iterable<Result<Item>> getObjects(String path) {
         return minioClient.listObjects(ListObjectsArgs
                 .builder()
                 .bucket(BUCKET_NAME)
@@ -53,12 +53,13 @@ public class DirectoryS3ApiImpl implements DirectoryS3Api {
     }
 
     @Override
-    public Iterable<Result<Item>> getObjectsDirectoryRecursive(String path) {
+    public Iterable<Result<Item>> getObjectsRecursive(String path) {
         return minioClient.listObjects(ListObjectsArgs
                 .builder()
                 .bucket(BUCKET_NAME)
                 .prefix(path)
                 .recursive(true)
+                .includeUserMetadata(true)
                 .build());
     }
 
@@ -86,5 +87,21 @@ public class DirectoryS3ApiImpl implements DirectoryS3Api {
             System.out.println(
                     "Error in deleting object " + error.objectName() + "; " + error.message());
         }
+    }
+
+    @Override
+    @SneakyThrows
+    public void copyObject(String path, String newPath, Map<String, String> metaData) {
+        minioClient.copyObject(CopyObjectArgs
+                .builder()
+                .bucket(BUCKET_NAME)
+                .object(newPath)
+                .source(CopySource.builder()
+                        .bucket(BUCKET_NAME)
+                        .object(path)
+                        .build())
+                .metadataDirective(Directive.REPLACE)
+                .userMetadata(metaData)
+                .build());
     }
 }

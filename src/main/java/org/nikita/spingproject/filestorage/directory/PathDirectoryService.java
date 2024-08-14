@@ -8,29 +8,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class DirPathService {
+public class PathDirectoryService {
     @Autowired
     private UserRepository userRepository;
 
-    private String createRootPathForUser(String userName) {
+    private String rootPathForUser(String userName) {
         User user = userRepository.findUserByEmail(userName)
                 .orElseThrow(() -> new EntityNotFoundException("User " + userName + "not exist"));
         return String.format("user-%s-files", user.getId());
     }
 
-    public String createAbsolutPath(String relativePath, String userName) {
-        String rootPath = createRootPathForUser(userName);
+    public String absolutPath(String relativePath, String userName) {
+        String rootPath = rootPathForUser(userName);
         if (relativePath.equals("/")) {
-            return String.format("%s/", rootPath);
+            return String.format("%s", rootPath);
         } else {
-            return String.format("%s/%s/",
+            return String.format("%s/%s",
                     rootPath,
                     relativePath);
         }
     }
 
-    public String createFullPathNewDir(String currentPath, String name, String userName) {
-        String rootPath = createRootPathForUser(userName);
+    public String absolutePathNewDir(String currentPath, String name, String userName) {
+        String rootPath = rootPathForUser(userName);
         if (currentPath.equals("/")) {
             return String.format("%s/%s", rootPath, name);
         } else {
@@ -38,7 +38,7 @@ public class DirPathService {
         }
     }
 
-    public String createRelativePath(String path, String name) {
+    public String relativePath(String path, String name) {
         if (path.equals("/")) {
             return name;
         } else {
@@ -46,7 +46,7 @@ public class DirPathService {
         }
     }
 
-    public String createRelativePathRenameDir(String previousPath, String newName) {
+    public String relativePathRenameDir(String previousPath, String newName) {
         if (previousPath.contains("/")) {
             String path = StringUtils.substringBeforeLast(previousPath, "/");
             return String.format("%s/%s", path, newName);
@@ -55,19 +55,16 @@ public class DirPathService {
         }
     }
 
-    public String createPathMetaDataObjectForRenameDir(String relativePath, String newName, String nameUser) {
-        String rootPath = createRootPathForUser(nameUser);
-        String relPath = createRelativePathRenameDir(relativePath, newName);
-        return String.format("%s/%s_", rootPath, relPath);
+    public String renameAbsolutePath(String previousAbsolutePath, String newName) {
+        String path = StringUtils.removeEnd(previousAbsolutePath,"/");
+        return StringUtils.substringBeforeLast(path, "/") + "/" + newName;
     }
 
-    public String createPathMetaDataObject(String pathFolder, String nameUser) {
-        if (pathFolder.equals("/")) {
-            return String.format("%s_", createRootPathForUser(nameUser));
+    public String renameRelativePath(String previousPath, String newName) {
+        if(previousPath.contains("/")) {
+            return StringUtils.substringBeforeLast(previousPath, "/") + "/" + newName;
         } else {
-            return String.format("%s/%s_",
-                    createRootPathForUser(nameUser),
-                    pathFolder);
+            return newName;
         }
     }
 }

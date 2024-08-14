@@ -25,7 +25,7 @@ public class StorageController {
             path = "/";
         }
 
-        List<ObjectStorageDto> entities = directoryService.listObjectsDirectory(new ObjectsDirDto(path, userDetails.getUsername()));
+        List<ObjectStorageDto> entities = directoryService.getObjectsDirectory(new ObjectsDirDto(path, userDetails.getUsername()));
         model.addAttribute("objects_dir", entities);
         model.addAttribute("current_path", path);
         return "home";
