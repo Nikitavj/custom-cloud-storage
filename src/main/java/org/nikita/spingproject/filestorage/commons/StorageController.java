@@ -1,5 +1,6 @@
 package org.nikita.spingproject.filestorage.commons;
 
+import org.nikita.spingproject.filestorage.commons.breadcrumbs.BreadcrumbsUtil;
 import org.nikita.spingproject.filestorage.directory.dto.ObjectsDirDto;
 import org.nikita.spingproject.filestorage.directory.service.DirectoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ public class StorageController {
         List<ObjectStorageDto> entities = directoryService.getObjectsDirectory(new ObjectsDirDto(path, userDetails.getUsername()));
         model.addAttribute("objects_dir", entities);
         model.addAttribute("current_path", path);
+        model.addAttribute("bread_crumbs", BreadcrumbsUtil.createBreadcrumbs(path));
         return "home";
     }
 
