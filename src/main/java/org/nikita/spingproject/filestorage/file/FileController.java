@@ -25,14 +25,16 @@ public class FileController {
     @SneakyThrows
     @PostMapping
     public String uploadFile(@AuthenticationPrincipal UserDetails userDetails,
-                             @RequestParam("file") MultipartFile multFile,
+                             @RequestParam("file") MultipartFile[] multFiles,
                              @RequestParam String path) {
 
-        fileServiceImpl.uploadFile(new FileUploadDto()
-                .setInputStream(multFile.getInputStream())
-                .setName(multFile.getOriginalFilename())
-                .setPath(path)
-                .setUserName(userDetails.getUsername()));
+        for (MultipartFile multFile : multFiles) {
+            fileServiceImpl.uploadFile(new FileUploadDto()
+                    .setInputStream(multFile.getInputStream())
+                    .setName(multFile.getOriginalFilename())
+                    .setPath(path)
+                    .setUserName(userDetails.getUsername()));
+        }
 
         return "redirect:/" + "?path=" + path;
     }

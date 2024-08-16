@@ -6,14 +6,12 @@ import org.nikita.spingproject.filestorage.directory.Directory;
 import org.nikita.spingproject.filestorage.directory.PathDirectoryService;
 import org.nikita.spingproject.filestorage.directory.repository.DirectoryDaoImpl;
 import org.nikita.spingproject.filestorage.file.File;
-import org.nikita.spingproject.filestorage.file.dao.FileDaoImpl;
 import org.nikita.spingproject.filestorage.search.dto.SearchFileDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class SearchFileService {
@@ -37,7 +35,6 @@ public class SearchFileService {
                 findObjects.add(mapFileToObjStorage(file));
             }
         }
-
         return findObjects;
     }
 

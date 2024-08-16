@@ -32,9 +32,9 @@ Create new folder
 
 <br>
 
+File to upload:
 <form th:method="post" enctype="multipart/form-data" th:action="@{/file}">
-    File to upload:
-    <input type="file" name="file">
+    <input type="file" name="file" multiple>
     <input name="path" type="hidden" th:value="${current_path}">
     <br/>
     <input type="submit" value="Upload">
