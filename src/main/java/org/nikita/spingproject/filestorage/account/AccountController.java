@@ -56,9 +56,4 @@ public class AccountController {
     public String showLoginForm() {
         return "login";
     }
-
-    @GetMapping("/admin")
-    public String adminPage() {
-        return "admin";
-    }
 }

@@ -12,7 +12,7 @@ public class PathDirectoryService {
     @Autowired
     private UserRepository userRepository;
 
-    private String rootPathForUser(String userName) {
+    public String rootPathForUser(String userName) {
         User user = userRepository.findUserByEmail(userName)
                 .orElseThrow(() -> new EntityNotFoundException("User " + userName + "not exist"));
         return String.format("user-%s-files", user.getId());

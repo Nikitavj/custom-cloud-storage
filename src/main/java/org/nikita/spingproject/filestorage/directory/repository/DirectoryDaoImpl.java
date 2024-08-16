@@ -86,6 +86,18 @@ public class DirectoryDaoImpl implements DirectoryDao {
         this.remove(previousAbsolutePath);
     }
 
+    public Directory getAll(String absolutePath) {
+        Iterable<Result<Item>> results = directoryS3Api.getObjectsRecursive(absolutePath + "/");
+        List<Item> items = getListItemsNoIsDir(results);
+
+        return Directory.builder()
+                .absolutePath(absolutePath)
+                .directories(getDirFromItems(items))
+                .files(getFilesFromItems(items))
+                .build();
+
+    }
+
 
     private Map<String, String> createMetaDataDir(String name, String relPath) {
         Map<String, String> metaData = new HashMap<>();

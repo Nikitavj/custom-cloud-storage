@@ -15,12 +15,10 @@ import java.util.List;
 @Service
 public class DirectoryServiceImpl implements DirectoryService {
     private PathDirectoryService pathDirectoryService;
-    private RenameDirectoryService renameDirectoryService;
     private DirectoryDaoImpl directoryDao;
 
-    public DirectoryServiceImpl(PathDirectoryService pathDirectoryService, RenameDirectoryService renameDirectoryService, DirectoryDaoImpl directoryDao) {
+    public DirectoryServiceImpl(PathDirectoryService pathDirectoryService, DirectoryDaoImpl directoryDao) {
         this.pathDirectoryService = pathDirectoryService;
-        this.renameDirectoryService = renameDirectoryService;
         this.directoryDao = directoryDao;
     }
 

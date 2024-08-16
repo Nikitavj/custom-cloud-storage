@@ -15,6 +15,12 @@
     <input type="submit" value="Log-out"/>
 </form>
 
+Search
+<form method="get" th:action="@{/search}">
+    <input type="text" name="query">
+    <input type="submit" value="Search">
+</form>
+
 <br>
 
 Create new folder
@@ -33,12 +39,6 @@ Create new folder
     <br/>
     <input type="submit" value="Upload">
 </form>
-
-<!--<ul th:each="breadCrumb:${bread_crumbs}">-->
-
-<!--      <li>/<a th:href="@{/(path=${breadCrumb.link})}" th:text="${breadCrumb.name}"> </a></li>-->
-
-<!--</ul>-->
 
 <nav aria-label="breadcrumb" >
     <ol class="breadcrumb" >
