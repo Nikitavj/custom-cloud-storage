@@ -12,15 +12,20 @@ import org.nikita.spingproject.filestorage.file.dto.FileRenameDto;
 import org.nikita.spingproject.filestorage.file.dto.FileUploadDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.HashMap;
 import java.util.Map;
 
 @Service
 public class FileServiceImpl implements FileService {
-    @Autowired
     FileDao fileDao;
-    @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    public FileServiceImpl(FileDao fileDao, UserRepository userRepository) {
+        this.fileDao = fileDao;
+        this.userRepository = userRepository;
+    }
 
     @Override
     @SneakyThrows
@@ -58,8 +63,7 @@ public class FileServiceImpl implements FileService {
                 dto.getPath(),
                 dto.getUserName());
 
-        return new FileDownloadDto()
-                .setInputStream(fileDao.downloadFile(path));
+        return new FileDownloadDto(fileDao.downloadFile(path));
     }
 
     @Override

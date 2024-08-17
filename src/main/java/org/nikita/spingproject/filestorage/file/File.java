@@ -1,11 +1,13 @@
 package org.nikita.spingproject.filestorage.file;
-import lombok.*;
-import org.nikita.spingproject.filestorage.commons.EntityS3;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.InputStream;
 
-@Setter
-@Getter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder

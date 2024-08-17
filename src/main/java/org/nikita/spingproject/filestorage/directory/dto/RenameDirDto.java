@@ -1,12 +1,12 @@
 package org.nikita.spingproject.filestorage.directory.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Accessors(chain = true)
-@Setter
-@Getter
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class RenameDirDto {
     private String previousPath;
     private String newName;

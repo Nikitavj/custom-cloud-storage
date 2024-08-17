@@ -22,7 +22,10 @@ Search
     <span th:if="${!entity.isDir()}" th:text="File">Type</span>
     <span th:if="${entity.isDir()}" th:text="Folder">Type</span>
 
-    <div>
+    <div th:if="${entity.relativePath.isBlank()}">
+        <a th:text="${entity.name}" th:href="@{/}">Folder Name</a>
+    </div>
+    <div th:unless="${entity.relativePath.isBlank()}">
         <a th:text="${entity.name}" th:href="@{/(path=${entity.relativePath})}">Folder Name</a>
     </div>
 

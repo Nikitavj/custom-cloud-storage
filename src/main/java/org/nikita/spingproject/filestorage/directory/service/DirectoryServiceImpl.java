@@ -2,11 +2,13 @@ package org.nikita.spingproject.filestorage.directory.service;
 
 import lombok.SneakyThrows;
 import org.nikita.spingproject.filestorage.commons.ObjectStorageDto;
-import org.nikita.spingproject.filestorage.directory.PathDirectoryService;
 import org.nikita.spingproject.filestorage.directory.Directory;
+import org.nikita.spingproject.filestorage.directory.PathDirectoryService;
+import org.nikita.spingproject.filestorage.directory.PathDirectoryServiceImpl;
 import org.nikita.spingproject.filestorage.directory.dto.*;
-import org.nikita.spingproject.filestorage.directory.repository.DirectoryDaoImpl;
+import org.nikita.spingproject.filestorage.directory.repository.DirectoryDao;
 import org.nikita.spingproject.filestorage.file.File;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -15,9 +17,10 @@ import java.util.List;
 @Service
 public class DirectoryServiceImpl implements DirectoryService {
     private PathDirectoryService pathDirectoryService;
-    private DirectoryDaoImpl directoryDao;
+    private DirectoryDao directoryDao;
 
-    public DirectoryServiceImpl(PathDirectoryService pathDirectoryService, DirectoryDaoImpl directoryDao) {
+    @Autowired
+    public DirectoryServiceImpl(PathDirectoryServiceImpl pathDirectoryService, DirectoryDao directoryDao) {
         this.pathDirectoryService = pathDirectoryService;
         this.directoryDao = directoryDao;
     }

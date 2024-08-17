@@ -1,14 +1,14 @@
 package org.nikita.spingproject.filestorage.file.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Setter
-@Getter
-@Accessors(chain = true)
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class FileRenameDto {
-    String path;
-    String newName;
-    String userName;
+    private String path;
+    private String newName;
+    private String userName;
 }

@@ -19,8 +19,12 @@ import java.util.stream.Collectors;
 
 @Repository
 public class DirectoryDaoImpl implements DirectoryDao {
-    @Autowired
     private DirectoryS3Api directoryS3Api;
+
+    @Autowired
+    public DirectoryDaoImpl(DirectoryS3Api directoryS3Api) {
+        this.directoryS3Api = directoryS3Api;
+    }
 
     @Override
     public void add(Directory directory) {
@@ -86,6 +90,7 @@ public class DirectoryDaoImpl implements DirectoryDao {
         this.remove(previousAbsolutePath);
     }
 
+    @Override
     public Directory getAll(String absolutePath) {
         Iterable<Result<Item>> results = directoryS3Api.getObjectsRecursive(absolutePath + "/");
         List<Item> items = getListItemsNoIsDir(results);

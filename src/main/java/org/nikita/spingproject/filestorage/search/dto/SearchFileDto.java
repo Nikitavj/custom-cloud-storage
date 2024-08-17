@@ -2,10 +2,12 @@ package org.nikita.spingproject.filestorage.search.dto;
 
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
 @AllArgsConstructor
-@Getter
+@NoArgsConstructor
 public class SearchFileDto {
     private String name;
     private String userName;

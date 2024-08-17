@@ -16,15 +16,23 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 @RequestMapping("/directory")
 public class DirectoryController {
-    @Autowired
     private DirectoryService directoryService;
+
+    @Autowired
+    public DirectoryController(DirectoryService directoryService) {
+        this.directoryService = directoryService;
+    }
 
     @PostMapping
     public String createNewFolder(@AuthenticationPrincipal UserDetails userDetails,
                                   @RequestParam(name = "current_path", required = false) String currentPath,
                                   @RequestParam("name_folder") @NotNull @NotEmpty String nameFolder) {
 
-        DirDto newDirectory = directoryService.createNewDirectory(new NewDirDto(currentPath, nameFolder, userDetails.getUsername()));
+        DirDto newDirectory = directoryService
+                .createNewDirectory(new NewDirDto(
+                        currentPath,
+                        nameFolder,
+                        userDetails.getUsername()));
 
         return "redirect:/" + "?path=" + newDirectory.getRelativePath();
     }
@@ -32,9 +40,12 @@ public class DirectoryController {
     @DeleteMapping
     public String deleteFolder(@AuthenticationPrincipal UserDetails userDetails,
                                @RequestParam(name = "current_path", required = false) String currentPath,
-                               @RequestParam("path") @NotNull @NotEmpty String relPath) {
+                               @RequestParam("path") @NotNull @NotEmpty String relativePath) {
 
-        directoryService.deleteDirectory(new DeleteDirDto(relPath, userDetails.getUsername()));
+        directoryService.deleteDirectory(
+                new DeleteDirDto(
+                        relativePath,
+                        userDetails.getUsername()));
 
         if (currentPath.isBlank()) {
             return "redirect:/";
@@ -46,13 +57,14 @@ public class DirectoryController {
     @PutMapping
     public String renameDirectory(@AuthenticationPrincipal UserDetails userDetails,
                                   @RequestParam("new_name") @NotNull @NotEmpty String newName,
-                                  @RequestParam("path") @NotNull @NotEmpty String relPath,
+                                  @RequestParam("path") @NotNull @NotEmpty String relativePath,
                                   @RequestParam(name = "current_path", required = false) String currentPath) {
 
-        directoryService.renameDirectory(new RenameDirDto()
-                .setNewName(newName)
-                .setUserName(userDetails.getUsername())
-                .setPreviousPath(relPath));
+        directoryService.renameDirectory(
+                new RenameDirDto(
+                        relativePath,
+                        newName,
+                        userDetails.getUsername()));
 
         if (currentPath.isBlank()) {
             return "redirect:/";

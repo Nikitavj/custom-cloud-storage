@@ -1,16 +1,22 @@
 package org.nikita.spingproject.filestorage.file.dao;
+
 import io.minio.*;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
 import java.io.InputStream;
 import java.util.Map;
 
 @Repository
 public class FileDaoImpl implements FileDao {
     private static String BUCKET_NAME = "user-files";
-    @Autowired
     private MinioClient minioClient;
+
+    @Autowired
+    public FileDaoImpl(MinioClient minioClient) {
+        this.minioClient = minioClient;
+    }
 
     @Override
     @SneakyThrows
@@ -55,16 +61,6 @@ public class FileDaoImpl implements FileDao {
                         .build())
                 .metadataDirective(Directive.REPLACE)
                 .userMetadata(metaData)
-                .build());
-    }
-
-    @Override
-    @SneakyThrows
-    public StatObjectResponse getStatFile(String path) {
-        return minioClient.statObject(StatObjectArgs
-                .builder()
-                .bucket(BUCKET_NAME)
-                .object(path)
                 .build());
     }
 }

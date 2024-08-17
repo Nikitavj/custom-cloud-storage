@@ -1,14 +1,16 @@
 package org.nikita.spingproject.filestorage.file.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.InputStream;
 
-@Setter
-@Getter
-@Accessors(chain = true)
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class FileUploadDto {
     private InputStream inputStream;
     private String name;

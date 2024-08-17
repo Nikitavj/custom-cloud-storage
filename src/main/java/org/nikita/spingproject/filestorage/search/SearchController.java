@@ -24,8 +24,10 @@ public class SearchController {
                          @RequestParam(name = "query", required = false) String query,
                          Model model) {
 
-        List<ObjectStorageDto> findObjects = searchFileService.search(new SearchFileDto(query, userDetails.getUsername()));
-
+        List<ObjectStorageDto> findObjects = searchFileService
+                .search(new SearchFileDto(
+                        query,
+                        userDetails.getUsername()));
         model.addAttribute("find_objects", findObjects);
 
         return "search";

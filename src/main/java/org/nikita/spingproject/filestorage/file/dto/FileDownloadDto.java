@@ -1,13 +1,14 @@
 package org.nikita.spingproject.filestorage.file.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.experimental.Accessors;
+import lombok.NoArgsConstructor;
 
 import java.io.InputStream;
 
 @Data
-@Accessors(chain = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class FileDownloadDto {
-    private String name;
     private InputStream inputStream;
 }

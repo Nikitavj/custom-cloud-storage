@@ -5,7 +5,7 @@ import org.nikita.spingproject.filestorage.commons.breadcrumbs.BreadcrumbsUtil;
 import org.nikita.spingproject.filestorage.directory.dto.ObjectsDirDto;
 import org.nikita.spingproject.filestorage.directory.service.DirectoryService;
 import org.nikita.spingproject.filestorage.file.dto.FileUploadDto;
-import org.nikita.spingproject.filestorage.upload.UploadFilesService;
+import org.nikita.spingproject.filestorage.upload.UploadFilesServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,14 +15,19 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 
 @Controller
 public class StorageController {
-    @Autowired
     private DirectoryService directoryService;
+    private UploadFilesServiceImpl uploadFilesService;
+
     @Autowired
-    private UploadFilesService uploadFilesService;
+    public StorageController(DirectoryService directoryService, UploadFilesServiceImpl uploadFilesService) {
+        this.directoryService = directoryService;
+        this.uploadFilesService = uploadFilesService;
+    }
 
     @GetMapping
     public String index(@AuthenticationPrincipal UserDetails userDetails,
@@ -33,7 +38,7 @@ public class StorageController {
         model.addAttribute("objects_dir", entities);
         model.addAttribute("current_path", path);
         model.addAttribute("bread_crumbs", BreadcrumbsUtil.createBreadcrumbs(path));
-            return "home";
+        return "home";
     }
 
     @SneakyThrows
@@ -43,11 +48,13 @@ public class StorageController {
                          @RequestParam String path) {
 
         for (MultipartFile multFile : multFiles) {
-            uploadFilesService.upload(new FileUploadDto()
-                    .setInputStream(multFile.getInputStream())
-                    .setName(multFile.getOriginalFilename())
-                    .setPath(path)
-                    .setUserName(userDetails.getUsername()));
+            uploadFilesService.upload(
+                    FileUploadDto.builder()
+                            .inputStream(multFile.getInputStream())
+                            .name(multFile.getOriginalFilename())
+                            .path(path)
+                            .userName(userDetails.getUsername())
+                            .build());
         }
 
         if (path.isBlank()) {

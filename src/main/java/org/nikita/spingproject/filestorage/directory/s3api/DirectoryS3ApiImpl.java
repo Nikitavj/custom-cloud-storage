@@ -15,9 +15,12 @@ import java.util.Map;
 @Repository
 public class DirectoryS3ApiImpl implements DirectoryS3Api {
     private static String BUCKET_NAME = "user-files";
+    private MinioClient minioClient;
 
     @Autowired
-    private MinioClient minioClient;
+    public DirectoryS3ApiImpl(MinioClient minioClient) {
+        this.minioClient = minioClient;
+    }
 
     @SneakyThrows
     @Override
