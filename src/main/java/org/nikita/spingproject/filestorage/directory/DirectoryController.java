@@ -24,10 +24,6 @@ public class DirectoryController {
                                   @RequestParam(name = "current_path", required = false) String currentPath,
                                   @RequestParam("name_folder") @NotNull @NotEmpty String nameFolder) {
 
-        if (currentPath == null || currentPath.isBlank()) {
-            currentPath = "/";
-        }
-
         DirDto newDirectory = directoryService.createNewDirectory(new NewDirDto(currentPath, nameFolder, userDetails.getUsername()));
 
         return "redirect:/" + "?path=" + newDirectory.getRelativePath();
@@ -38,13 +34,13 @@ public class DirectoryController {
                                @RequestParam(name = "current_path", required = false) String currentPath,
                                @RequestParam("path") @NotNull @NotEmpty String relPath) {
 
-        if (currentPath == null || currentPath.isBlank()) {
-            currentPath = "/";
-        }
-
         directoryService.deleteDirectory(new DeleteDirDto(relPath, userDetails.getUsername()));
 
-        return "redirect:/" + "?path=" + currentPath;
+        if (currentPath.isBlank()) {
+            return "redirect:/";
+        } else {
+            return "redirect:/" + "?path=" + currentPath;
+        }
     }
 
     @PutMapping
@@ -53,15 +49,15 @@ public class DirectoryController {
                                   @RequestParam("path") @NotNull @NotEmpty String relPath,
                                   @RequestParam(name = "current_path", required = false) String currentPath) {
 
-        if (currentPath == null || currentPath.isBlank()) {
-            currentPath = "/";
-        }
-
         directoryService.renameDirectory(new RenameDirDto()
                 .setNewName(newName)
                 .setUserName(userDetails.getUsername())
                 .setPreviousPath(relPath));
 
-        return "redirect:/" + "?path=" + currentPath;
+        if (currentPath.isBlank()) {
+            return "redirect:/";
+        } else {
+            return "redirect:/" + "?path=" + currentPath;
+        }
     }
 }

@@ -33,8 +33,16 @@ Create new folder
 <br>
 
 File to upload:
-<form th:method="post" enctype="multipart/form-data" th:action="@{/file}">
+<form th:method="post" enctype="multipart/form-data" th:action="@{/}">
     <input type="file" name="file" multiple>
+    <input name="path" type="hidden" th:value="${current_path}">
+    <br/>
+    <input type="submit" value="Upload">
+</form>
+
+Directory to upload:
+<form th:method="post" th:action="@{/}" enctype="multipart/form-data">
+    <input type="file" name="file" multiple webkitdirectory>
     <input name="path" type="hidden" th:value="${current_path}">
     <br/>
     <input type="submit" value="Upload">
@@ -42,6 +50,9 @@ File to upload:
 
 <nav aria-label="breadcrumb" >
     <ol class="breadcrumb" >
+        <li class="breadcrumb-item">
+            <a th:href="@{/}" th:text="root"></a>
+        </li>
         <li class="breadcrumb-item" th:each="breadCrumb:${bread_crumbs}">
             <a th:href="@{/(path=${breadCrumb.link})}" th:text="${breadCrumb.name}"></a>
         </li>

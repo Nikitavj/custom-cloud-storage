@@ -9,9 +9,8 @@ public class BreadcrumbsUtil {
 
     public static List<Breadcrumbs> createBreadcrumbs(String relativePath) {
         List<Breadcrumbs> breadCrumbs = new ArrayList<>();
-        breadCrumbs.add(new Breadcrumbs("root", ""));
 
-        if (relativePath.equals("/")) {
+        if (relativePath == null) {
             return breadCrumbs;
         }
         if (!relativePath.contains("/")) {

@@ -1,5 +1,6 @@
 package org.nikita.spingproject.filestorage.file;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.SneakyThrows;
 import org.nikita.spingproject.filestorage.file.dto.FileDownloadDto;
 import org.nikita.spingproject.filestorage.file.dto.FileDto;
@@ -36,7 +37,11 @@ public class FileController {
                     .setUserName(userDetails.getUsername()));
         }
 
-        return "redirect:/" + "?path=" + path;
+        if (path.isBlank()) {
+            return "redirect:/";
+        } else {
+            return "redirect:/" + "?path=" + path;
+        }
     }
 
     @PutMapping
@@ -49,7 +54,11 @@ public class FileController {
                 .setPath(path)
                 .setUserName(userDetails.getUsername()));
 
-        return "redirect:/" + "?path=" + currentPath;
+        if (currentPath.isBlank()) {
+            return "redirect:/";
+        } else {
+            return "redirect:/" + "?path=" + currentPath;
+        }
     }
 
     @SneakyThrows
@@ -74,6 +83,11 @@ public class FileController {
         fileServiceImpl.deleteFile(new FileDto()
                 .setPath(path)
                 .setUserName(userDetails.getUsername()));
-        return "redirect:/" + "?path=" + currentPath;
+
+        if (currentPath.isBlank()) {
+            return "redirect:/";
+        } else {
+            return "redirect:/" + "?path=" + currentPath;
+        }
     }
 }

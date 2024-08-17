@@ -65,11 +65,11 @@ public class FileServiceImpl implements FileService {
     @Override
     public void renameFile(FileRenameDto dto) {
         String path = createPathForFile(dto.getPath(), dto.getUserName());
-        String newPath = createRenamePath(path, dto.getNewName());
+        String newPath = renameAbsolutePath(path, dto.getNewName());
 
         Map<String, String> metadata = new HashMap<>();
         metadata.put("name", dto.getNewName());
-        metadata.put("rel_path", createRenameLink(path, dto.getNewName()));
+        metadata.put("rel_path", renameLink(path, dto.getNewName()));
         metadata.put("file", "");
 
         fileDao.copyFile(
@@ -81,22 +81,25 @@ public class FileServiceImpl implements FileService {
     }
 
 
-    private String createRenamePath(String previousPath, String newName) {
-        String path1 = StringUtils.substringBeforeLast(previousPath, "/");
-        String newPath = path1 + "/" + newName;
-        return newPath;
+    private String renameAbsolutePath(String oldAsolurtePath, String newName) {
+        String prefix = StringUtils.substringBeforeLast(oldAsolurtePath, "/");
+        String newAsolutePath = prefix + "/" + newName;
+        return newAsolutePath;
     }
 
-    private String createRenameLink(String previousPath, String newNameFile) {
-        String path1 = StringUtils.substringAfter(previousPath, "/");
-        String path2 = StringUtils.substringBeforeLast(path1, "/");
-        return path2 + "/" + newNameFile;
+    private String renameLink(String oldAbsolutePath, String newNameFile) {
+        String oldRelativePath = StringUtils.substringAfter(oldAbsolutePath, "/");
+        String prefix = StringUtils.substringBeforeLast(oldRelativePath, "/");
+        if (prefix.contains("/")) {
+            return prefix + "/" + newNameFile;
+        } else {
+            return newNameFile;
+        }
+
     }
 
     private String createLink(String path, String name) {
-        if (path == null
-                || path.equals("/")
-                || path.isBlank()) {
+        if (path.isBlank()) {
             return name;
         } else {
             return String.format("%s/%s", path, name);
@@ -110,7 +113,7 @@ public class FileServiceImpl implements FileService {
     }
 
     private String createPathForSaveNewFile(String path, String nameFile, String nameUser) {
-        if (path == null || path.equals("/") || path.isBlank()) {
+        if (path.isBlank()) {
             path = "";
         } else {
             path = path + "/";

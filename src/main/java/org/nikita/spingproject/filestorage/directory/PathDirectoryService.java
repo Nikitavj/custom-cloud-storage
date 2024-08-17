@@ -20,7 +20,7 @@ public class PathDirectoryService {
 
     public String absolutPath(String relativePath, String userName) {
         String rootPath = rootPathForUser(userName);
-        if (relativePath.equals("/")) {
+        if (relativePath == null) {
             return String.format("%s", rootPath);
         } else {
             return String.format("%s/%s",
@@ -31,7 +31,7 @@ public class PathDirectoryService {
 
     public String absolutePathNewDir(String currentPath, String name, String userName) {
         String rootPath = rootPathForUser(userName);
-        if (currentPath.equals("/")) {
+        if (currentPath.isBlank()) {
             return String.format("%s/%s", rootPath, name);
         } else {
             return String.format("%s/%s/%s", rootPath, currentPath, name);
@@ -39,19 +39,10 @@ public class PathDirectoryService {
     }
 
     public String relativePath(String path, String name) {
-        if (path.equals("/")) {
+        if (path.isBlank()) {
             return name;
         } else {
             return String.format("%s/%s", path, name);
-        }
-    }
-
-    public String relativePathRenameDir(String previousPath, String newName) {
-        if (previousPath.contains("/")) {
-            String path = StringUtils.substringBeforeLast(previousPath, "/");
-            return String.format("%s/%s", path, newName);
-        } else {
-            return newName;
         }
     }
 
