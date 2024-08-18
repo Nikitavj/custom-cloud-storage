@@ -1,7 +1,6 @@
 package org.nikita.spingproject.filestorage.search;
 
 import org.nikita.spingproject.filestorage.commons.ObjectStorageDto;
-import org.nikita.spingproject.filestorage.search.dto.SearchFileDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;

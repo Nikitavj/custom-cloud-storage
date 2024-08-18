@@ -32,16 +32,19 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(
-                        auth -> auth.requestMatchers("/admin").hasRole("ADMIN")
-                                .requestMatchers("log-up", "log-in").permitAll()
-                                .anyRequest().hasAnyRole("ADMIN", "USER"))
+                        auth -> auth
+                                .requestMatchers("/file", "/directory", "/search").hasAnyRole("ADMIN", "USER")
+                                .anyRequest().permitAll()
+                )
                 .formLogin(login -> login.loginPage("/log-in")
                         .loginProcessingUrl("/login_process")
                         .defaultSuccessUrl("/", true)
-                        .failureForwardUrl("/log-in?error"))
+                        .failureForwardUrl("/log-in?error")
+                )
                 .logout(logout -> logout
                         .logoutUrl("/log-out")
-                        .logoutSuccessUrl("/log-in"))
+                        .logoutSuccessUrl("/log-in")
+                )
                 .build();
     }
 

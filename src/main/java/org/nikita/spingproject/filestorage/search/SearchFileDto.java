@@ -1,4 +1,4 @@
-package org.nikita.spingproject.filestorage.search.dto;
+package org.nikita.spingproject.filestorage.search;
 
 
 import lombok.AllArgsConstructor;

@@ -33,6 +33,9 @@ public class StorageController {
     public String index(@AuthenticationPrincipal UserDetails userDetails,
                         @RequestParam(name = "path", required = false) String path,
                         Model model) {
+        if (userDetails == null) {
+            return "home";
+        }
 
         List<ObjectStorageDto> entities = directoryService.getObjectsDirectory(new ObjectsDirDto(path, userDetails.getUsername()));
         model.addAttribute("objects_dir", entities);
@@ -46,6 +49,10 @@ public class StorageController {
     public String upload(@AuthenticationPrincipal UserDetails userDetails,
                          @RequestParam("file") MultipartFile[] multFiles,
                          @RequestParam String path) {
+
+        if (userDetails == null) {
+            return "home";
+        }
 
         for (MultipartFile multFile : multFiles) {
             uploadFilesService.upload(

@@ -1,5 +1,6 @@
 package org.nikita.spingproject.filestorage.service;
 
+import io.minio.errors.*;
 import org.junit.jupiter.api.Test;
 import org.nikita.spingproject.filestorage.account.UserDto;
 import org.nikita.spingproject.filestorage.account.UserServiceImpl;
@@ -13,6 +14,10 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
+
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
@@ -38,7 +43,7 @@ class UserServiceImplTest {
     private UserRepository userRepository;
 
     @Test
-    void registerNewUserAccount() {
+    void registerNewUserAccount() throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         final String EMAIL = "user@gmail.com";
         final String PASSWORD = "root";
 
