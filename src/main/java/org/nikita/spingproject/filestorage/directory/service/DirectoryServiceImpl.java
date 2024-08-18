@@ -6,7 +6,7 @@ import org.nikita.spingproject.filestorage.directory.Directory;
 import org.nikita.spingproject.filestorage.directory.PathDirectoryService;
 import org.nikita.spingproject.filestorage.directory.PathDirectoryServiceImpl;
 import org.nikita.spingproject.filestorage.directory.dto.*;
-import org.nikita.spingproject.filestorage.directory.repository.DirectoryDao;
+import org.nikita.spingproject.filestorage.directory.dao.DirectoryDao;
 import org.nikita.spingproject.filestorage.file.File;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

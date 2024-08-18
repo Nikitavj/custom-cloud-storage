@@ -1,4 +1,4 @@
-package org.nikita.spingproject.filestorage.directory.repository;
+package org.nikita.spingproject.filestorage.directory.dao;
 
 import io.minio.Result;
 import io.minio.messages.DeleteObject;
@@ -6,7 +6,7 @@ import io.minio.messages.Item;
 import lombok.SneakyThrows;
 import org.nikita.spingproject.filestorage.commons.InformationEntityS3;
 import org.nikita.spingproject.filestorage.directory.Directory;
-import org.nikita.spingproject.filestorage.directory.s3api.DirectoryS3Api;
+import org.nikita.spingproject.filestorage.directory.s3Api.DirectoryS3Api;
 import org.nikita.spingproject.filestorage.file.File;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;

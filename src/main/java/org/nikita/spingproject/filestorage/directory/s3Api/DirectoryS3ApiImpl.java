@@ -1,4 +1,4 @@
-package org.nikita.spingproject.filestorage.directory.s3api;
+package org.nikita.spingproject.filestorage.directory.s3Api;
 
 import io.minio.*;
 import io.minio.messages.DeleteError;

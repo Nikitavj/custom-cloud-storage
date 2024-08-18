@@ -1,11 +1,16 @@
 package org.nikita.spingproject.filestorage.file.dao;
 
+import org.nikita.spingproject.filestorage.file.File;
+
 import java.io.InputStream;
-import java.util.Map;
 
 public interface FileDao {
-    void putFile(Map<String, String> metaData, String path, InputStream is);
-    void deleteFile(String path);
-    InputStream downloadFile(String path);
-    void copyFile(String path, String newPath, Map<String, String> metaData);
+
+    void add(File file);
+
+    void remove(String absolutePath);
+
+    InputStream get(String absolutePath);
+
+    void rename(String prevAbsolutePath, String targetAbsolutePath, String relativePath, String name);
 }

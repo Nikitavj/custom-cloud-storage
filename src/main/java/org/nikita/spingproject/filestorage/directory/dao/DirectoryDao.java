@@ -1,4 +1,4 @@
-package org.nikita.spingproject.filestorage.directory.repository;
+package org.nikita.spingproject.filestorage.directory.dao;
 
 import org.nikita.spingproject.filestorage.directory.Directory;
 
