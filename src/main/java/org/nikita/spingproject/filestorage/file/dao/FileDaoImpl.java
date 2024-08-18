@@ -1,66 +1,56 @@
 package org.nikita.spingproject.filestorage.file.dao;
 
-import io.minio.*;
-import lombok.SneakyThrows;
+import org.nikita.spingproject.filestorage.file.File;
+import org.nikita.spingproject.filestorage.file.s3Api.FileS3Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 
 @Repository
 public class FileDaoImpl implements FileDao {
-    private static String BUCKET_NAME = "user-files";
-    private MinioClient minioClient;
+    private FileS3Api fileS3Api;
 
     @Autowired
-    public FileDaoImpl(MinioClient minioClient) {
-        this.minioClient = minioClient;
+    public FileDaoImpl(FileS3Api fileS3Api) {
+        this.fileS3Api = fileS3Api;
     }
 
     @Override
-    @SneakyThrows
-    public void putFile(Map<String, String> metaData, String path, InputStream is) {
-        minioClient.putObject(PutObjectArgs.builder()
-                .bucket(BUCKET_NAME)
-                .object(path)
-                .stream(is, is.available(), -1)
-                .userMetadata(metaData)
-                .build());
+    public void add(File file) {
+        fileS3Api.putFile(
+                createMetaDataFile(
+                        file.getName(),
+                        file.getRelativePath()),
+                file.getAbsolutePath(),
+                file.getInputStream());
     }
 
     @Override
-    @SneakyThrows
-    public void deleteFile(String path) {
-        minioClient.removeObject(RemoveObjectArgs.builder()
-                .bucket(BUCKET_NAME)
-                .object(path)
-                .build());
+    public void remove(String absolutePath) {
+        fileS3Api.deleteFile(absolutePath);
     }
 
     @Override
-    @SneakyThrows
-    public InputStream downloadFile(String path) {
-        return minioClient.getObject(GetObjectArgs
-                .builder()
-                .bucket(BUCKET_NAME)
-                .object(path)
-                .build());
+    public InputStream get(String absolutePath) {
+        return fileS3Api.downloadFile(absolutePath);
     }
 
     @Override
-    @SneakyThrows
-    public void copyFile(String path, String newPath, Map<String, String> metaData) {
-        minioClient.copyObject(CopyObjectArgs
-                .builder()
-                .bucket(BUCKET_NAME)
-                .object(newPath)
-                .source(CopySource.builder()
-                        .bucket(BUCKET_NAME)
-                        .object(path)
-                        .build())
-                .metadataDirective(Directive.REPLACE)
-                .userMetadata(metaData)
-                .build());
+    public void rename(String prevAbsolutePath, String targetAbsolutePath, String relativePath, String name) {
+        fileS3Api.copyFile(
+                prevAbsolutePath,
+                targetAbsolutePath,
+                createMetaDataFile(name, relativePath));
+    }
+
+    private Map<String, String> createMetaDataFile(String name, String relPath) {
+        Map<String, String> metaData = new HashMap<>();
+        metaData.put("name", name);
+        metaData.put("rel_path", relPath);
+        metaData.put("file", "");
+        return metaData;
     }
 }
