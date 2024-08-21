@@ -1,11 +1,15 @@
 package org.nikita.spingproject.filestorage.file.s3Api;
 
 import io.minio.*;
+import io.minio.errors.*;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
 @Repository
@@ -19,8 +23,7 @@ public class FileS3ApiImpl implements FileS3Api {
     }
 
     @Override
-    @SneakyThrows
-    public void putFile(Map<String, String> metaData, String path, InputStream is) {
+    public void putFile(Map<String, String> metaData, String path, InputStream is) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         minioClient.putObject(PutObjectArgs.builder()
                 .bucket(BUCKET_NAME)
                 .object(path)
@@ -30,8 +33,7 @@ public class FileS3ApiImpl implements FileS3Api {
     }
 
     @Override
-    @SneakyThrows
-    public void deleteFile(String path) {
+    public void deleteFile(String path) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         minioClient.removeObject(RemoveObjectArgs.builder()
                 .bucket(BUCKET_NAME)
                 .object(path)
@@ -39,8 +41,7 @@ public class FileS3ApiImpl implements FileS3Api {
     }
 
     @Override
-    @SneakyThrows
-    public InputStream downloadFile(String path) {
+    public InputStream downloadFile(String path) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         return minioClient.getObject(GetObjectArgs
                 .builder()
                 .bucket(BUCKET_NAME)
@@ -49,8 +50,7 @@ public class FileS3ApiImpl implements FileS3Api {
     }
 
     @Override
-    @SneakyThrows
-    public void copyFile(String path, String newPath, Map<String, String> metaData) {
+    public void copyFile(String path, String newPath, Map<String, String> metaData) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         minioClient.copyObject(CopyObjectArgs
                 .builder()
                 .bucket(BUCKET_NAME)

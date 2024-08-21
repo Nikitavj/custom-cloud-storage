@@ -16,6 +16,9 @@ Search
 <form method="get" th:action="@{/search}">
     <input type="text" name="query">
     <input type="submit" value="Search">
+    <div>
+        <p th:if="${errorSearch}" th:text="${errorSearch}" style="color:red">Error</p>
+    </div>
 </form>
 
 <div th:each="entity:${find_objects}">

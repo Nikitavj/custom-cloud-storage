@@ -1,16 +1,24 @@
 package org.nikita.spingproject.filestorage.directory.dao;
 
 import io.minio.Result;
+import io.minio.errors.*;
 import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
 import lombok.SneakyThrows;
 import org.nikita.spingproject.filestorage.commons.InformationEntityS3;
 import org.nikita.spingproject.filestorage.directory.Directory;
+import org.nikita.spingproject.filestorage.directory.exception.*;
 import org.nikita.spingproject.filestorage.directory.s3Api.DirectoryS3Api;
 import org.nikita.spingproject.filestorage.file.File;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,77 +38,105 @@ public class DirectoryDaoImpl implements DirectoryDao {
     public void add(Directory directory) {
         String pathForMeta = directory.getAbsolutePath() + "_meta";
 
-        directoryS3Api.create(
-                createMetaDataDir(directory.getName(), directory.getRelativePath()),
-                pathForMeta);
+        try {
+            directoryS3Api.create(
+                    createMetaDataDir(directory.getName(), directory.getRelativePath()),
+                    pathForMeta);
+        } catch (MinioException | IOException | NoSuchAlgorithmException | InvalidKeyException e) {
+            throw new DirectoryCreatedException("Directory not created");
+        }
     }
 
     @Override
     public Directory get(String absolutPath) {
         Iterable<Result<Item>> results = directoryS3Api.getObjects(absolutPath + "/");
-        List<Item> items = getListItemsNoIsDir(results);
+        try {
+            List<Item> items = getListItemsNoIsDir(results);
 
-        return Directory.builder()
-                .absolutePath(absolutPath)
-                .directories(getDirFromItems(items))
-                .files(getFilesFromItems(items))
-                .build();
+            return Directory.builder()
+                    .absolutePath(absolutPath)
+                    .directories(getDirFromItems(items))
+                    .files(getFilesFromItems(items))
+                    .build();
+        } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
+                 NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
+                 InternalException e) {
+            throw new GetDirectoryObjectsExcepton("Unable to get directory objects");
+        }
     }
 
 
     @Override
-    @SneakyThrows
     public void remove(String absolutePath) {
         String pathForMeta = absolutePath + "_meta";
-        directoryS3Api.deleteObject(pathForMeta);
+        try {
+            directoryS3Api.deleteObject(pathForMeta);
 
-        Iterable<Result<Item>> results = directoryS3Api.getObjectsRecursive(absolutePath + "/");
-        List<DeleteObject> deleteObjects = new ArrayList<>();
-        for (Result<Item> itemResult : results) {
-            Item item = itemResult.get();
-            deleteObjects.add(new DeleteObject(item.objectName()));
+            Iterable<Result<Item>> results = directoryS3Api.getObjectsRecursive(absolutePath + "/");
+            List<DeleteObject> deleteObjects = new ArrayList<>();
+            for (Result<Item> itemResult : results) {
+                Item item = itemResult.get();
+                deleteObjects.add(new DeleteObject(item.objectName()));
+            }
+
+            directoryS3Api.deleteObjects(deleteObjects);
+        } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
+                 NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
+                 InternalException e) {
+            throw new DirectoryRemoveException("Directory not remove");
+
         }
-
-        directoryS3Api.deleteObjects(deleteObjects);
     }
 
     @Override
     public void rename(String previousAbsolutePath, String newAbsolutePath, String previousRelPath, String newRelPath, String newName) {
         Iterable<Result<Item>> results = directoryS3Api.getObjectsRecursive(previousAbsolutePath + "/");
-        List<Item> items = getListItemsNoIsDir(results);
+        try {
+            List<Item> items = getListItemsNoIsDir(results);
 
-        List<Directory> directories = getDirFromItems(items);
-        List<File> files = getFilesFromItems(items);
+            List<Directory> directories = getDirFromItems(items);
+            List<File> files = getFilesFromItems(items);
 
-        for (Directory dir : directories) {
-            String absolutePathDir = dir.getAbsolutePath();
-            String newAbsolutePathDir = absolutePathDir.replaceFirst(previousAbsolutePath, newAbsolutePath);
-            String newRelPathDir = dir.getRelativePath().replaceFirst(previousRelPath, newRelPath);
-            directoryS3Api.copyObject(absolutePathDir, newAbsolutePathDir, createMetaDataDir(dir.getName(), newRelPathDir));
+            for (Directory dir : directories) {
+                String absolutePathDir = dir.getAbsolutePath();
+                String newAbsolutePathDir = absolutePathDir.replaceFirst(previousAbsolutePath, newAbsolutePath);
+                String newRelPathDir = dir.getRelativePath().replaceFirst(previousRelPath, newRelPath);
+                directoryS3Api.copyObject(absolutePathDir, newAbsolutePathDir, createMetaDataDir(dir.getName(), newRelPathDir));
+            }
+
+            for (File file: files) {
+                String absolutePathFile = file.getAbsolutePath();
+                String newAbsolutePathFile = absolutePathFile.replaceFirst(previousAbsolutePath, newAbsolutePath);
+                String newRelPathFile = file.getRelativePath().replaceFirst(previousRelPath, newRelPath);
+                directoryS3Api.copyObject(absolutePathFile, newAbsolutePathFile, createMetaDataFile(file.getName(), newRelPathFile));
+            }
+
+            directoryS3Api.copyObject(previousAbsolutePath + "_meta", newAbsolutePath + "_meta", createMetaDataDir(newName, newRelPath));
+            this.remove(previousAbsolutePath);
+
+        } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
+                 NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
+                 InternalException e) {
+            throw new DirectoryRenameException("Directory dont rename");
         }
-
-        for (File file: files) {
-            String absolutePathFile = file.getAbsolutePath();
-            String newAbsolutePathFile = absolutePathFile.replaceFirst(previousAbsolutePath, newAbsolutePath);
-            String newRelPathFile = file.getRelativePath().replaceFirst(previousRelPath, newRelPath);
-            directoryS3Api.copyObject(absolutePathFile, newAbsolutePathFile, createMetaDataFile(file.getName(), newRelPathFile));
-        }
-
-        directoryS3Api.copyObject(previousAbsolutePath + "_meta", newAbsolutePath + "_meta", createMetaDataDir(newName, newRelPath));
-        this.remove(previousAbsolutePath);
     }
 
     @Override
     public Directory getAll(String absolutePath) {
         Iterable<Result<Item>> results = directoryS3Api.getObjectsRecursive(absolutePath + "/");
-        List<Item> items = getListItemsNoIsDir(results);
+        try {
+            List<Item> items = getListItemsNoIsDir(results);
 
-        return Directory.builder()
-                .absolutePath(absolutePath)
-                .directories(getDirFromItems(items))
-                .files(getFilesFromItems(items))
-                .build();
-
+            return Directory.builder()
+                    .absolutePath(absolutePath)
+                    .directories(getDirFromItems(items))
+                    .files(getFilesFromItems(items))
+                    .build();
+        } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
+                 NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
+                 InternalException e) {
+            throw new DirectorySearchFilesException("File search error");
+        }
     }
 
 
@@ -121,8 +157,7 @@ public class DirectoryDaoImpl implements DirectoryDao {
     }
 
 
-    @SneakyThrows
-    private List<Item> getListItemsNoIsDir(Iterable<Result<Item>> results) {
+    private List<Item> getListItemsNoIsDir(Iterable<Result<Item>> results) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         List<Item> items = new ArrayList<>();
         for (Result<Item> itemResult : results) {
             Item item = itemResult.get();

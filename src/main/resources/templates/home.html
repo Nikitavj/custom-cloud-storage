@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"
-      xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -36,6 +37,9 @@
     <form method="get" th:action="@{/search}">
         <input type="text" name="query">
         <input type="submit" value="Search">
+        <div>
+            <p th:if="${errorSearch}" th:text="${errorSearch}" style="color:red">Create directory error</p>
+        </div>
     </form>
 
     <br>
@@ -43,8 +47,12 @@
     Create new folder
     <form method="post" th:action="@{/directory}">
         <input type="hidden" name="current_path" th:value="${current_path}">
-        <input type="text" name="name_folder">
+        <input type="text" name="name">
         <input type="submit" name="create" value="Create">
+        <div>
+            <p th:if="${errorCreate}" th:text="${errorCreate}" style="color:red">Create directory error</p>
+        </div>
+
     </form>
 
     <br>
@@ -55,6 +63,9 @@
         <input name="path" type="hidden" th:value="${current_path}">
         <br/>
         <input type="submit" value="Upload">
+        <div>
+            <p th:if="${errorUpload}" th:text="${errorUpload}" style="color:red">Create directory error</p>
+        </div>
     </form>
 
     <br>
@@ -99,6 +110,9 @@
                 <input type="hidden" name="path" th:value="${entity.relativePath}">
                 <input type="text" name="new_name">
                 <input type="submit" name="rename" value="Rename">
+                <div>
+                    <p th:if="${errorRenameFile}" th:text="${errorRenameFile}" style="color:red">Error</p>
+                </div>
             </form>
         </div>
 
@@ -109,6 +123,9 @@
                 <input type="hidden" name="path" th:value="${entity.relativePath}">
                 <input type="text" name="new_name">
                 <input type="submit" name="rename" value="Rename">
+                <div>
+                    <p th:if="${errorRenameDir}" th:text="${errorRenameDir}" style="color:red">Error</p>
+                </div>
             </form>
         </div>
 

@@ -24,7 +24,6 @@ public class DirectoryServiceImpl implements DirectoryService {
     }
 
     @Override
-    @SneakyThrows
     public List<ObjectStorageDto> getObjectsDirectory(ObjectsDirDto dto) {
         String absolutePath = pathDirectoryService.absolutPath(dto.getRelativePath(), dto.getUserName());
         Directory directory = directoryDao.get(absolutePath);
@@ -55,14 +54,12 @@ public class DirectoryServiceImpl implements DirectoryService {
     }
 
     @Override
-    @SneakyThrows
     public void deleteDirectory(DeleteDirDto dto) {
         String absolutePath = pathDirectoryService.absolutPath(dto.getRelativePath(), dto.getUserName());
         directoryDao.remove(absolutePath);
     }
 
     @Override
-    @SneakyThrows
     public void renameDirectory(RenameDirDto dto) {
         String previousAbsolutePath = pathDirectoryService.absolutPath(dto.getPreviousPath(), dto.getUserName());
         String newAbsolutePath = pathDirectoryService.renameAbsolutePath(previousAbsolutePath, dto.getNewName());

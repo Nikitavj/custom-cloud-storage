@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import org.nikita.spingproject.filestorage.file.dto.FileDownloadDto;
 import org.nikita.spingproject.filestorage.file.dto.FileDto;
 import org.nikita.spingproject.filestorage.file.dto.FileRenameDto;
+import org.nikita.spingproject.filestorage.file.exception.FileRenameException;
 import org.nikita.spingproject.filestorage.file.service.FileService;
 import org.nikita.spingproject.filestorage.file.service.FileServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.RedirectView;
 
 @Controller
 @RequestMapping("/file")
@@ -41,20 +44,30 @@ public class FileController {
     }
 
     @PutMapping
-    public String renameFile(@AuthenticationPrincipal UserDetails userDetails,
-                             @RequestParam("new_name") String newName,
-                             @RequestParam String path,
-                             @RequestParam(name = "current_path", required = false) String currentPath) {
-        fileService.renameFile(new FileRenameDto(
-                path,
-                newName,
-                userDetails.getUsername()));
-
-        if (currentPath.isBlank()) {
-            return "redirect:/";
-        } else {
-            return "redirect:/" + "?path=" + currentPath;
+    public RedirectView renameFile(@AuthenticationPrincipal UserDetails userDetails,
+                                   @RequestParam("new_name") String newName,
+                                   @RequestParam String path,
+                                   @RequestParam(name = "current_path", required = false) String currentPath,
+                                   RedirectAttributes redirectAttributes) {
+        String redirectPath = "/?path=" + currentPath;
+        if (currentPath == null || currentPath.isBlank()) {
+            redirectPath = "/";
         }
+
+        if (newName == null || newName.isBlank()) {
+            redirectAttributes.addFlashAttribute("errorRenameFile", "Empty field");
+            return new RedirectView(redirectPath);
+        }
+
+        try {
+            fileService.renameFile(new FileRenameDto(
+                    path,
+                    newName,
+                    userDetails.getUsername()));
+        } catch (FileRenameException e) {
+            redirectAttributes.addFlashAttribute("errorRenameFile", e.getMessage());
+        }
+        return new RedirectView(redirectPath);
     }
 
     @DeleteMapping

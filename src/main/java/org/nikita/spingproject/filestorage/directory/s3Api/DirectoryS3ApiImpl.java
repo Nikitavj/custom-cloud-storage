@@ -1,6 +1,7 @@
 package org.nikita.spingproject.filestorage.directory.s3Api;
 
 import io.minio.*;
+import io.minio.errors.*;
 import io.minio.messages.DeleteError;
 import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
@@ -9,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
 
@@ -32,16 +36,15 @@ public class DirectoryS3ApiImpl implements DirectoryS3Api {
                 .build());
     }
 
-    @SneakyThrows
     @Override
-    public void create(Map<String, String> metaData, String path) {
-        minioClient.putObject(PutObjectArgs
-                .builder()
-                .bucket(BUCKET_NAME)
-                .object(path)
-                .stream(new ByteArrayInputStream(new byte[]{}), 0, -1)
-                .userMetadata(metaData)
-                .build());
+    public void create(Map<String, String> metaData, String path) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+            minioClient.putObject(PutObjectArgs
+                    .builder()
+                    .bucket(BUCKET_NAME)
+                    .object(path)
+                    .stream(new ByteArrayInputStream(new byte[]{}), 0, -1)
+                    .userMetadata(metaData)
+                    .build());
     }
 
     @Override
@@ -67,8 +70,7 @@ public class DirectoryS3ApiImpl implements DirectoryS3Api {
     }
 
     @Override
-    @SneakyThrows
-    public void deleteObject(String path) {
+    public void deleteObject(String path) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         minioClient.removeObject(RemoveObjectArgs
                 .builder()
                 .bucket(BUCKET_NAME)
@@ -76,9 +78,8 @@ public class DirectoryS3ApiImpl implements DirectoryS3Api {
                 .build());
     }
 
-    @SneakyThrows
     @Override
-    public void deleteObjects(List<DeleteObject> objects) {
+    public void deleteObjects(List<DeleteObject> objects) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         Iterable<Result<DeleteError>> results = minioClient.removeObjects(RemoveObjectsArgs
                 .builder()
                 .bucket(BUCKET_NAME)
@@ -93,8 +94,7 @@ public class DirectoryS3ApiImpl implements DirectoryS3Api {
     }
 
     @Override
-    @SneakyThrows
-    public void copyObject(String path, String newPath, Map<String, String> metaData) {
+    public void copyObject(String path, String newPath, Map<String, String> metaData) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         minioClient.copyObject(CopyObjectArgs
                 .builder()
                 .bucket(BUCKET_NAME)

@@ -1,6 +1,7 @@
 package org.nikita.spingproject.filestorage.search;
 
 import org.nikita.spingproject.filestorage.commons.ObjectStorageDto;
+import org.nikita.spingproject.filestorage.directory.exception.DirectorySearchFilesException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,11 +24,26 @@ public class SearchController {
                          @RequestParam(name = "query", required = false) String query,
                          Model model) {
 
-        List<ObjectStorageDto> findObjects = searchFileService
-                .search(new SearchFileDto(
-                        query,
-                        userDetails.getUsername()));
-        model.addAttribute("find_objects", findObjects);
+        if (query == null || query.isBlank()) {
+            model.addAttribute("errorSearch", "Empty field");
+            return "search";
+        }
+
+        List<ObjectStorageDto> findObjects = null;
+        try {
+            findObjects = searchFileService
+                    .search(new SearchFileDto(
+                            query,
+                            userDetails.getUsername()));
+        } catch (DirectorySearchFilesException e) {
+            model.addAttribute("errorSearch", e.getMessage());
+        }
+
+        if (findObjects.isEmpty()) {
+            model.addAttribute("errorSearch", "Nothing found");
+        } else {
+            model.addAttribute("find_objects", findObjects);
+        }
 
         return "search";
     }
