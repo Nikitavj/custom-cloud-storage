@@ -11,6 +11,7 @@ import org.nikita.spingproject.filestorage.directory.exception.*;
 import org.nikita.spingproject.filestorage.directory.s3Api.DirectoryS3Api;
 import org.nikita.spingproject.filestorage.file.File;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 @Repository
 public class DirectoryDaoImpl implements DirectoryDao {
     private DirectoryS3Api directoryS3Api;
+    private Logger logger = LoggerFactory.getLogger(DirectoryDaoImpl.class);
 
     @Autowired
     public DirectoryDaoImpl(DirectoryS3Api directoryS3Api) {
@@ -42,7 +44,9 @@ public class DirectoryDaoImpl implements DirectoryDao {
             directoryS3Api.create(
                     createMetaDataDir(directory.getName(), directory.getRelativePath()),
                     pathForMeta);
+
         } catch (MinioException | IOException | NoSuchAlgorithmException | InvalidKeyException e) {
+            logger.warn("Directory {} dont create", directory.getAbsolutePath());
             throw new DirectoryCreatedException("Directory not created");
         }
     }
@@ -58,9 +62,11 @@ public class DirectoryDaoImpl implements DirectoryDao {
                     .directories(getDirFromItems(items))
                     .files(getFilesFromItems(items))
                     .build();
+
         } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
                  InternalException e) {
+            logger.warn("Directory {} dont get", absolutPath);
             throw new GetDirectoryObjectsExcepton("Unable to get directory objects");
         }
     }
@@ -78,13 +84,13 @@ public class DirectoryDaoImpl implements DirectoryDao {
                 Item item = itemResult.get();
                 deleteObjects.add(new DeleteObject(item.objectName()));
             }
-
             directoryS3Api.deleteObjects(deleteObjects);
+
         } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
                  InternalException e) {
+            logger.warn("Directory {} dont remove", absolutePath);
             throw new DirectoryRemoveException("Directory not remove");
-
         }
     }
 
@@ -117,6 +123,7 @@ public class DirectoryDaoImpl implements DirectoryDao {
         } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
                  InternalException e) {
+            logger.warn("Directory {} dont rename", previousAbsolutePath);
             throw new DirectoryRenameException("Directory dont rename");
         }
     }
@@ -135,6 +142,7 @@ public class DirectoryDaoImpl implements DirectoryDao {
         } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
                  InternalException e) {
+            logger.warn("Directory {} dont get all objects", absolutePath);
             throw new DirectorySearchFilesException("File search error");
         }
     }

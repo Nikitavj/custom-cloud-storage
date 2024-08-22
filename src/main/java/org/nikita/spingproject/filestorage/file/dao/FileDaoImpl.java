@@ -7,6 +7,8 @@ import org.nikita.spingproject.filestorage.file.exception.FileDownloadException;
 import org.nikita.spingproject.filestorage.file.exception.FileRemoveException;
 import org.nikita.spingproject.filestorage.file.exception.FileRenameException;
 import org.nikita.spingproject.filestorage.file.s3Api.FileS3Api;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -20,6 +22,7 @@ import java.util.Map;
 @Repository
 public class FileDaoImpl implements FileDao {
     private FileS3Api fileS3Api;
+    private Logger logger = LoggerFactory.getLogger(FileDaoImpl.class);
 
     @Autowired
     public FileDaoImpl(FileS3Api fileS3Api) {
@@ -36,6 +39,7 @@ public class FileDaoImpl implements FileDao {
                     file.getAbsolutePath(),
                     file.getInputStream());
         } catch (Exception e) {
+            logger.warn("File {} dont add", file.getAbsolutePath());
             throw new FileCreateException("File not uploaded");
         }
     }
@@ -47,6 +51,7 @@ public class FileDaoImpl implements FileDao {
         } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
                  InternalException e) {
+            logger.warn("File {} dont remove", absolutePath);
             throw new FileRemoveException("File not deleted");
         }
     }
@@ -58,6 +63,7 @@ public class FileDaoImpl implements FileDao {
         } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
                  InternalException e) {
+            logger.warn("File {} dont get", absolutePath);
             throw new FileDownloadException("File not download");
         }
     }
@@ -75,6 +81,7 @@ public class FileDaoImpl implements FileDao {
         } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
                  InternalException e) {
+            logger.warn("File {} dont rename", prevAbsolutePath);
             throw new FileRenameException("File not rename");
         }
     }
