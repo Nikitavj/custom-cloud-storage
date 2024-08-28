@@ -7,8 +7,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class InformationEntityS3 {
+public class InfoOfObjectS3 {
     String name;
     String relativePath;
+    String absPath;
     boolean isDir;
 }

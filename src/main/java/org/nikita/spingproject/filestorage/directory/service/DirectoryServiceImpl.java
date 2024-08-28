@@ -35,15 +35,13 @@ public class DirectoryServiceImpl implements DirectoryService {
         String absolutePath = pathDirectoryService.absolutPath(
                 request.getPath(),
                 request.getUserName());
+        Directory directory = directoryDao.get(absolutePath);
 
-        Directory directory = directoryDao.getRecursive(absolutePath);
         String nameZipFile = directory.getName() + ".zip";
-
         Path zipPath = Files.createTempFile(directory.getName(), ".zip");
 
         try (ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(zipPath))) {
-            zipDirectory(directory, zos);
-
+            zipDirectory(directory, directory.getName(), zos);
             FileInputStream fis = new FileInputStream(zipPath.toFile());
             return new DirDownloadResponse(fis, nameZipFile);
 
@@ -52,14 +50,19 @@ public class DirectoryServiceImpl implements DirectoryService {
         }
     }
 
-    private void zipDirectory(Directory dir, ZipOutputStream zos) throws IOException {
+    private void zipDirectory(Directory dir, String prefixPath, ZipOutputStream zos) throws IOException {
         List<File> files = dir.getFiles();
         List<Directory> directories = dir.getDirectories();
+
+        for (Directory directory: directories) {
+            String basePath = prefixPath + "/" + directory.getName();
+            zipDirectory(directory, basePath, zos);
+        }
 
         for (File file: files) {
             File file1 = fileDao.get(file.getAbsolutePath());
             InputStream is = file1.getInputStream();
-            ZipEntry zipEntry = new ZipEntry(file.getName());
+            ZipEntry zipEntry = new ZipEntry(prefixPath + "/" + file.getName());
             zos.putNextEntry(zipEntry);
 
             byte[] bytes = new byte[1024];

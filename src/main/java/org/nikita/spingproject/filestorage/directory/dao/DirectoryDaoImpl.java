@@ -5,7 +5,7 @@ import io.minio.StatObjectResponse;
 import io.minio.errors.*;
 import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
-import org.nikita.spingproject.filestorage.commons.InformationEntityS3;
+import org.nikita.spingproject.filestorage.commons.InfoOfObjectS3;
 import org.nikita.spingproject.filestorage.directory.Directory;
 import org.nikita.spingproject.filestorage.directory.exception.*;
 import org.nikita.spingproject.filestorage.directory.s3Api.DirectoryS3Api;
@@ -40,7 +40,11 @@ public class DirectoryDaoImpl implements DirectoryDao {
 
         try {
             directoryS3Api.create(
-                    createMetaDataDir(directory.getName(), directory.getRelativePath()),
+                    createMetaDataDir(
+                            directory.getName(),
+                            directory.getRelativePath(),
+                            directory.getAbsolutePath()
+                    ),
                     pathForMeta);
 
         } catch (MinioException | IOException | NoSuchAlgorithmException | InvalidKeyException e) {
@@ -50,22 +54,45 @@ public class DirectoryDaoImpl implements DirectoryDao {
     }
 
     @Override
-    public Directory get(String absolutPath) {
-        Iterable<Result<Item>> results = directoryS3Api.getObjects(absolutPath + "/");
+    public Directory get(String absolutePath) {
+        Directory directory = new Directory();
+        ;
         try {
-            List<Item> items = getListItemsNoIsDir(results);
+            if (absolutePath.contains("/")) {
+                StatObjectResponse info = directoryS3Api.getInfo(absolutePath + "_meta");
+                InfoOfObjectS3 stat = buildStatObject(info.userMetadata());
 
-            return Directory.builder()
-                    .absolutePath(absolutPath)
-                    .directories(getDirFromItems(items))
-                    .files(getFilesFromItems(items))
-                    .build();
+                directory.setName(stat.getName());
+                directory.setRelativePath(stat.getRelativePath());
+                directory.setAbsolutePath(absolutePath);
+            } else {
+                directory.setAbsolutePath(absolutePath);
+            }
+
+            fillDirectory(directory);
+            return directory;
 
         } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
                  InternalException e) {
-            logger.warn("Directory {} dont get", absolutPath);
+            logger.warn("Directory {} dont get", absolutePath);
             throw new GetDirectoryObjectsExcepton("Unable to get directory objects");
+        }
+    }
+
+    private void fillDirectory(Directory dir) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        Iterable<Result<Item>> results = directoryS3Api.getObjects(dir.getAbsolutePath() + "/");
+        List<Item> items = getListItemsNoIsMinioDir(results);
+
+        List<Directory> directories = getDirFromItems(items);
+        List<File> files = getFilesFromItems(items);
+
+        for (Directory directory : directories) {
+            dir.putDirectory(directory);
+            fillDirectory(directory);
+        }
+        for (File file : files) {
+            dir.putFile(file);
         }
     }
 
@@ -96,7 +123,7 @@ public class DirectoryDaoImpl implements DirectoryDao {
     public void rename(String previousAbsolutePath, String newAbsolutePath, String previousRelPath, String newRelPath, String newName) {
         Iterable<Result<Item>> results = directoryS3Api.getObjectsRecursive(previousAbsolutePath + "/");
         try {
-            List<Item> items = getListItemsNoIsDir(results);
+            List<Item> items = getListItemsNoIsMinioDir(results);
 
             List<Directory> directories = getDirFromItems(items);
             List<File> files = getFilesFromItems(items);
@@ -105,22 +132,41 @@ public class DirectoryDaoImpl implements DirectoryDao {
                 String absolutePathDir = dir.getAbsolutePath();
                 String newAbsolutePathDir = absolutePathDir.replaceFirst(previousAbsolutePath, newAbsolutePath);
                 String newRelPathDir = dir.getRelativePath().replaceFirst(previousRelPath, newRelPath);
-                directoryS3Api.copyObject(absolutePathDir, newAbsolutePathDir, createMetaDataDir(dir.getName(), newRelPathDir));
+                directoryS3Api.copyObject(
+                        absolutePathDir + "_meta",
+                        newAbsolutePathDir + "_meta",
+                        createMetaDataDir(
+                                dir.getName(),
+                                newRelPathDir,
+                                newAbsolutePathDir));
             }
 
-            for (File file: files) {
+            for (File file : files) {
                 String absolutePathFile = file.getAbsolutePath();
                 String newAbsolutePathFile = absolutePathFile.replaceFirst(previousAbsolutePath, newAbsolutePath);
                 String newRelPathFile = file.getRelativePath().replaceFirst(previousRelPath, newRelPath);
-                directoryS3Api.copyObject(absolutePathFile, newAbsolutePathFile, createMetaDataFile(file.getName(), newRelPathFile));
+                directoryS3Api.copyObject(
+                        absolutePathFile,
+                        newAbsolutePathFile,
+                        createMetaDataFile(
+                                file.getName(),
+                                newRelPathFile,
+                                newAbsolutePathFile));
             }
 
-            directoryS3Api.copyObject(previousAbsolutePath + "_meta", newAbsolutePath + "_meta", createMetaDataDir(newName, newRelPath));
+            directoryS3Api.copyObject(
+                    previousAbsolutePath + "_meta",
+                    newAbsolutePath + "_meta",
+                    createMetaDataDir(
+                            newName,
+                            newRelPath,
+                            newAbsolutePath));
             this.remove(previousAbsolutePath);
 
-        } catch (IllegalArgumentException | ServerException | InsufficientDataException | ErrorResponseException | IOException |
+        } catch (IllegalArgumentException | ServerException | InsufficientDataException | ErrorResponseException |
+                 IOException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
-                  InternalException e) {
+                 InternalException e) {
             logger.warn("Directory {} dont rename", previousAbsolutePath);
             throw new DirectoryRenameException("Directory dont rename");
         }
@@ -130,15 +176,16 @@ public class DirectoryDaoImpl implements DirectoryDao {
     public Directory getRecursive(String absolutePath) {
         Iterable<Result<Item>> results = directoryS3Api.getObjectsRecursive(absolutePath + "/");
         try {
-            List<Item> items = getListItemsNoIsDir(results);
+            List<Item> items = getListItemsNoIsMinioDir(results);
 
             StatObjectResponse statResp = directoryS3Api.getInfo(absolutePath + "_meta");
+            InfoOfObjectS3 info = buildStatObject(statResp.userMetadata());
 
             return Directory.builder()
                     .absolutePath(absolutePath)
                     .directories(getDirFromItems(items))
                     .files(getFilesFromItems(items))
-                    .name(statResp.userMetadata().get("name"))
+                    .name(info.getName())
                     .build();
         } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
@@ -148,23 +195,25 @@ public class DirectoryDaoImpl implements DirectoryDao {
         }
     }
 
-    private Map<String, String> createMetaDataDir(String name, String relPath) {
+    private Map<String, String> createMetaDataDir(String name, String relPath, String absPath) {
         Map<String, String> metaData = new HashMap<>();
         metaData.put("name", name);
         metaData.put("rel_path", relPath);
+        metaData.put("abs_path", absPath);
         metaData.put("dir", "");
         return metaData;
     }
 
-    private Map<String, String> createMetaDataFile(String name, String relPath) {
+    private Map<String, String> createMetaDataFile(String name, String relPath, String absPath) {
         Map<String, String> metaData = new HashMap<>();
         metaData.put("name", name);
         metaData.put("rel_path", relPath);
+        metaData.put("abs_path", absPath);
         metaData.put("file", "");
         return metaData;
     }
 
-    private List<Item> getListItemsNoIsDir(Iterable<Result<Item>> results) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    private List<Item> getListItemsNoIsMinioDir(Iterable<Result<Item>> results) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         List<Item> items = new ArrayList<>();
         for (Result<Item> itemResult : results) {
             Item item = itemResult.get();
@@ -190,7 +239,7 @@ public class DirectoryDaoImpl implements DirectoryDao {
     }
 
     private File itemMapToFile(Item item) {
-        InformationEntityS3 info = buildInfo(item.userMetadata());
+        InfoOfObjectS3 info = buildInfo(item.userMetadata());
         return File.builder()
                 .name(info.getName())
                 .relativePath(info.getRelativePath())
@@ -199,19 +248,28 @@ public class DirectoryDaoImpl implements DirectoryDao {
     }
 
     private Directory itemMaptoDirectory(Item item) {
-        InformationEntityS3 info = buildInfo(item.userMetadata());
-        return Directory.builder()
-                .name(info.getName())
-                .relativePath(info.getRelativePath())
-                .absolutePath(item.objectName())
+        InfoOfObjectS3 info = buildInfo(item.userMetadata());
+        return new Directory(
+                info.getName(),
+                info.getAbsPath(),
+                info.getRelativePath());
+    }
+
+    private InfoOfObjectS3 buildInfo(Map<String, String> metaData) {
+        return InfoOfObjectS3.builder()
+                .name(metaData.get("X-Amz-Meta-Name"))
+                .relativePath(metaData.get("X-Amz-Meta-Rel_path"))
+                .absPath(metaData.get("X-Amz-Meta-Abs_path"))
+                .isDir(metaData.containsKey("X-Amz-Meta-Dir"))
                 .build();
     }
 
-    private InformationEntityS3 buildInfo(Map<String, String> metaData) {
-        return InformationEntityS3.builder()
-                .name(metaData.get("X-Amz-Meta-Name"))
-                .relativePath(metaData.get("X-Amz-Meta-Rel_path"))
-                .isDir(metaData.containsKey("X-Amz-Meta-Dir"))
+    private InfoOfObjectS3 buildStatObject(Map<String, String> metaData) {
+        return InfoOfObjectS3.builder()
+                .name(metaData.get("name"))
+                .relativePath(metaData.get("rel_path"))
+                .absPath(metaData.get("abs_path"))
+                .isDir(metaData.containsKey("dir"))
                 .build();
     }
 }

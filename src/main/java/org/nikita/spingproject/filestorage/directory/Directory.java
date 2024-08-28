@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.nikita.spingproject.filestorage.file.File;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -18,4 +19,25 @@ public class Directory{
     private String relativePath;
     private List<Directory> directories;
     private List<File> files;
+
+    {
+        this.directories = new ArrayList<>();
+        this.files = new ArrayList<>();
+    }
+
+    public Directory(String name, String absolutePath, String relativePath) {
+        this.name = name;
+        this.absolutePath = absolutePath;
+        this.relativePath = relativePath;
+    }
+
+
+
+    public void putDirectory(Directory directory) {
+        directories.add(directory);
+    }
+
+    public void putFile(File file) {
+        files.add(file);
+    }
 }
