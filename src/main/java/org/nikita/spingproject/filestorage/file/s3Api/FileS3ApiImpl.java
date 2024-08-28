@@ -2,7 +2,6 @@ package org.nikita.spingproject.filestorage.file.s3Api;
 
 import io.minio.*;
 import io.minio.errors.*;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -41,7 +40,7 @@ public class FileS3ApiImpl implements FileS3Api {
     }
 
     @Override
-    public InputStream downloadFile(String path) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    public InputStream getInputStream(String path) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         return minioClient.getObject(GetObjectArgs
                 .builder()
                 .bucket(BUCKET_NAME)
@@ -50,7 +49,7 @@ public class FileS3ApiImpl implements FileS3Api {
     }
 
     @Override
-    public void copyFile(String path, String newPath, Map<String, String> metaData) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    public void copyFile(String path, String newPath, Map<String, String> metaData) throws IllegalArgumentException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         minioClient.copyObject(CopyObjectArgs
                 .builder()
                 .bucket(BUCKET_NAME)
@@ -61,6 +60,15 @@ public class FileS3ApiImpl implements FileS3Api {
                         .build())
                 .metadataDirective(Directive.REPLACE)
                 .userMetadata(metaData)
+                .build());
+    }
+
+    @Override
+    public StatObjectResponse getInfo(String path) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        return minioClient.statObject(StatObjectArgs
+                .builder()
+                .bucket(BUCKET_NAME)
+                .object(path)
                 .build());
     }
 }

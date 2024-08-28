@@ -1,7 +1,8 @@
 package org.nikita.spingproject.filestorage.file.dao;
 
+import io.minio.StatObjectResponse;
 import io.minio.errors.*;
-import org.nikita.spingproject.filestorage.file.*;
+import org.nikita.spingproject.filestorage.file.File;
 import org.nikita.spingproject.filestorage.file.exception.FileCreateException;
 import org.nikita.spingproject.filestorage.file.exception.FileDownloadException;
 import org.nikita.spingproject.filestorage.file.exception.FileRemoveException;
@@ -57,9 +58,15 @@ public class FileDaoImpl implements FileDao {
     }
 
     @Override
-    public InputStream get(String absolutePath) {
+    public File get(String absolutePath) {
         try {
-            return fileS3Api.downloadFile(absolutePath);
+            InputStream is = fileS3Api.getInputStream(absolutePath);
+            StatObjectResponse stat = fileS3Api.getInfo(absolutePath);
+
+            return File.builder()
+                    .inputStream(is)
+                    .name(stat.userMetadata().get("name"))
+                    .build();
         } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
                  InternalException e) {
@@ -76,9 +83,7 @@ public class FileDaoImpl implements FileDao {
                     targetAbsolutePath,
                     createMetaDataFile(name, relativePath));
 
-            throw new FileRenameException("dsafhasdkj;lf rename exception");
-
-        } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
+        } catch (IllegalArgumentException | ServerException | InsufficientDataException | ErrorResponseException | IOException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
                  InternalException e) {
             logger.warn("File {} dont rename", prevAbsolutePath);

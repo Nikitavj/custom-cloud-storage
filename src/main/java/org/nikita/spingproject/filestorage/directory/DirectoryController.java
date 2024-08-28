@@ -1,30 +1,24 @@
 package org.nikita.spingproject.filestorage.directory;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import okhttp3.internal.http2.ErrorCode;
-import org.nikita.spingproject.filestorage.directory.dto.DeleteDirDto;
-import org.nikita.spingproject.filestorage.directory.dto.DirDto;
-import org.nikita.spingproject.filestorage.directory.dto.NewDirDto;
-import org.nikita.spingproject.filestorage.directory.dto.RenameDirDto;
+import org.nikita.spingproject.filestorage.directory.dto.*;
 import org.nikita.spingproject.filestorage.directory.exception.DirectoryCreatedException;
 import org.nikita.spingproject.filestorage.directory.exception.DirectoryRemoveException;
 import org.nikita.spingproject.filestorage.directory.exception.DirectoryRenameException;
 import org.nikita.spingproject.filestorage.directory.service.DirectoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
+
+import java.io.IOException;
 
 @Controller
 @Validated
@@ -35,6 +29,26 @@ public class DirectoryController {
     @Autowired
     public DirectoryController(DirectoryService directoryService) {
         this.directoryService = directoryService;
+    }
+
+    @GetMapping
+    public ResponseEntity<InputStreamResource> downloadDirectory(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam String path
+    ) throws IOException {
+        DirDownloadResponse response = directoryService.downloadDirectory(
+                new DirDownloadRequest(
+                        path,
+                        userDetails.getUsername()));
+
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + response.getName());
+
+        return ResponseEntity
+                .ok()
+                .headers(responseHeaders)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(new InputStreamResource(response.getInputStream()));
     }
 
     @PostMapping
@@ -100,7 +114,7 @@ public class DirectoryController {
             redirectPath = "/";
         }
 
-        if(newName != null || newName.isBlank()) {
+        if (newName == null || newName.isBlank()) {
             redirectAttributes.addFlashAttribute("errorRenameDir", "Empty field");
             return new RedirectView(redirectPath);
         }

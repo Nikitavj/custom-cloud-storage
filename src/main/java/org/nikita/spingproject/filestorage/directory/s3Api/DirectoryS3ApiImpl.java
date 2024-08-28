@@ -5,7 +5,6 @@ import io.minio.errors.*;
 import io.minio.messages.DeleteError;
 import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -26,9 +25,9 @@ public class DirectoryS3ApiImpl implements DirectoryS3Api {
         this.minioClient = minioClient;
     }
 
-    @SneakyThrows
+
     @Override
-    public StatObjectResponse getInfo(String path) {
+    public StatObjectResponse getInfo(String path) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         return minioClient.statObject(StatObjectArgs
                 .builder()
                 .bucket(BUCKET_NAME)
@@ -94,7 +93,7 @@ public class DirectoryS3ApiImpl implements DirectoryS3Api {
     }
 
     @Override
-    public void copyObject(String path, String newPath, Map<String, String> metaData) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    public void copyObject(String path, String newPath, Map<String, String> metaData) throws IllegalArgumentException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         minioClient.copyObject(CopyObjectArgs
                 .builder()
                 .bucket(BUCKET_NAME)

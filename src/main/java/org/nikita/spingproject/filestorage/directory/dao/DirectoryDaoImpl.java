@@ -1,10 +1,10 @@
 package org.nikita.spingproject.filestorage.directory.dao;
 
 import io.minio.Result;
+import io.minio.StatObjectResponse;
 import io.minio.errors.*;
 import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
-import lombok.SneakyThrows;
 import org.nikita.spingproject.filestorage.commons.InformationEntityS3;
 import org.nikita.spingproject.filestorage.directory.Directory;
 import org.nikita.spingproject.filestorage.directory.exception.*;
@@ -15,11 +15,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -120,24 +118,27 @@ public class DirectoryDaoImpl implements DirectoryDao {
             directoryS3Api.copyObject(previousAbsolutePath + "_meta", newAbsolutePath + "_meta", createMetaDataDir(newName, newRelPath));
             this.remove(previousAbsolutePath);
 
-        } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
+        } catch (IllegalArgumentException | ServerException | InsufficientDataException | ErrorResponseException | IOException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
-                 InternalException e) {
+                  InternalException e) {
             logger.warn("Directory {} dont rename", previousAbsolutePath);
             throw new DirectoryRenameException("Directory dont rename");
         }
     }
 
     @Override
-    public Directory getAll(String absolutePath) {
+    public Directory getRecursive(String absolutePath) {
         Iterable<Result<Item>> results = directoryS3Api.getObjectsRecursive(absolutePath + "/");
         try {
             List<Item> items = getListItemsNoIsDir(results);
+
+            StatObjectResponse statResp = directoryS3Api.getInfo(absolutePath + "_meta");
 
             return Directory.builder()
                     .absolutePath(absolutePath)
                     .directories(getDirFromItems(items))
                     .files(getFilesFromItems(items))
+                    .name(statResp.userMetadata().get("name"))
                     .build();
         } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
@@ -146,7 +147,6 @@ public class DirectoryDaoImpl implements DirectoryDao {
             throw new DirectorySearchFilesException("File search error");
         }
     }
-
 
     private Map<String, String> createMetaDataDir(String name, String relPath) {
         Map<String, String> metaData = new HashMap<>();
@@ -163,7 +163,6 @@ public class DirectoryDaoImpl implements DirectoryDao {
         metaData.put("file", "");
         return metaData;
     }
-
 
     private List<Item> getListItemsNoIsDir(Iterable<Result<Item>> results) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         List<Item> items = new ArrayList<>();

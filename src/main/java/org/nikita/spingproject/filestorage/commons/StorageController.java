@@ -1,6 +1,5 @@
 package org.nikita.spingproject.filestorage.commons;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.SneakyThrows;
 import org.nikita.spingproject.filestorage.commons.breadcrumbs.BreadcrumbsUtil;
 import org.nikita.spingproject.filestorage.directory.dto.ObjectsDirDto;
@@ -13,16 +12,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.RequestContextUtils;
 
+import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-
-import static com.fasterxml.jackson.databind.type.LogicalType.Map;
 
 @Controller
 public class StorageController {
@@ -51,11 +46,10 @@ public class StorageController {
         return "home";
     }
 
-    @SneakyThrows
     @PostMapping
     public String upload(@AuthenticationPrincipal UserDetails userDetails,
                          @RequestParam("file") MultipartFile[] multFiles,
-                         @RequestParam String path) {
+                         @RequestParam String path) throws IOException {
 
         if (userDetails == null) {
             return "home";

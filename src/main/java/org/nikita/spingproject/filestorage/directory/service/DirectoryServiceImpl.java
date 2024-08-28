@@ -1,26 +1,73 @@
 package org.nikita.spingproject.filestorage.directory.service;
 
-import lombok.SneakyThrows;
 import org.nikita.spingproject.filestorage.commons.ObjectStorageDto;
 import org.nikita.spingproject.filestorage.directory.Directory;
-import org.nikita.spingproject.filestorage.directory.dto.*;
 import org.nikita.spingproject.filestorage.directory.dao.DirectoryDao;
+import org.nikita.spingproject.filestorage.directory.dto.*;
 import org.nikita.spingproject.filestorage.file.File;
+import org.nikita.spingproject.filestorage.file.dao.FileDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Service
 public class DirectoryServiceImpl implements DirectoryService {
     private PathDirectoryService pathDirectoryService;
     private DirectoryDao directoryDao;
+    private FileDao fileDao;
 
     @Autowired
-    public DirectoryServiceImpl(PathDirectoryServiceImpl pathDirectoryService, DirectoryDao directoryDao) {
+    public DirectoryServiceImpl(PathDirectoryService pathDirectoryService, DirectoryDao directoryDao, FileDao fileDao) {
         this.pathDirectoryService = pathDirectoryService;
         this.directoryDao = directoryDao;
+        this.fileDao = fileDao;
+    }
+
+    @Override
+    public DirDownloadResponse downloadDirectory(DirDownloadRequest request) throws IOException {
+        String absolutePath = pathDirectoryService.absolutPath(
+                request.getPath(),
+                request.getUserName());
+
+        Directory directory = directoryDao.getRecursive(absolutePath);
+        String nameZipFile = directory.getName() + ".zip";
+
+        Path zipPath = Files.createTempFile(directory.getName(), ".zip");
+
+        try (ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(zipPath))) {
+            zipDirectory(directory, zos);
+
+            FileInputStream fis = new FileInputStream(zipPath.toFile());
+            return new DirDownloadResponse(fis, nameZipFile);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void zipDirectory(Directory dir, ZipOutputStream zos) throws IOException {
+        List<File> files = dir.getFiles();
+        List<Directory> directories = dir.getDirectories();
+
+        for (File file: files) {
+            File file1 = fileDao.get(file.getAbsolutePath());
+            InputStream is = file1.getInputStream();
+            ZipEntry zipEntry = new ZipEntry(file.getName());
+            zos.putNextEntry(zipEntry);
+
+            byte[] bytes = new byte[1024];
+            int length;
+            while ((length = is.read(bytes)) >= 0) {
+                zos.write(bytes);
+            }
+        }
     }
 
     @Override

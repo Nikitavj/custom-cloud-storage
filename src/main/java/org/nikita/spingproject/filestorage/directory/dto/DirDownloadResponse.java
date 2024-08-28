@@ -4,11 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.InputStream;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class NewDirDto {
-    private String currentPath;
+public class DirDownloadResponse {
+    private InputStream inputStream;
     private String name;
-    private String userName;
 }

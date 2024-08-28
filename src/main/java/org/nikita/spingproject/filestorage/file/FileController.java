@@ -1,6 +1,5 @@
 package org.nikita.spingproject.filestorage.file;
 
-import lombok.SneakyThrows;
 import org.nikita.spingproject.filestorage.file.dto.FileDownloadDto;
 import org.nikita.spingproject.filestorage.file.dto.FileDto;
 import org.nikita.spingproject.filestorage.file.dto.FileRenameDto;
@@ -9,6 +8,7 @@ import org.nikita.spingproject.filestorage.file.service.FileService;
 import org.nikita.spingproject.filestorage.file.service.FileServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,6 +17,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
+
+import java.io.UnsupportedEncodingException;
 
 @Controller
 @RequestMapping("/file")
@@ -28,7 +30,6 @@ public class FileController {
         this.fileService = fileService;
     }
 
-    @SneakyThrows
     @GetMapping
     public ResponseEntity<InputStreamResource> downloadFile(@AuthenticationPrincipal UserDetails userDetails,
                                                             @RequestParam String path) {
@@ -37,8 +38,11 @@ public class FileController {
                         path,
                         userDetails.getUsername()));
 
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + dto.getName());
         return ResponseEntity
                 .ok()
+                .headers(responseHeaders)
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(new InputStreamResource(dto.getInputStream()));
     }

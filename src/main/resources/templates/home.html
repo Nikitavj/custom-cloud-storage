@@ -129,8 +129,18 @@
             </form>
         </div>
 
-        <div th:if="${!entity.isDir()}">
-            <button th:data-path="${entity.relativePath}"
+        <div>
+            <div th:if="${!entity.isDir()}">
+            <button th:data-path="'/file?path=' + ${entity.relativePath}"
+                    th:data-name="${entity.name}"
+                    th:onclick="downloadFile(this.getAttribute('data-path'), this.getAttribute('data-name'))">
+                Download
+            </button>
+        </div>
+
+        <div>
+            <div th:if="${entity.isDir()}">
+            <button th:data-path="'/directory?path=' + ${entity.relativePath}"
                     th:data-name="${entity.name}"
                     th:onclick="downloadFile(this.getAttribute('data-path'), this.getAttribute('data-name'))">
                 Download
@@ -170,8 +180,16 @@
 
 <script th:inline="javascript">
     function downloadFile(path, name) {
-        fetch("/file?path=" + path)
+        var header;
+        var filename = "";
+        fetch(path)
             .then(response => {
+                header = response.headers.get('Content-Disposition');
+                var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                var matches = filenameRegex.exec(header);
+                if (matches != null && matches[1]) {
+                    filename = matches[1].replace(/['"]/g, '');
+                }
                 if (response.ok) {
                     return response.blob();
                 }
@@ -180,9 +198,10 @@
             .then(blob => {
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
+
                 a.style.display = 'none';
                 a.href = url;
-                a.download = name; // Укажите имя файла
+                a.download = filename; // Укажите имя файла
                 document.body.appendChild(a);
                 a.click();
                 window.URL.revokeObjectURL(url);

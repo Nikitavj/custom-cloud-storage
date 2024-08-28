@@ -2,10 +2,10 @@ package org.nikita.spingproject.filestorage.service;
 
 import io.minio.errors.*;
 import org.junit.jupiter.api.Test;
-import org.nikita.spingproject.filestorage.account.UserDto;
-import org.nikita.spingproject.filestorage.account.UserServiceImpl;
 import org.nikita.spingproject.filestorage.account.User;
+import org.nikita.spingproject.filestorage.account.UserDto;
 import org.nikita.spingproject.filestorage.account.UserRepository;
+import org.nikita.spingproject.filestorage.account.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -19,7 +19,8 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 @SpringBootTest

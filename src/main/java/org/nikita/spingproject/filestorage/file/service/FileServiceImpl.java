@@ -1,6 +1,5 @@
 package org.nikita.spingproject.filestorage.file.service;
 
-import lombok.SneakyThrows;
 import org.nikita.spingproject.filestorage.file.File;
 import org.nikita.spingproject.filestorage.file.dao.FileDao;
 import org.nikita.spingproject.filestorage.file.dto.FileDownloadDto;
@@ -22,7 +21,6 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    @SneakyThrows
     public void uploadFile(FileUploadDto dto) {
         String absolutePath = pathFileService
                 .createAbsolutePathNewFile(
@@ -41,7 +39,6 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    @SneakyThrows
     public void deleteFile(FileDto dto) {
         String absolutePath = pathFileService.
                 createAbsolutePath(
@@ -52,14 +49,14 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    @SneakyThrows
     public FileDownloadDto downloadFile(FileDto dto) {
         String absolutePath = pathFileService
                 .createAbsolutePath(
                         dto.getPath(),
                         dto.getUserName());
+        File file = fileDao.get(absolutePath);
 
-        return new FileDownloadDto(fileDao.get(absolutePath));
+        return new FileDownloadDto(file.getInputStream(), file.getName());
     }
 
     @Override

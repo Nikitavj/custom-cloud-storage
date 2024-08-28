@@ -3,10 +3,10 @@ package org.nikita.spingproject.filestorage.search;
 import org.apache.commons.lang3.StringUtils;
 import org.nikita.spingproject.filestorage.commons.ObjectStorageDto;
 import org.nikita.spingproject.filestorage.directory.Directory;
-import org.nikita.spingproject.filestorage.directory.service.PathDirectoryService;
-import org.nikita.spingproject.filestorage.directory.service.PathDirectoryServiceImpl;
 import org.nikita.spingproject.filestorage.directory.dao.DirectoryDao;
 import org.nikita.spingproject.filestorage.directory.dao.DirectoryDaoImpl;
+import org.nikita.spingproject.filestorage.directory.service.PathDirectoryService;
+import org.nikita.spingproject.filestorage.directory.service.PathDirectoryServiceImpl;
 import org.nikita.spingproject.filestorage.file.File;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,7 @@ public class SearchFileServiceImpl implements SearchFileService {
     public List<ObjectStorageDto> search(SearchFileDto dto) {
         List<ObjectStorageDto> findObjects = new ArrayList<>();
         String rootPath = pathDirectoryService.rootPathForUser(dto.getUserName());
-        Directory directory = directoryDao.getAll(rootPath);
+        Directory directory = directoryDao.getRecursive(rootPath);
 
         for (Directory dir: directory.getDirectories()) {
             if(dir.getName().contains(dto.getName())) {

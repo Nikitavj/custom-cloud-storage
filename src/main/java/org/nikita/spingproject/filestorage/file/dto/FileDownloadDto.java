@@ -11,4 +11,5 @@ import java.io.InputStream;
 @NoArgsConstructor
 public class FileDownloadDto {
     private InputStream inputStream;
+    private String name;
 }
