@@ -5,13 +5,12 @@ import io.minio.StatObjectResponse;
 import io.minio.errors.*;
 import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
+import lombok.extern.slf4j.Slf4j;
 import org.nikita.spingproject.filestorage.commons.InfoOfObjectS3;
 import org.nikita.spingproject.filestorage.directory.Directory;
 import org.nikita.spingproject.filestorage.directory.exception.*;
 import org.nikita.spingproject.filestorage.directory.s3Api.DirectoryS3Api;
 import org.nikita.spingproject.filestorage.file.File;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -24,10 +23,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Repository
 public class DirectoryDaoImpl implements DirectoryDao {
     private DirectoryS3Api directoryS3Api;
-    private Logger logger = LoggerFactory.getLogger(DirectoryDaoImpl.class);
 
     @Autowired
     public DirectoryDaoImpl(DirectoryS3Api directoryS3Api) {
@@ -48,7 +47,7 @@ public class DirectoryDaoImpl implements DirectoryDao {
                     pathForMeta);
 
         } catch (MinioException | IOException | NoSuchAlgorithmException | InvalidKeyException e) {
-            logger.warn("Directory {} dont create", directory.getAbsolutePath());
+            log.warn("Directory {} dont create", directory.getAbsolutePath());
             throw new DirectoryCreatedException("Directory not created");
         }
     }
@@ -75,7 +74,7 @@ public class DirectoryDaoImpl implements DirectoryDao {
         } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
                  InternalException e) {
-            logger.warn("Directory {} dont get", absolutePath);
+            log.warn("Directory {} dont get", absolutePath);
             throw new GetDirectoryObjectsExcepton("Unable to get directory objects");
         }
     }
@@ -114,7 +113,7 @@ public class DirectoryDaoImpl implements DirectoryDao {
         } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
                  InternalException e) {
-            logger.warn("Directory {} dont remove", absolutePath);
+            log.warn("Directory {} dont remove", absolutePath);
             throw new DirectoryRemoveException("Directory not remove");
         }
     }
@@ -167,7 +166,7 @@ public class DirectoryDaoImpl implements DirectoryDao {
                  IOException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
                  InternalException e) {
-            logger.warn("Directory {} dont rename", previousAbsolutePath);
+            log.warn("Directory {} dont rename", previousAbsolutePath);
             throw new DirectoryRenameException("Directory dont rename");
         }
     }
@@ -190,7 +189,7 @@ public class DirectoryDaoImpl implements DirectoryDao {
         } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
                  InternalException e) {
-            logger.warn("Directory {} dont get all objects", absolutePath);
+            log.warn("Directory {} dont get all objects", absolutePath);
             throw new DirectorySearchFilesException("File search error");
         }
     }
