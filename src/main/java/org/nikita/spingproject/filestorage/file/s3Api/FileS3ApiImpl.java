@@ -2,6 +2,8 @@ package org.nikita.spingproject.filestorage.file.s3Api;
 
 import io.minio.*;
 import io.minio.errors.*;
+import org.nikita.spingproject.filestorage.commons.S3ApiImpl;
+import org.nikita.spingproject.filestorage.file.File;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -12,12 +14,13 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
 @Repository
-public class FileS3ApiImpl implements FileS3Api {
+public class FileS3ApiImpl extends S3ApiImpl<File> implements FileS3Api {
     private static String BUCKET_NAME = "user-files";
     private MinioClient minioClient;
 
     @Autowired
     public FileS3ApiImpl(MinioClient minioClient) {
+        super(minioClient);
         this.minioClient = minioClient;
     }
 
@@ -28,14 +31,6 @@ public class FileS3ApiImpl implements FileS3Api {
                 .object(path)
                 .stream(is, is.available(), -1)
                 .userMetadata(metaData)
-                .build());
-    }
-
-    @Override
-    public void deleteFile(String path) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-        minioClient.removeObject(RemoveObjectArgs.builder()
-                .bucket(BUCKET_NAME)
-                .object(path)
                 .build());
     }
 
@@ -60,15 +55,6 @@ public class FileS3ApiImpl implements FileS3Api {
                         .build())
                 .metadataDirective(Directive.REPLACE)
                 .userMetadata(metaData)
-                .build());
-    }
-
-    @Override
-    public StatObjectResponse getInfo(String path) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-        return minioClient.statObject(StatObjectArgs
-                .builder()
-                .bucket(BUCKET_NAME)
-                .object(path)
                 .build());
     }
 }

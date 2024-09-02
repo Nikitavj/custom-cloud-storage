@@ -7,6 +7,7 @@ import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
 import lombok.extern.slf4j.Slf4j;
 import org.nikita.spingproject.filestorage.commons.InfoOfObjectS3;
+import org.nikita.spingproject.filestorage.commons.S3ApiImpl;
 import org.nikita.spingproject.filestorage.directory.Directory;
 import org.nikita.spingproject.filestorage.directory.exception.*;
 import org.nikita.spingproject.filestorage.directory.s3Api.DirectoryS3Api;
@@ -100,7 +101,7 @@ public class DirectoryDaoImpl implements DirectoryDao {
     public void remove(String absolutePath) {
         String pathForMeta = absolutePath + "_meta";
         try {
-            directoryS3Api.deleteObject(pathForMeta);
+            directoryS3Api.removeObject(pathForMeta);
 
             Iterable<Result<Item>> results = directoryS3Api.getObjectsRecursive(absolutePath + "/");
             List<DeleteObject> deleteObjects = new ArrayList<>();

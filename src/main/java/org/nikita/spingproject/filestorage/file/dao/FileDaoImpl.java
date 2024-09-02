@@ -47,7 +47,7 @@ public class FileDaoImpl implements FileDao {
     @Override
     public void remove(String absolutePath) {
         try {
-            fileS3Api.deleteFile(absolutePath);
+            fileS3Api.removeObject(absolutePath);
         } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
                  InternalException e) {
