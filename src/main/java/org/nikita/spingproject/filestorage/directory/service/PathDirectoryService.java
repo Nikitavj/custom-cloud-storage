@@ -1,11 +1,11 @@
 package org.nikita.spingproject.filestorage.directory.service;
 
 public interface PathDirectoryService {
-    String rootPathForUser(String userName);
+    String rootPathForUser();
 
-    String absolutPath(String relativePath, String userName);
+    String absolutPath(String relativePath);
 
-    String absolutePathNewDir(String currentPath, String name, String userName);
+    String absolutePathNewDir(String currentPath, String name);
 
     String relativePath(String path, String name);
 

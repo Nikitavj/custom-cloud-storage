@@ -5,6 +5,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.nikita.spingproject.filestorage.account.User;
 import org.nikita.spingproject.filestorage.account.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,15 +19,16 @@ public class PathDirectoryServiceImpl implements PathDirectoryService {
     }
 
     @Override
-    public String rootPathForUser(String userName) {
-        User user = userRepository.findUserByEmail(userName)
-                .orElseThrow(() -> new EntityNotFoundException("User " + userName + "not exist"));
+    public String rootPathForUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = userRepository.findUserByEmail(auth.getName())
+                .orElseThrow(() -> new EntityNotFoundException("User " + auth.getName() + "not exist"));
         return String.format("user-%s-files", user.getId());
     }
 
     @Override
-    public String absolutPath(String relativePath, String userName) {
-        String rootPath = rootPathForUser(userName);
+    public String absolutPath(String relativePath) {
+        String rootPath = rootPathForUser();
         if (relativePath == null) {
             return String.format("%s", rootPath);
         } else {
@@ -36,8 +39,8 @@ public class PathDirectoryServiceImpl implements PathDirectoryService {
     }
 
     @Override
-    public String absolutePathNewDir(String currentPath, String name, String userName) {
-        String rootPath = rootPathForUser(userName);
+    public String absolutePathNewDir(String currentPath, String name) {
+        String rootPath = rootPathForUser();
         if (currentPath.isBlank()) {
             return String.format("%s/%s", rootPath, name);
         } else {

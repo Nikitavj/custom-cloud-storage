@@ -28,7 +28,7 @@ public class SearchFileServiceImpl implements SearchFileService {
     @Override
     public List<ObjectStorageDto> search(SearchFileDto dto) {
         List<ObjectStorageDto> findObjects = new ArrayList<>();
-        String rootPath = pathDirectoryService.rootPathForUser(dto.getUserName());
+        String rootPath = pathDirectoryService.rootPathForUser();
         Directory directory = directoryDao.getRecursive(rootPath);
 
         for (Directory dir: directory.getDirectories()) {

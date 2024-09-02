@@ -25,8 +25,7 @@ public class FileServiceImpl implements FileService {
         String absolutePath = pathFileService
                 .createAbsolutePathNewFile(
                         dto.getPath(),
-                        dto.getName(),
-                        dto.getUserName());
+                        dto.getName());
         String relativePath = pathFileService
                 .createRelativePath(dto.getPath(), dto.getName());
 
@@ -41,9 +40,7 @@ public class FileServiceImpl implements FileService {
     @Override
     public void deleteFile(FileDto dto) {
         String absolutePath = pathFileService.
-                createAbsolutePath(
-                        dto.getPath(),
-                        dto.getUserName());
+                createAbsolutePath(dto.getPath());
 
         fileDao.remove(absolutePath);
     }
@@ -52,8 +49,7 @@ public class FileServiceImpl implements FileService {
     public FileDownloadDto downloadFile(FileDto dto) {
         String absolutePath = pathFileService
                 .createAbsolutePath(
-                        dto.getPath(),
-                        dto.getUserName());
+                        dto.getPath());
         File file = fileDao.get(absolutePath);
 
         return new FileDownloadDto(file.getInputStream(), file.getName());
@@ -62,9 +58,7 @@ public class FileServiceImpl implements FileService {
     @Override
     public void renameFile(FileRenameDto dto) {
         String path = pathFileService
-                .createAbsolutePath(
-                        dto.getPath(),
-                        dto.getUserName());
+                .createAbsolutePath(dto.getPath());
         String newPath = pathFileService
                 .renameAbsolutePath(
                         path,

@@ -20,8 +20,7 @@ public class SearchController {
     private SearchFileService searchFileService;
 
     @GetMapping
-    public String search(@AuthenticationPrincipal UserDetails userDetails,
-                         @RequestParam(name = "query", required = false) String query,
+    public String search(@RequestParam(name = "query", required = false) String query,
                          Model model) {
 
         if (query == null || query.isBlank()) {
@@ -32,9 +31,7 @@ public class SearchController {
         List<ObjectStorageDto> findObjects = null;
         try {
             findObjects = searchFileService
-                    .search(new SearchFileDto(
-                            query,
-                            userDetails.getUsername()));
+                    .search(new SearchFileDto(query));
         } catch (DirectorySearchFilesException e) {
             model.addAttribute("errorSearch", e.getMessage());
         }

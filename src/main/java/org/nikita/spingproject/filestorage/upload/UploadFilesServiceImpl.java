@@ -6,7 +6,11 @@ import org.nikita.spingproject.filestorage.directory.service.DirectoryService;
 import org.nikita.spingproject.filestorage.file.dto.FileUploadDto;
 import org.nikita.spingproject.filestorage.file.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
 @Service
 public class UploadFilesServiceImpl implements UploadFilesService {
@@ -34,7 +38,7 @@ public class UploadFilesServiceImpl implements UploadFilesService {
         String[] namesDir = prefixPathFile.split("/");
         String pathNewDir = currentPath;
         for (String nameDir: namesDir) {
-            directoryService.createNewDirectory(new NewDirDto(pathNewDir ,nameDir, userName));
+            directoryService.createNewDirectory(new NewDirDto(pathNewDir ,nameDir));
 
             if (pathNewDir.isBlank()) {
                 pathNewDir = nameDir;

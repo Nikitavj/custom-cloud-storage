@@ -10,5 +10,4 @@ import lombok.NoArgsConstructor;
 public class FileRenameDto {
     private String path;
     private String newName;
-    private String userName;
 }

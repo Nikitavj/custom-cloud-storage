@@ -10,5 +10,4 @@ import lombok.NoArgsConstructor;
 public class NewDirDto {
     private String currentPath;
     private String name;
-    private String userName;
 }

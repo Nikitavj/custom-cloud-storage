@@ -176,15 +176,10 @@ public class DirectoryDaoImpl implements DirectoryDao {
         Iterable<Result<Item>> results = directoryS3Api.getObjectsRecursive(absolutePath + "/");
         try {
             List<Item> items = getListItemsNoIsMinioDir(results);
-
-            StatObjectResponse statResp = directoryS3Api.getInfo(absolutePath + "_meta");
-            InfoOfObjectS3 info = buildStatObject(statResp.userMetadata());
-
             return Directory.builder()
                     .absolutePath(absolutePath)
                     .directories(getDirFromItems(items))
                     .files(getFilesFromItems(items))
-                    .name(info.getName())
                     .build();
         } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |

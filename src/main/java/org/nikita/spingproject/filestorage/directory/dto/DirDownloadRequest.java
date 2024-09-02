@@ -9,5 +9,4 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DirDownloadRequest {
     private String path;
-    private String userName;
 }

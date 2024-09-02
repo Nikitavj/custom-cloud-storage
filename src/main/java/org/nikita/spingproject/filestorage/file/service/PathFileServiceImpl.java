@@ -5,6 +5,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.nikita.spingproject.filestorage.account.User;
 import org.nikita.spingproject.filestorage.account.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -43,14 +45,14 @@ public class PathFileServiceImpl implements PathFileService{
     }
 
     @Override
-    public String createAbsolutePath(String path, String nameUser) {
+    public String createAbsolutePath(String path) {
         return String.format("%s/%s",
-                createRootPathForUser(nameUser),
+                createRootPathForUser(),
                 path);
     }
 
     @Override
-    public String createAbsolutePathNewFile(String path, String nameFile, String nameUser) {
+    public String createAbsolutePathNewFile(String path, String nameFile) {
         if (path.isBlank()) {
             path = "";
         } else {
@@ -58,14 +60,15 @@ public class PathFileServiceImpl implements PathFileService{
         }
 
         return String.format("%s/%s%s",
-                createRootPathForUser(nameUser),
+                createRootPathForUser(),
                 path,
                 nameFile);
     }
 
-    private String createRootPathForUser(String userName) {
-        User user = userRepository.findUserByEmail(userName)
-                .orElseThrow(() -> new EntityNotFoundException("User " + userName + "not exist"));
+    private String createRootPathForUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = userRepository.findUserByEmail(auth.getName())
+                .orElseThrow(() -> new EntityNotFoundException("User " + auth.getName() + "not exist"));
         return String.format("user-%s-files", user.getId());
     }
 }

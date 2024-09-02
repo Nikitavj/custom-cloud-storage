@@ -32,9 +32,7 @@ public class DirectoryServiceImpl implements DirectoryService {
 
     @Override
     public DirDownloadResponse downloadDirectory(DirDownloadRequest request) throws IOException {
-        String absolutePath = pathDirectoryService.absolutPath(
-                request.getPath(),
-                request.getUserName());
+        String absolutePath = pathDirectoryService.absolutPath(request.getPath());
         Directory directory = directoryDao.get(absolutePath);
 
         String nameZipFile = directory.getName() + ".zip";
@@ -75,7 +73,7 @@ public class DirectoryServiceImpl implements DirectoryService {
 
     @Override
     public List<ObjectStorageDto> getObjectsDirectory(ObjectsDirDto dto) {
-        String absolutePath = pathDirectoryService.absolutPath(dto.getRelativePath(), dto.getUserName());
+        String absolutePath = pathDirectoryService.absolutPath(dto.getRelativePath());
         Directory directory = directoryDao.get(absolutePath);
 
         List<ObjectStorageDto> objects = new ArrayList<>();
@@ -90,7 +88,7 @@ public class DirectoryServiceImpl implements DirectoryService {
 
     @Override
     public DirDto createNewDirectory(NewDirDto dto) {
-        String absolutePath = pathDirectoryService.absolutePathNewDir(dto.getCurrentPath(), dto.getName(), dto.getUserName());
+        String absolutePath = pathDirectoryService.absolutePathNewDir(dto.getCurrentPath(), dto.getName());
         String relativePath = pathDirectoryService.relativePath(dto.getCurrentPath(), dto.getName());
 
         Directory directory = Directory.builder()
@@ -105,13 +103,13 @@ public class DirectoryServiceImpl implements DirectoryService {
 
     @Override
     public void deleteDirectory(DeleteDirDto dto) {
-        String absolutePath = pathDirectoryService.absolutPath(dto.getRelativePath(), dto.getUserName());
+        String absolutePath = pathDirectoryService.absolutPath(dto.getRelativePath());
         directoryDao.remove(absolutePath);
     }
 
     @Override
     public void renameDirectory(RenameDirDto dto) {
-        String previousAbsolutePath = pathDirectoryService.absolutPath(dto.getPreviousPath(), dto.getUserName());
+        String previousAbsolutePath = pathDirectoryService.absolutPath(dto.getPreviousPath());
         String newAbsolutePath = pathDirectoryService.renameAbsolutePath(previousAbsolutePath, dto.getNewName());
         String newRelativePath = pathDirectoryService.renameRelativePath(dto.getPreviousPath(), dto.getNewName());
         directoryDao.rename(

@@ -10,8 +10,6 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -33,13 +31,10 @@ public class DirectoryController {
 
     @GetMapping
     public ResponseEntity<InputStreamResource> downloadDirectory(
-            @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam String path
     ) throws IOException {
-        DirDownloadResponse response = directoryService.downloadDirectory(
-                new DirDownloadRequest(
-                        path,
-                        userDetails.getUsername()));
+        DirDownloadResponse response = directoryService
+                .downloadDirectory(new DirDownloadRequest(path));
 
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + response.getName());
@@ -52,10 +47,9 @@ public class DirectoryController {
     }
 
     @PostMapping
-    public RedirectView createNewFolder(@AuthenticationPrincipal UserDetails userDetails,
-                                        @RequestParam("name") String nameFolder,
-                                        @RequestParam("current_path") String currentPath,
-                                        RedirectAttributes redirectAttributes) {
+    public String createNewFolder(@RequestParam("name") String nameFolder,
+                                  @RequestParam("current_path") String currentPath,
+                                  RedirectAttributes redirectAttributes) {
 
         String redirectPath = "/?path=" + currentPath;
         if (currentPath == null || currentPath.isBlank()) {
@@ -64,33 +58,29 @@ public class DirectoryController {
 
         if (nameFolder == null || nameFolder.isBlank()) {
             redirectAttributes.addFlashAttribute("errorCreate", "Empty field");
-            return new RedirectView(redirectPath);
+            return "redirect:" + redirectPath;
         }
 
         try {
             DirDto newDirectory = directoryService
                     .createNewDirectory(new NewDirDto(
                             currentPath,
-                            nameFolder,
-                            userDetails.getUsername()));
-            return new RedirectView("/?path=" + newDirectory.getRelativePath());
+                            nameFolder));
+            return "redirect:/?path=" + newDirectory.getRelativePath();
 
         } catch (DirectoryCreatedException e) {
             redirectAttributes.addFlashAttribute("errorCreate", e.getMessage());
-            return new RedirectView(redirectPath);
+            return "redirect:" + redirectPath;
         }
     }
 
     @DeleteMapping
-    public String deleteFolder(@AuthenticationPrincipal UserDetails userDetails,
-                               @RequestParam(name = "current_path", required = false) String currentPath,
+    public String deleteFolder(@RequestParam(name = "current_path", required = false) String currentPath,
                                @RequestParam("path") String relativePath) {
 
         try {
             directoryService.deleteDirectory(
-                    new DeleteDirDto(
-                            relativePath,
-                            userDetails.getUsername()));
+                    new DeleteDirDto(relativePath));
         } catch (DirectoryRemoveException e) {
             throw new RuntimeException(e);
         }
@@ -103,8 +93,7 @@ public class DirectoryController {
     }
 
     @PutMapping
-    public RedirectView renameDirectory(@AuthenticationPrincipal UserDetails userDetails,
-                                        @RequestParam(value = "new_name", required = false) String newName,
+    public RedirectView renameDirectory(@RequestParam(value = "new_name", required = false) String newName,
                                         @RequestParam("path") String relativePath,
                                         @RequestParam(name = "current_path", required = false) String currentPath,
                                         RedirectAttributes redirectAttributes) {
@@ -123,8 +112,7 @@ public class DirectoryController {
             directoryService.renameDirectory(
                     new RenameDirDto(
                             relativePath,
-                            newName,
-                            userDetails.getUsername()));
+                            newName));
         } catch (DirectoryRenameException e) {
             redirectAttributes.addFlashAttribute("errorRenameDir", e.getMessage());
         }

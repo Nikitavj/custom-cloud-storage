@@ -7,7 +7,7 @@ public interface PathFileService {
 
     String createRelativePath(String path, String name);
 
-    String createAbsolutePath(String path, String nameUser);
+    String createAbsolutePath(String path);
 
-    String createAbsolutePathNewFile(String path, String nameFile, String nameUser);
+    String createAbsolutePathNewFile(String path, String nameFile);
 }

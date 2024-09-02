@@ -31,12 +31,9 @@ public class FileController {
     }
 
     @GetMapping
-    public ResponseEntity<InputStreamResource> downloadFile(@AuthenticationPrincipal UserDetails userDetails,
-                                                            @RequestParam String path) {
+    public ResponseEntity<InputStreamResource> downloadFile(@RequestParam String path) {
         FileDownloadDto dto = fileService
-                .downloadFile(new FileDto(
-                        path,
-                        userDetails.getUsername()));
+                .downloadFile(new FileDto(path));
 
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + dto.getName());
@@ -48,8 +45,7 @@ public class FileController {
     }
 
     @PutMapping
-    public RedirectView renameFile(@AuthenticationPrincipal UserDetails userDetails,
-                                   @RequestParam("new_name") String newName,
+    public RedirectView renameFile(@RequestParam("new_name") String newName,
                                    @RequestParam String path,
                                    @RequestParam(name = "current_path", required = false) String currentPath,
                                    RedirectAttributes redirectAttributes) {
@@ -64,10 +60,10 @@ public class FileController {
         }
 
         try {
-            fileService.renameFile(new FileRenameDto(
-                    path,
-                    newName,
-                    userDetails.getUsername()));
+            fileService.renameFile(
+                    new FileRenameDto(
+                            path,
+                            newName));
         } catch (FileRenameException e) {
             redirectAttributes.addFlashAttribute("errorRenameFile", e.getMessage());
         }
@@ -75,13 +71,10 @@ public class FileController {
     }
 
     @DeleteMapping
-    public String deleteFile(@AuthenticationPrincipal UserDetails userDetails,
-                             @RequestParam(name = "current_path", required = false) String currentPath,
+    public String deleteFile(@RequestParam(name = "current_path", required = false) String currentPath,
                              @RequestParam String path) {
 
-        fileService.deleteFile(new FileDto(
-                path,
-                userDetails.getUsername()));
+        fileService.deleteFile(new FileDto(path));
 
         if (currentPath.isBlank()) {
             return "redirect:/";

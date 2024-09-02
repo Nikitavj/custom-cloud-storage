@@ -10,5 +10,4 @@ import lombok.NoArgsConstructor;
 public class RenameDirDto {
     private String previousPath;
     private String newName;
-    private String userName;
 }

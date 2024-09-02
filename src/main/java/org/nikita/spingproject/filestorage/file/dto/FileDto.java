@@ -9,5 +9,4 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class FileDto {
     private String path;
-    private String userName;
 }

@@ -10,5 +10,4 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SearchFileDto {
     private String name;
-    private String userName;
 }
