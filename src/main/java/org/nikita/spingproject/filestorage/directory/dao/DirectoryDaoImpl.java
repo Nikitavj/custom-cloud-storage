@@ -7,7 +7,6 @@ import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
 import lombok.extern.slf4j.Slf4j;
 import org.nikita.spingproject.filestorage.commons.InfoOfObjectS3;
-import org.nikita.spingproject.filestorage.commons.S3ApiImpl;
 import org.nikita.spingproject.filestorage.directory.Directory;
 import org.nikita.spingproject.filestorage.directory.exception.*;
 import org.nikita.spingproject.filestorage.directory.s3Api.DirectoryS3Api;
@@ -56,7 +55,7 @@ public class DirectoryDaoImpl implements DirectoryDao {
     @Override
     public Directory get(String absolutePath) {
         Directory directory = new Directory();
-        ;
+
         try {
             if (absolutePath.contains("/")) {
                 StatObjectResponse info = directoryS3Api.getInfo(absolutePath + "_meta");

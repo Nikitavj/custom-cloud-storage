@@ -40,7 +40,7 @@ public class FileDaoImpl implements FileDao {
                     file.getInputStream());
         } catch (Exception e) {
             log.warn("File {} dont add", file.getAbsolutePath());
-            throw new FileCreateException("File not uploaded");
+            throw new FileCreateException("File upload error");
         }
     }
 
@@ -70,7 +70,7 @@ public class FileDaoImpl implements FileDao {
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
                  InternalException e) {
             log.warn("File {} dont get", absolutePath);
-            throw new FileDownloadException("File not download");
+            throw new FileDownloadException("File download error");
         }
     }
 

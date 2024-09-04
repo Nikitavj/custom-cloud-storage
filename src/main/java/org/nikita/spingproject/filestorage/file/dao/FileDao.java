@@ -1,10 +1,8 @@
 package org.nikita.spingproject.filestorage.file.dao;
 
+import org.nikita.spingproject.filestorage.commons.BaseDao;
 import org.nikita.spingproject.filestorage.file.File;
 
-public interface FileDao {
-    void add(File file);
-    void remove(String absolutePath);
-    File get(String absolutePath);
+public interface FileDao extends BaseDao<File> {
     void rename(String prevAbsolutePath, String targetAbsolutePath, String relativePath, String name);
 }
