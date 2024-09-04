@@ -1,9 +1,7 @@
 package org.nikita.spingproject.filestorage.directory;
 
 import org.nikita.spingproject.filestorage.directory.dto.*;
-import org.nikita.spingproject.filestorage.directory.exception.DirectoryCreatedException;
-import org.nikita.spingproject.filestorage.directory.exception.DirectoryRemoveException;
-import org.nikita.spingproject.filestorage.directory.exception.DirectoryRenameException;
+import org.nikita.spingproject.filestorage.directory.exception.*;
 import org.nikita.spingproject.filestorage.directory.service.DirectoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -31,19 +29,22 @@ public class DirectoryController {
 
     @GetMapping
     public ResponseEntity<InputStreamResource> downloadDirectory(
-            @RequestParam String path
-    ) throws IOException {
-        DirDownloadResponse response = directoryService
-                .downloadDirectory(new DirDownloadRequest(path));
+            @RequestParam String path) {
+        try {
+            DirDownloadResponse response = directoryService
+                    .downloadDirectory(new DirDownloadRequest(path));
 
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + response.getName());
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + response.getName());
+            return ResponseEntity
+                    .ok()
+                    .headers(responseHeaders)
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(new InputStreamResource(response.getInputStream()));
 
-        return ResponseEntity
-                .ok()
-                .headers(responseHeaders)
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(new InputStreamResource(response.getInputStream()));
+        } catch (GetDirectoryObjectsExcepton | IOException e) {
+            throw new DirectoryDownloadException("Folder download error");
+        }
     }
 
     @PostMapping

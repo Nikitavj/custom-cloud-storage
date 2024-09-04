@@ -4,12 +4,15 @@ import org.nikita.spingproject.filestorage.commons.ObjectStorageDto;
 import org.nikita.spingproject.filestorage.directory.Directory;
 import org.nikita.spingproject.filestorage.directory.dao.DirectoryDao;
 import org.nikita.spingproject.filestorage.directory.dto.*;
+import org.nikita.spingproject.filestorage.directory.exception.DirectoryDownloadException;
 import org.nikita.spingproject.filestorage.file.File;
 import org.nikita.spingproject.filestorage.file.dao.FileDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -42,9 +45,6 @@ public class DirectoryServiceImpl implements DirectoryService {
             zipDirectory(directory, directory.getName(), zos);
             FileInputStream fis = new FileInputStream(zipPath.toFile());
             return new DirDownloadResponse(fis, nameZipFile);
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -58,15 +58,17 @@ public class DirectoryServiceImpl implements DirectoryService {
         }
 
         for (File file: files) {
-            File file1 = fileDao.get(file.getAbsolutePath());
-            InputStream is = file1.getInputStream();
-            ZipEntry zipEntry = new ZipEntry(prefixPath + "/" + file.getName());
-            zos.putNextEntry(zipEntry);
+            File fileWithIS = fileDao.get(file.getAbsolutePath());
 
-            byte[] bytes = new byte[1024];
-            int length;
-            while ((length = is.read(bytes)) >= 0) {
-                zos.write(bytes);
+            try (InputStream is = fileWithIS.getInputStream()) {
+                ZipEntry zipEntry = new ZipEntry(prefixPath + "/" + file.getName());
+                zos.putNextEntry(zipEntry);
+                byte[] bytes = new byte[1024];
+                int length;
+                while ((length = is.read(bytes)) >= 0) {
+                    zos.write(bytes);
+                }
+                zos.closeEntry();
             }
         }
     }

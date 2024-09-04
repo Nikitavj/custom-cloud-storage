@@ -5,7 +5,7 @@ import io.minio.errors.*;
 import io.minio.messages.DeleteError;
 import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
-import org.nikita.spingproject.filestorage.commons.S3ApiImpl;
+import org.nikita.spingproject.filestorage.commons.s3Api.S3ApiImpl;
 import org.nikita.spingproject.filestorage.directory.Directory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;

@@ -15,5 +15,4 @@ public class FileUploadDto {
     private InputStream inputStream;
     private String name;
     private String path;
-    private String userName;
 }

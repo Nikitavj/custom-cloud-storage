@@ -1,11 +1,10 @@
-package org.nikita.spingproject.filestorage.commons;
+package org.nikita.spingproject.filestorage.commons.s3Api;
 
 import io.minio.MinioClient;
 import io.minio.RemoveObjectArgs;
 import io.minio.StatObjectArgs;
 import io.minio.StatObjectResponse;
 import io.minio.errors.*;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;

@@ -2,7 +2,7 @@ package org.nikita.spingproject.filestorage.file.s3Api;
 
 import io.minio.*;
 import io.minio.errors.*;
-import org.nikita.spingproject.filestorage.commons.S3ApiImpl;
+import org.nikita.spingproject.filestorage.commons.s3Api.S3ApiImpl;
 import org.nikita.spingproject.filestorage.file.File;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;

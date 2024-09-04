@@ -76,6 +76,9 @@
         <input name="path" type="hidden" th:value="${current_path}">
         <br/>
         <input type="submit" value="Upload">
+        <div>
+            <p th:if="${errorUpload}" th:text="${errorUpload}" style="color:red">Error</p>
+        </div>
     </form>
 
     <br>
@@ -131,38 +134,45 @@
 
         <div>
             <div th:if="${!entity.isDir()}">
-            <button th:data-path="'/file?path=' + ${entity.relativePath}"
-                    th:data-name="${entity.name}"
-                    th:onclick="downloadFile(this.getAttribute('data-path'), this.getAttribute('data-name'))">
-                Download
-            </button>
-        </div>
+                <button th:data-path="'/file?path=' + ${entity.relativePath}"
+                        th:data-name="${entity.name}"
+                        th:onclick="downloadFile(this.getAttribute('data-path'), this.getAttribute('data-name'))">
+                    Download
+                </button>
+            </div>
 
-        <div>
+
             <div th:if="${entity.isDir()}">
-            <button th:data-path="'/directory?path=' + ${entity.relativePath}"
-                    th:data-name="${entity.name}"
-                    th:onclick="downloadFile(this.getAttribute('data-path'), this.getAttribute('data-name'))">
-                Download
-            </button>
-        </div>
+                <button th:data-path="'/directory?path=' + ${entity.relativePath}"
+                        th:data-name="${entity.name}"
+                        th:onclick="downloadFile(this.getAttribute('data-path'), this.getAttribute('data-name'))">
+                    Download
+                </button>
+            </div>
 
-        <div th:if="${!entity.isDir()}">
-            <form th:method="DELETE" th:action="@{/file(path=${entity.relativePath})}">
-                <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden">
-                <input type="hidden" name="current_path" th:value="${current_path}">
-                <input type="submit" name="delete" value="Delete">
-            </form>
-        </div>
 
-        <div th:if="${entity.isDir()}">
-            <form th:method="DELETE" th:action="@{/directory(path=${entity.relativePath})}">
-                <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden">
-                <input type="hidden" name="current_path" th:value="${current_path}">
-                <input type="submit" name="delete" value="Delete">
-            </form>
+            <div th:if="${!entity.isDir()}">
+                <form th:method="DELETE" th:action="@{/file(path=${entity.relativePath})}">
+                    <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden">
+                    <input type="hidden" name="current_path" th:value="${current_path}">
+                    <input type="submit" name="delete" value="Delete">
+                </form>
+            </div>
+
+            <div th:if="${entity.isDir()}">
+                <form th:method="DELETE" th:action="@{/directory(path=${entity.relativePath})}">
+                    <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden">
+                    <input type="hidden" name="current_path" th:value="${current_path}">
+                    <input type="submit" name="delete" value="Delete">
+                </form>
+            </div>
+            <br>
         </div>
-        <br>
+    </div>
+
+
+    <div id="error-download" style="color:red">
+
     </div>
 </main>
 
@@ -193,7 +203,11 @@
                 if (response.ok) {
                     return response.blob();
                 }
-                throw new Error('Network response was not ok.');
+                response.text()
+                    .then(errorText => {
+                            document.getElementById('error-download').innerHTML = errorText;
+                        }
+                    )
             })
             .then(blob => {
                 const url = window.URL.createObjectURL(blob);
@@ -206,7 +220,6 @@
                 a.click();
                 window.URL.revokeObjectURL(url);
             })
-            .catch(error => console.error('There has been a problem with your fetch operation:', error));
     }
 </script>
 </html>

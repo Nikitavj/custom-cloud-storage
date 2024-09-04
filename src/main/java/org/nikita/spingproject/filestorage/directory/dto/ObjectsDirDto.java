@@ -9,5 +9,4 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ObjectsDirDto {
     private String relativePath;
-    private String userName;
 }

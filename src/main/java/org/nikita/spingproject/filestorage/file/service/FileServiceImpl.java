@@ -51,7 +51,6 @@ public class FileServiceImpl implements FileService {
                 .createAbsolutePath(
                         dto.getPath());
         File file = fileDao.get(absolutePath);
-
         return new FileDownloadDto(file.getInputStream(), file.getName());
     }
 

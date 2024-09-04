@@ -1,6 +1,5 @@
 package org.nikita.spingproject.filestorage.commons;
 
-import lombok.SneakyThrows;
 import org.nikita.spingproject.filestorage.commons.breadcrumbs.BreadcrumbsUtil;
 import org.nikita.spingproject.filestorage.directory.dto.ObjectsDirDto;
 import org.nikita.spingproject.filestorage.directory.service.DirectoryService;
@@ -15,6 +14,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
 import java.util.List;
@@ -39,7 +40,8 @@ public class StorageController {
             return "home";
         }
 
-        List<ObjectStorageDto> entities = directoryService.getObjectsDirectory(new ObjectsDirDto(path, userDetails.getUsername()));
+        List<ObjectStorageDto> entities = directoryService
+                .getObjectsDirectory(new ObjectsDirDto(path));
         model.addAttribute("objects_dir", entities);
         model.addAttribute("current_path", path);
         model.addAttribute("bread_crumbs", BreadcrumbsUtil.createBreadcrumbs(path));
@@ -47,28 +49,34 @@ public class StorageController {
     }
 
     @PostMapping
-    public String upload(@AuthenticationPrincipal UserDetails userDetails,
-                         @RequestParam("file") MultipartFile[] multFiles,
-                         @RequestParam String path) throws IOException {
+    public RedirectView upload(@AuthenticationPrincipal UserDetails userDetails,
+                               @RequestParam("file") MultipartFile[] multFiles,
+                               @RequestParam String path,
+                               RedirectAttributes redirectAttributes) {
 
         if (userDetails == null) {
-            return "home";
+            return new RedirectView( "home");
         }
 
-        for (MultipartFile multFile : multFiles) {
-            uploadFilesService.upload(
-                    FileUploadDto.builder()
-                            .inputStream(multFile.getInputStream())
-                            .name(multFile.getOriginalFilename())
-                            .path(path)
-                            .userName(userDetails.getUsername())
-                            .build());
+        try {
+
+
+            for (MultipartFile multFile : multFiles) {
+                uploadFilesService.upload(
+                        FileUploadDto.builder()
+                                .inputStream(multFile.getInputStream())
+                                .name(multFile.getOriginalFilename())
+                                .path(path)
+                                .build());
+            }
+        } catch (IOException e) {
+            redirectAttributes.addFlashAttribute("errorUpload", "Error loading object");
         }
 
         if (path.isBlank()) {
-            return "redirect:/";
+            return new RedirectView( "/");
         } else {
-            return "redirect:/" + "?path=" + path;
+            return new RedirectView("/?path=" + path);
         }
     }
 }
