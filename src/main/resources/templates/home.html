@@ -171,7 +171,7 @@
     </div>
 
 
-    <div id="error-download" style="color:red">
+    <div id="error-message" style="color:red" th:text="${errorMessage}">
 
     </div>
 </main>
@@ -205,7 +205,7 @@
                 }
                 response.text()
                     .then(errorText => {
-                            document.getElementById('error-download').innerHTML = errorText;
+                            document.getElementById('error-message').innerHTML = errorText;
                         }
                     )
             })

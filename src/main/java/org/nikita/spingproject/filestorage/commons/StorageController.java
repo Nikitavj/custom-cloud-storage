@@ -2,8 +2,10 @@ package org.nikita.spingproject.filestorage.commons;
 
 import org.nikita.spingproject.filestorage.commons.breadcrumbs.BreadcrumbsUtil;
 import org.nikita.spingproject.filestorage.directory.dto.ObjectsDirDto;
+import org.nikita.spingproject.filestorage.directory.exception.DirectoryCreatedException;
 import org.nikita.spingproject.filestorage.directory.service.DirectoryService;
 import org.nikita.spingproject.filestorage.file.dto.FileUploadDto;
+import org.nikita.spingproject.filestorage.file.exception.FileUploadException;
 import org.nikita.spingproject.filestorage.upload.UploadFilesServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -53,14 +55,22 @@ public class StorageController {
                                @RequestParam("file") MultipartFile[] multFiles,
                                @RequestParam String path,
                                RedirectAttributes redirectAttributes) {
-
-        if (userDetails == null) {
-            return new RedirectView( "home");
+        String redirectPath = "/?path=" + path;
+        if (path == null || path.isBlank()) {
+            redirectPath = "/";
         }
 
+        if (userDetails == null) {
+            return new RedirectView("/");
+        }
+
+        //TODO: проверить имена загружаемых файлов,
+        // если имя пустое или содержит недопустимве символы,
+        // то вернуться на ту же страницу с ошибкой
+
+
+
         try {
-
-
             for (MultipartFile multFile : multFiles) {
                 uploadFilesService.upload(
                         FileUploadDto.builder()
@@ -69,14 +79,9 @@ public class StorageController {
                                 .path(path)
                                 .build());
             }
-        } catch (IOException e) {
-            redirectAttributes.addFlashAttribute("errorUpload", "Error loading object");
+        } catch (FileUploadException | DirectoryCreatedException | IOException e) {
+            redirectAttributes.addFlashAttribute("errorUpload", "Error upload object");
         }
-
-        if (path.isBlank()) {
-            return new RedirectView( "/");
-        } else {
-            return new RedirectView("/?path=" + path);
-        }
+        return new RedirectView(redirectPath);
     }
 }

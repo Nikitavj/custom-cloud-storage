@@ -4,7 +4,7 @@ import io.minio.StatObjectResponse;
 import io.minio.errors.*;
 import lombok.extern.slf4j.Slf4j;
 import org.nikita.spingproject.filestorage.file.File;
-import org.nikita.spingproject.filestorage.file.exception.FileCreateException;
+import org.nikita.spingproject.filestorage.file.exception.FileUploadException;
 import org.nikita.spingproject.filestorage.file.exception.FileDownloadException;
 import org.nikita.spingproject.filestorage.file.exception.FileRemoveException;
 import org.nikita.spingproject.filestorage.file.exception.FileRenameException;
@@ -40,7 +40,7 @@ public class FileDaoImpl implements FileDao {
                     file.getInputStream());
         } catch (Exception e) {
             log.warn("File {} dont add", file.getAbsolutePath());
-            throw new FileCreateException("File upload error");
+            throw new FileUploadException("File upload error");
         }
     }
 

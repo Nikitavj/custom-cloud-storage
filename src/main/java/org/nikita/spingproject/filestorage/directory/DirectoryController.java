@@ -9,6 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -48,9 +49,9 @@ public class DirectoryController {
     }
 
     @PostMapping
-    public String createNewFolder(@RequestParam("name") String nameFolder,
-                                  @RequestParam("current_path") String currentPath,
-                                  RedirectAttributes redirectAttributes) {
+    public RedirectView createNewFolder(@RequestParam("name") String nameFolder,
+                                        @RequestParam("current_path") String currentPath,
+                                        RedirectAttributes redirectAttributes) {
 
         String redirectPath = "/?path=" + currentPath;
         if (currentPath == null || currentPath.isBlank()) {
@@ -59,7 +60,7 @@ public class DirectoryController {
 
         if (nameFolder == null || nameFolder.isBlank()) {
             redirectAttributes.addFlashAttribute("errorCreate", "Empty field");
-            return "redirect:" + redirectPath;
+            new RedirectView(redirectPath);
         }
 
         try {
@@ -67,30 +68,29 @@ public class DirectoryController {
                     .createNewDirectory(new NewDirDto(
                             currentPath,
                             nameFolder));
-            return "redirect:/?path=" + newDirectory.getRelativePath();
-
         } catch (DirectoryCreatedException e) {
             redirectAttributes.addFlashAttribute("errorCreate", e.getMessage());
-            return "redirect:" + redirectPath;
         }
+        return new RedirectView(redirectPath);
     }
 
     @DeleteMapping
-    public String deleteFolder(@RequestParam(name = "current_path", required = false) String currentPath,
-                               @RequestParam("path") String relativePath) {
+    public RedirectView deleteFolder(@RequestParam(name = "current_path", required = false) String currentPath,
+                                     @RequestParam("path") String relativePath,
+                                     RedirectAttributes redirectAttributes) {
+        String redirectPath = "/?path=" + currentPath;
+        if (currentPath == null || currentPath.isBlank()) {
+            redirectPath = "/";
+        }
 
         try {
             directoryService.deleteDirectory(
                     new DeleteDirDto(relativePath));
         } catch (DirectoryRemoveException e) {
-            throw new RuntimeException(e);
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
 
-        if (currentPath.isBlank()) {
-            return "redirect:/";
-        } else {
-            return "redirect:/" + "?path=" + currentPath;
-        }
+        return new RedirectView(redirectPath);
     }
 
     @PutMapping

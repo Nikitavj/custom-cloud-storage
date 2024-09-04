@@ -26,20 +26,19 @@ public class SearchController {
             return "search";
         }
 
-        List<ObjectStorageDto> findObjects = null;
         try {
-            findObjects = searchFileService
+            model.addAttribute("query", query);
+            List<ObjectStorageDto> findObjects = searchFileService
                     .search(new SearchFileDto(query));
+
+            if (findObjects.isEmpty()) {
+                model.addAttribute("errorSearch", "Nothing found");
+            } else {
+                model.addAttribute("find_objects", findObjects);
+            }
         } catch (DirectorySearchFilesException e) {
             model.addAttribute("errorSearch", e.getMessage());
         }
-
-        if (findObjects.isEmpty()) {
-            model.addAttribute("errorSearch", "Nothing found");
-        } else {
-            model.addAttribute("find_objects", findObjects);
-        }
-
         return "search";
     }
 }

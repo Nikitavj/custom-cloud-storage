@@ -3,6 +3,7 @@ package org.nikita.spingproject.filestorage.file;
 import org.nikita.spingproject.filestorage.file.dto.FileDownloadDto;
 import org.nikita.spingproject.filestorage.file.dto.FileDto;
 import org.nikita.spingproject.filestorage.file.dto.FileRenameDto;
+import org.nikita.spingproject.filestorage.file.exception.FileRemoveException;
 import org.nikita.spingproject.filestorage.file.exception.FileRenameException;
 import org.nikita.spingproject.filestorage.file.service.FileService;
 import org.nikita.spingproject.filestorage.file.service.FileServiceImpl;
@@ -67,15 +68,21 @@ public class FileController {
     }
 
     @DeleteMapping
-    public String deleteFile(@RequestParam(name = "current_path", required = false) String currentPath,
-                             @RequestParam String path) {
+    public RedirectView deleteFile(@RequestParam(name = "current_path", required = false) String currentPath,
+                                   @RequestParam String path,
+                                   RedirectAttributes redirectAttributes) {
 
-        fileService.deleteFile(new FileDto(path));
-
-        if (currentPath.isBlank()) {
-            return "redirect:/";
-        } else {
-            return "redirect:/" + "?path=" + currentPath;
+        String redirectPath = "/?path=" + currentPath;
+        if (currentPath == null || currentPath.isBlank()) {
+            redirectPath = "/";
         }
+
+        try {
+            fileService.deleteFile(new FileDto(path));
+            throw new FileRemoveException("ошибка удаления файла!!!");
+        } catch (FileRenameException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return new RedirectView(redirectPath);
     }
 }
