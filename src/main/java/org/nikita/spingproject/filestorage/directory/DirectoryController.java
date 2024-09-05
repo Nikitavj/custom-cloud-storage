@@ -3,6 +3,7 @@ package org.nikita.spingproject.filestorage.directory;
 import org.nikita.spingproject.filestorage.directory.dto.*;
 import org.nikita.spingproject.filestorage.directory.exception.*;
 import org.nikita.spingproject.filestorage.directory.service.DirectoryService;
+import org.nikita.spingproject.filestorage.utils.NameFileValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -60,15 +61,18 @@ public class DirectoryController {
 
         if (nameFolder == null || nameFolder.isBlank()) {
             redirectAttributes.addFlashAttribute("errorCreate", "Empty field");
-            new RedirectView(redirectPath);
+            return new RedirectView(redirectPath);
         }
 
         try {
+            NameFileValidator.checkDirectoryName(nameFolder);
             DirDto newDirectory = directoryService
                     .createNewDirectory(new NewDirDto(
                             currentPath,
                             nameFolder));
-        } catch (DirectoryCreatedException e) {
+            return new RedirectView("/?path=" + newDirectory.getRelativePath());
+
+        } catch (DirectoryCreatedException | DirectoryNameException e) {
             redirectAttributes.addFlashAttribute("errorCreate", e.getMessage());
         }
         return new RedirectView(redirectPath);
@@ -110,11 +114,12 @@ public class DirectoryController {
         }
 
         try {
+            NameFileValidator.checkDirectoryName(newName);
             directoryService.renameDirectory(
                     new RenameDirDto(
                             relativePath,
                             newName));
-        } catch (DirectoryRenameException e) {
+        } catch (DirectoryRenameException | DirectoryNameException e) {
             redirectAttributes.addFlashAttribute("errorRenameDir", e.getMessage());
         }
         return new RedirectView(redirectPath);

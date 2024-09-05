@@ -3,10 +3,15 @@ package org.nikita.spingproject.filestorage.commons;
 import org.nikita.spingproject.filestorage.commons.breadcrumbs.BreadcrumbsUtil;
 import org.nikita.spingproject.filestorage.directory.dto.ObjectsDirDto;
 import org.nikita.spingproject.filestorage.directory.exception.DirectoryCreatedException;
+import org.nikita.spingproject.filestorage.directory.exception.DirectoryNameException;
+import org.nikita.spingproject.filestorage.directory.exception.DirectoryRenameException;
 import org.nikita.spingproject.filestorage.directory.service.DirectoryService;
 import org.nikita.spingproject.filestorage.file.dto.FileUploadDto;
+import org.nikita.spingproject.filestorage.file.exception.FileNameException;
+import org.nikita.spingproject.filestorage.file.exception.FileRenameException;
 import org.nikita.spingproject.filestorage.file.exception.FileUploadException;
 import org.nikita.spingproject.filestorage.upload.UploadFilesServiceImpl;
+import org.nikita.spingproject.filestorage.utils.NameFileValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -60,17 +65,11 @@ public class StorageController {
             redirectPath = "/";
         }
 
-        if (userDetails == null) {
-            return new RedirectView("/");
-        }
-
-        //TODO: проверить имена загружаемых файлов,
-        // если имя пустое или содержит недопустимве символы,
-        // то вернуться на ту же страницу с ошибкой
-
-
-
         try {
+            for (MultipartFile multFile : multFiles) {
+                NameFileValidator.checkUploadName(multFile.getOriginalFilename());
+            }
+
             for (MultipartFile multFile : multFiles) {
                 uploadFilesService.upload(
                         FileUploadDto.builder()
@@ -81,6 +80,8 @@ public class StorageController {
             }
         } catch (FileUploadException | DirectoryCreatedException | IOException e) {
             redirectAttributes.addFlashAttribute("errorUpload", "Error upload object");
+        } catch (DirectoryNameException | FileNameException e) {
+            redirectAttributes.addFlashAttribute("errorUpload", e.getMessage());
         }
         return new RedirectView(redirectPath);
     }

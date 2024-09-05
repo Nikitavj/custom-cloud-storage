@@ -3,10 +3,12 @@ package org.nikita.spingproject.filestorage.file;
 import org.nikita.spingproject.filestorage.file.dto.FileDownloadDto;
 import org.nikita.spingproject.filestorage.file.dto.FileDto;
 import org.nikita.spingproject.filestorage.file.dto.FileRenameDto;
+import org.nikita.spingproject.filestorage.file.exception.FileNameException;
 import org.nikita.spingproject.filestorage.file.exception.FileRemoveException;
 import org.nikita.spingproject.filestorage.file.exception.FileRenameException;
 import org.nikita.spingproject.filestorage.file.service.FileService;
 import org.nikita.spingproject.filestorage.file.service.FileServiceImpl;
+import org.nikita.spingproject.filestorage.utils.NameFileValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -57,11 +59,12 @@ public class FileController {
         }
 
         try {
+            NameFileValidator.checkFileName(newName);
             fileService.renameFile(
                     new FileRenameDto(
                             path,
                             newName));
-        } catch (FileRenameException e) {
+        } catch (FileRenameException | FileNameException e) {
             redirectAttributes.addFlashAttribute("errorRenameFile", e.getMessage());
         }
         return new RedirectView(redirectPath);
@@ -79,8 +82,7 @@ public class FileController {
 
         try {
             fileService.deleteFile(new FileDto(path));
-            throw new FileRemoveException("ошибка удаления файла!!!");
-        } catch (FileRenameException e) {
+        } catch (FileRemoveException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
         return new RedirectView(redirectPath);
