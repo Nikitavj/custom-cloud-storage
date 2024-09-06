@@ -17,6 +17,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 @Controller
 @Validated
@@ -52,11 +54,11 @@ public class DirectoryController {
     @PostMapping
     public RedirectView createNewFolder(@RequestParam("name") String nameFolder,
                                         @RequestParam("current_path") String currentPath,
-                                        RedirectAttributes redirectAttributes) {
+                                        RedirectAttributes redirectAttributes) throws UnsupportedEncodingException {
 
-        String redirectPath = "/?path=" + currentPath;
-        if (currentPath == null || currentPath.isBlank()) {
-            redirectPath = "/";
+        String redirectPath = "/";
+        if (currentPath != null || !currentPath.isBlank()) {
+            redirectPath = "/?path=" + URLEncoder.encode(currentPath, "UTF-8");;
         }
 
         if (nameFolder == null || nameFolder.isBlank()) {
@@ -70,9 +72,14 @@ public class DirectoryController {
                     .createNewDirectory(new NewDirDto(
                             currentPath,
                             nameFolder));
-            return new RedirectView("/?path=" + newDirectory.getRelativePath());
 
-        } catch (DirectoryCreatedException | DirectoryNameException e) {
+            String pathUTF8 = URLEncoder.encode(
+                    newDirectory.getRelativePath(),
+                    "UTF-8");
+            redirectPath = "/?path=" + pathUTF8;
+
+        } catch (UnsupportedEncodingException | DirectoryCreatedException | DirectoryNameException |
+                 DirectoryAlreadyExistsException e) {
             redirectAttributes.addFlashAttribute("errorCreate", e.getMessage());
         }
         return new RedirectView(redirectPath);
