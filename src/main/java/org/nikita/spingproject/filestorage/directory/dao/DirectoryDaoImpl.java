@@ -36,7 +36,7 @@ public class DirectoryDaoImpl implements DirectoryDao {
     @Override
     public void add(Directory directory) {
         String pathForMeta = directory.getAbsolutePath() + "_meta";
-
+        checkExistsDirectory(pathForMeta);
         try {
             directoryS3Api.create(
                     createMetaDataDir(
@@ -45,7 +45,6 @@ public class DirectoryDaoImpl implements DirectoryDao {
                             directory.getAbsolutePath()
                     ),
                     pathForMeta);
-
         } catch (MinioException | IOException | NoSuchAlgorithmException | InvalidKeyException e) {
             log.warn("Directory {} dont create", directory.getAbsolutePath());
             throw new DirectoryCreatedException("Directory not created");
@@ -79,23 +78,6 @@ public class DirectoryDaoImpl implements DirectoryDao {
         }
     }
 
-    private void fillDirectory(Directory dir) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-        Iterable<Result<Item>> results = directoryS3Api.getObjects(dir.getAbsolutePath() + "/");
-        List<Item> items = getListItemsNoIsMinioDir(results);
-
-        List<Directory> directories = getDirFromItems(items);
-        List<File> files = getFilesFromItems(items);
-
-        for (Directory directory : directories) {
-            dir.putDirectory(directory);
-            fillDirectory(directory);
-        }
-        for (File file : files) {
-            dir.putFile(file);
-        }
-    }
-
-
     @Override
     public void remove(String absolutePath) {
         String pathForMeta = absolutePath + "_meta";
@@ -120,6 +102,7 @@ public class DirectoryDaoImpl implements DirectoryDao {
 
     @Override
     public void rename(String previousAbsolutePath, String newAbsolutePath, String previousRelPath, String newRelPath, String newName) {
+        checkExistsDirectory(newAbsolutePath + "_meta");
         Iterable<Result<Item>> results = directoryS3Api.getObjectsRecursive(previousAbsolutePath + "/");
         try {
             List<Item> items = getListItemsNoIsMinioDir(results);
@@ -186,6 +169,33 @@ public class DirectoryDaoImpl implements DirectoryDao {
                  InternalException e) {
             log.warn("Directory {} dont get all objects", absolutePath);
             throw new DirectorySearchFilesException("File search error");
+        }
+    }
+
+    private void fillDirectory(Directory dir) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        Iterable<Result<Item>> results = directoryS3Api.getObjects(dir.getAbsolutePath() + "/");
+        List<Item> items = getListItemsNoIsMinioDir(results);
+
+        List<Directory> directories = getDirFromItems(items);
+        List<File> files = getFilesFromItems(items);
+
+        for (Directory directory : directories) {
+            dir.putDirectory(directory);
+            fillDirectory(directory);
+        }
+        for (File file : files) {
+            dir.putFile(file);
+        }
+    }
+
+    private void checkExistsDirectory(String absPath) {
+        StatObjectResponse stat = null;
+        try {
+            stat = directoryS3Api.getInfo(absPath);
+        } catch (Exception e) {}
+
+        if(stat != null) {
+            throw new DirectoryAlreadyExistsException("Directory already exists");
         }
     }
 

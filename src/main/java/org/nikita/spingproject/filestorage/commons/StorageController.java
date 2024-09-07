@@ -2,13 +2,12 @@ package org.nikita.spingproject.filestorage.commons;
 
 import org.nikita.spingproject.filestorage.commons.breadcrumbs.BreadcrumbsUtil;
 import org.nikita.spingproject.filestorage.directory.dto.ObjectsDirDto;
+import org.nikita.spingproject.filestorage.directory.exception.DirectoryAlreadyExistsException;
 import org.nikita.spingproject.filestorage.directory.exception.DirectoryCreatedException;
 import org.nikita.spingproject.filestorage.directory.exception.DirectoryNameException;
-import org.nikita.spingproject.filestorage.directory.exception.DirectoryRenameException;
 import org.nikita.spingproject.filestorage.directory.service.DirectoryService;
-import org.nikita.spingproject.filestorage.file.dto.FileUploadDto;
+import org.nikita.spingproject.filestorage.file.dto.FilesUploadDto;
 import org.nikita.spingproject.filestorage.file.exception.FileNameException;
-import org.nikita.spingproject.filestorage.file.exception.FileRenameException;
 import org.nikita.spingproject.filestorage.file.exception.FileUploadException;
 import org.nikita.spingproject.filestorage.upload.UploadFilesServiceImpl;
 import org.nikita.spingproject.filestorage.utils.NameFileValidator;
@@ -56,8 +55,7 @@ public class StorageController {
     }
 
     @PostMapping
-    public RedirectView upload(@AuthenticationPrincipal UserDetails userDetails,
-                               @RequestParam("file") MultipartFile[] multFiles,
+    public RedirectView upload(@RequestParam("file") MultipartFile[] multFiles,
                                @RequestParam String path,
                                RedirectAttributes redirectAttributes) {
         String redirectPath = "/?path=" + path;
@@ -69,18 +67,12 @@ public class StorageController {
             for (MultipartFile multFile : multFiles) {
                 NameFileValidator.checkUploadName(multFile.getOriginalFilename());
             }
+            uploadFilesService.upload(
+                    new FilesUploadDto(multFiles, path));
 
-            for (MultipartFile multFile : multFiles) {
-                uploadFilesService.upload(
-                        FileUploadDto.builder()
-                                .inputStream(multFile.getInputStream())
-                                .name(multFile.getOriginalFilename())
-                                .path(path)
-                                .build());
-            }
-        } catch (FileUploadException | DirectoryCreatedException | IOException e) {
+        } catch (IOException | FileUploadException | DirectoryCreatedException e) {
             redirectAttributes.addFlashAttribute("errorUpload", "Error upload object");
-        } catch (DirectoryNameException | FileNameException e) {
+        } catch (DirectoryAlreadyExistsException | DirectoryNameException | FileNameException e) {
             redirectAttributes.addFlashAttribute("errorUpload", e.getMessage());
         }
         return new RedirectView(redirectPath);

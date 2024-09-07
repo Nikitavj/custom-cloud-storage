@@ -1,9 +1,6 @@
 package org.nikita.spingproject.filestorage.file.service;
 
-import org.nikita.spingproject.filestorage.file.dto.FileDownloadDto;
-import org.nikita.spingproject.filestorage.file.dto.FileDto;
-import org.nikita.spingproject.filestorage.file.dto.FileRenameDto;
-import org.nikita.spingproject.filestorage.file.dto.FileUploadDto;
+import org.nikita.spingproject.filestorage.file.dto.*;
 
 public interface FileService {
     void uploadFile(FileUploadDto dto);

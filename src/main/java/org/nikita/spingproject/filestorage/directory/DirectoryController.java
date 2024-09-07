@@ -126,7 +126,7 @@ public class DirectoryController {
                     new RenameDirDto(
                             relativePath,
                             newName));
-        } catch (DirectoryRenameException | DirectoryNameException e) {
+        } catch (DirectoryAlreadyExistsException | DirectoryRenameException | DirectoryNameException e) {
             redirectAttributes.addFlashAttribute("errorRenameDir", e.getMessage());
         }
         return new RedirectView(redirectPath);
