@@ -1,8 +1,10 @@
 package org.nikita.spingproject.filestorage.file;
 
+import org.nikita.spingproject.filestorage.commons.PathEncoder;
 import org.nikita.spingproject.filestorage.file.dto.FileDownloadDto;
 import org.nikita.spingproject.filestorage.file.dto.FileDto;
 import org.nikita.spingproject.filestorage.file.dto.FileRenameDto;
+import org.nikita.spingproject.filestorage.file.exception.FileAlreadyExistsException;
 import org.nikita.spingproject.filestorage.file.exception.FileNameException;
 import org.nikita.spingproject.filestorage.file.exception.FileRemoveException;
 import org.nikita.spingproject.filestorage.file.exception.FileRenameException;
@@ -18,6 +20,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
+
+import java.io.UnsupportedEncodingException;
 
 @Controller
 @RequestMapping("/file")
@@ -48,23 +52,24 @@ public class FileController {
                                    @RequestParam String path,
                                    @RequestParam(name = "current_path", required = false) String currentPath,
                                    RedirectAttributes redirectAttributes) {
-        String redirectPath = "/?path=" + currentPath;
-        if (currentPath == null || currentPath.isBlank()) {
-            redirectPath = "/";
-        }
 
-        if (newName == null || newName.isBlank()) {
-            redirectAttributes.addFlashAttribute("errorRenameFile", "Empty field");
-            return new RedirectView(redirectPath);
-        }
-
+        String redirectPath = "/";
         try {
+            if (currentPath != null && !currentPath.isBlank()) {
+                redirectPath = "/?path=" + PathEncoder.encode(currentPath);
+            }
+
+            if (newName == null || newName.isBlank()) {
+                redirectAttributes.addFlashAttribute("errorRenameFile", "Empty field");
+                return new RedirectView(redirectPath);
+            }
+
             NameFileValidator.checkFileName(newName);
             fileService.renameFile(
                     new FileRenameDto(
                             path,
-                            newName));
-        } catch (FileRenameException | FileNameException e) {
+                            newName.trim()));
+        } catch (FileAlreadyExistsException | FileRenameException | FileNameException | UnsupportedEncodingException e) {
             redirectAttributes.addFlashAttribute("errorRenameFile", e.getMessage());
         }
         return new RedirectView(redirectPath);
@@ -75,14 +80,14 @@ public class FileController {
                                    @RequestParam String path,
                                    RedirectAttributes redirectAttributes) {
 
-        String redirectPath = "/?path=" + currentPath;
-        if (currentPath == null || currentPath.isBlank()) {
-            redirectPath = "/";
-        }
-
+        String redirectPath = "/";
         try {
+            if (currentPath != null && !currentPath.isBlank()) {
+                redirectPath = "/?path=" + PathEncoder.encode(currentPath);
+            }
+
             fileService.deleteFile(new FileDto(path));
-        } catch (FileRemoveException e) {
+        } catch (FileRemoveException | UnsupportedEncodingException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
         return new RedirectView(redirectPath);

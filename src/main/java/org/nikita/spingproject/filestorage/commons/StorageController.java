@@ -7,6 +7,7 @@ import org.nikita.spingproject.filestorage.directory.exception.DirectoryCreatedE
 import org.nikita.spingproject.filestorage.directory.exception.DirectoryNameException;
 import org.nikita.spingproject.filestorage.directory.service.DirectoryService;
 import org.nikita.spingproject.filestorage.file.dto.FilesUploadDto;
+import org.nikita.spingproject.filestorage.file.exception.FileAlreadyExistsException;
 import org.nikita.spingproject.filestorage.file.exception.FileNameException;
 import org.nikita.spingproject.filestorage.file.exception.FileUploadException;
 import org.nikita.spingproject.filestorage.upload.UploadFilesServiceImpl;
@@ -58,13 +59,16 @@ public class StorageController {
     public RedirectView upload(@RequestParam("file") MultipartFile[] multFiles,
                                @RequestParam String path,
                                RedirectAttributes redirectAttributes) {
-        String redirectPath = "/?path=" + path;
-        if (path == null || path.isBlank()) {
-            redirectPath = "/";
-        }
 
+        String redirectPath = "/";
         try {
+            if (path != null && !path.isBlank()) {
+                redirectPath = "/?path=" + PathEncoder.encode(path);
+            }
             for (MultipartFile multFile : multFiles) {
+                if (multFile.getOriginalFilename().isBlank()) {
+                    throw new FileUploadException();
+                }
                 NameFileValidator.checkUploadName(multFile.getOriginalFilename());
             }
             uploadFilesService.upload(
@@ -72,7 +76,7 @@ public class StorageController {
 
         } catch (IOException | FileUploadException | DirectoryCreatedException e) {
             redirectAttributes.addFlashAttribute("errorUpload", "Error upload object");
-        } catch (DirectoryAlreadyExistsException | DirectoryNameException | FileNameException e) {
+        } catch (FileAlreadyExistsException | DirectoryAlreadyExistsException | DirectoryNameException | FileNameException e) {
             redirectAttributes.addFlashAttribute("errorUpload", e.getMessage());
         }
         return new RedirectView(redirectPath);

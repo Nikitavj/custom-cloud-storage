@@ -6,6 +6,8 @@ import org.nikita.spingproject.filestorage.file.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.UnsupportedEncodingException;
+
 @Service
 public class FileServiceImpl implements FileService {
     private PathFileService pathFileService;
@@ -19,19 +21,25 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public void uploadFile(FileUploadDto dto) {
-        String absolutePath = pathFileService
-                .createAbsolutePathNewFile(
-                        dto.getPath(),
-                        dto.getName());
-        String relativePath = pathFileService
-                .createRelativePath(dto.getPath(), dto.getName());
+        try {
+            String absolutePath = pathFileService
+                    .createAbsolutePathNewFile(
+                            dto.getPath(),
+                            dto.getName());
 
-        fileDao.add(File.builder()
-                .absolutePath(absolutePath)
-                .relativePath(relativePath)
-                .name(dto.getName())
-                .inputStream(dto.getInputStream())
-                .build());
+            String relativePath = pathFileService
+                    .createRelativePath(dto.getPath(), dto.getName());
+
+            fileDao.add(File.builder()
+                    .absolutePath(absolutePath)
+                    .relativePath(relativePath)
+                    .name(dto.getName())
+                    .inputStream(dto.getInputStream())
+                    .build());
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     @Override
@@ -53,21 +61,25 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public void renameFile(FileRenameDto dto) {
-        String path = pathFileService
-                .createAbsolutePath(dto.getPath());
-        String newPath = pathFileService
-                .renameAbsolutePath(
-                        path,
-                        dto.getNewName());
-        String relativeNewPath = pathFileService
-                .renameLink(
-                        path,
-                        dto.getNewName());
-        fileDao.rename(
-                path,
-                newPath,
-                relativeNewPath,
-                dto.getNewName());
-        fileDao.remove(path);
+        try {
+            String path = pathFileService
+                    .createAbsolutePath(dto.getPath());
+            String newPath = pathFileService
+                    .renameAbsolutePath(
+                            path,
+                            dto.getNewName());
+            String relativeNewPath = pathFileService
+                    .renameRelPath(
+                            path,
+                            dto.getNewName());
+            fileDao.rename(
+                    path,
+                    newPath,
+                    relativeNewPath,
+                    dto.getNewName());
+            fileDao.remove(path);
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

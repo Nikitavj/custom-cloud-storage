@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -48,41 +49,15 @@ public class DirectoryServiceImpl implements DirectoryService {
         }
     }
 
-    private void zipDirectory(Directory dir, String prefixPath, ZipOutputStream zos) throws IOException {
-        List<File> files = dir.getFiles();
-        List<Directory> directories = dir.getDirectories();
-
-        for (Directory directory: directories) {
-            String basePath = prefixPath + "/" + directory.getName();
-            zipDirectory(directory, basePath, zos);
-        }
-
-        for (File file: files) {
-            File fileWithIS = fileDao.get(file.getAbsolutePath());
-
-            try (InputStream is = fileWithIS.getInputStream()) {
-                ZipEntry zipEntry = new ZipEntry(prefixPath + "/" + file.getName());
-                zos.putNextEntry(zipEntry);
-                byte[] bytes = new byte[1024];
-                int length;
-                while ((length = is.read(bytes)) >= 0) {
-                    zos.write(bytes);
-                }
-                zos.closeEntry();
-            }
-        }
-    }
-
     @Override
     public List<ObjectStorageDto> getObjectsDirectory(ObjectsDirDto dto) {
         String absolutePath = pathDirectoryService.absolutPath(dto.getRelativePath());
         Directory directory = directoryDao.get(absolutePath);
-
         List<ObjectStorageDto> objects = new ArrayList<>();
-        for (Directory dir: directory.getDirectories()) {
+        for (Directory dir : directory.getDirectories()) {
             objects.add(mapDirToObjStorage(dir));
         }
-        for (File file: directory.getFiles()) {
+        for (File file : directory.getFiles()) {
             objects.add(mapFileToObjStorage(file));
         }
         return objects;
@@ -92,6 +67,7 @@ public class DirectoryServiceImpl implements DirectoryService {
     public DirDto createNewDirectory(NewDirDto dto) {
         String absolutePath = pathDirectoryService.absolutePathNewDir(dto.getCurrentPath(), dto.getName());
         String relativePath = pathDirectoryService.relativePath(dto.getCurrentPath(), dto.getName());
+
 
         Directory directory = Directory.builder()
                 .name(dto.getName())
@@ -114,6 +90,7 @@ public class DirectoryServiceImpl implements DirectoryService {
         String previousAbsolutePath = pathDirectoryService.absolutPath(dto.getPreviousPath());
         String newAbsolutePath = pathDirectoryService.renameAbsolutePath(previousAbsolutePath, dto.getNewName());
         String newRelativePath = pathDirectoryService.renameRelativePath(dto.getPreviousPath(), dto.getNewName());
+
         directoryDao.rename(
                 previousAbsolutePath,
                 newAbsolutePath,
@@ -136,5 +113,30 @@ public class DirectoryServiceImpl implements DirectoryService {
                 .relativePath(directory.getRelativePath())
                 .isDir(true)
                 .build();
+    }
+
+    private void zipDirectory(Directory dir, String prefixPath, ZipOutputStream zos) throws IOException {
+        List<File> files = dir.getFiles();
+        List<Directory> directories = dir.getDirectories();
+
+        for (Directory directory : directories) {
+            String basePath = prefixPath + "/" + directory.getName();
+            zipDirectory(directory, basePath, zos);
+        }
+
+        for (File file : files) {
+            File fileWithIS = fileDao.get(file.getAbsolutePath());
+
+            try (InputStream is = fileWithIS.getInputStream()) {
+                ZipEntry zipEntry = new ZipEntry(prefixPath + "/" + file.getName());
+                zos.putNextEntry(zipEntry);
+                byte[] bytes = new byte[1024];
+                int length;
+                while ((length = is.read(bytes)) >= 0) {
+                    zos.write(bytes);
+                }
+                zos.closeEntry();
+            }
+        }
     }
 }

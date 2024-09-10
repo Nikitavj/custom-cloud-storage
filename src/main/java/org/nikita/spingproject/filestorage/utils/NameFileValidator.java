@@ -1,5 +1,6 @@
 package org.nikita.spingproject.filestorage.utils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.nikita.spingproject.filestorage.directory.exception.DirectoryNameException;
 import org.nikita.spingproject.filestorage.directory.exception.DirectoryRenameException;
 import org.nikita.spingproject.filestorage.file.exception.FileNameException;
@@ -32,7 +33,7 @@ public class NameFileValidator {
     public static void checkFileName(String name) {
         Pattern pattern = Pattern.compile(REGEX_INVALID_NAME);
         Matcher matcher = pattern.matcher(name);
-        if (matcher.find()) {
+        if (matcher.find() || name.isBlank()) {
             throw new FileNameException("Invalid file name: " + name + " (do not use <>:/\\|?*\")");
         }
     }
@@ -40,7 +41,7 @@ public class NameFileValidator {
     public static void checkDirectoryName(String name) {
         Pattern pattern = Pattern.compile(REGEX_INVALID_NAME);
         Matcher matcher = pattern.matcher(name);
-        if(matcher.find()) {
+        if(matcher.find() || name.isBlank()) {
             throw new DirectoryNameException("Invalid folder name: " + name + " (do not use <>:/\\|?*\")");
         }
     }

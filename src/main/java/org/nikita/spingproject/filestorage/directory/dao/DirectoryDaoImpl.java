@@ -7,6 +7,7 @@ import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
 import lombok.extern.slf4j.Slf4j;
 import org.nikita.spingproject.filestorage.commons.InfoOfObjectS3;
+import org.nikita.spingproject.filestorage.commons.PathEncoder;
 import org.nikita.spingproject.filestorage.directory.Directory;
 import org.nikita.spingproject.filestorage.directory.exception.*;
 import org.nikita.spingproject.filestorage.directory.s3Api.DirectoryS3Api;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Repository
 public class DirectoryDaoImpl implements DirectoryDao {
+    private static final String POSTFIX = "_meta";
     private DirectoryS3Api directoryS3Api;
 
     @Autowired
@@ -35,9 +37,11 @@ public class DirectoryDaoImpl implements DirectoryDao {
 
     @Override
     public void add(Directory directory) {
-        String pathForMeta = directory.getAbsolutePath() + "_meta";
-        checkExistsDirectory(pathForMeta);
         try {
+            String encodePath = PathEncoder.encode(directory.getAbsolutePath());
+            String pathForMeta = encodePath + POSTFIX;
+            checkExistsDirectory(pathForMeta);
+
             directoryS3Api.create(
                     createMetaDataDir(
                             directory.getName(),
@@ -45,6 +49,8 @@ public class DirectoryDaoImpl implements DirectoryDao {
                             directory.getAbsolutePath()
                     ),
                     pathForMeta);
+        } catch (DirectoryAlreadyExistsException e) {
+            throw new DirectoryAlreadyExistsException(e.getMessage());
         } catch (MinioException | IOException | NoSuchAlgorithmException | InvalidKeyException e) {
             log.warn("Directory {} dont create", directory.getAbsolutePath());
             throw new DirectoryCreatedException("Directory not created");
@@ -56,17 +62,15 @@ public class DirectoryDaoImpl implements DirectoryDao {
         Directory directory = new Directory();
 
         try {
-            if (absolutePath.contains("/")) {
-                StatObjectResponse info = directoryS3Api.getInfo(absolutePath + "_meta");
-                InfoOfObjectS3 stat = buildStatObject(info.userMetadata());
+            String encodePath = PathEncoder.encode(absolutePath);
+            directory.setAbsolutePath(encodePath);
 
+            if (absolutePath.contains("/")) {
+                StatObjectResponse info = directoryS3Api.getInfo(encodePath + POSTFIX);
+                InfoOfObjectS3 stat = buildStatObject(info.userMetadata());
                 directory.setName(stat.getName());
                 directory.setRelativePath(stat.getRelativePath());
-                directory.setAbsolutePath(absolutePath);
-            } else {
-                directory.setAbsolutePath(absolutePath);
             }
-
             fillDirectory(directory);
             return directory;
 
@@ -80,11 +84,12 @@ public class DirectoryDaoImpl implements DirectoryDao {
 
     @Override
     public void remove(String absolutePath) {
-        String pathForMeta = absolutePath + "_meta";
         try {
+            String encodePath = PathEncoder.encode(absolutePath);
+            String pathForMeta = encodePath + POSTFIX;
             directoryS3Api.removeObject(pathForMeta);
 
-            Iterable<Result<Item>> results = directoryS3Api.getObjectsRecursive(absolutePath + "/");
+            Iterable<Result<Item>> results = directoryS3Api.getObjectsRecursive(encodePath + "/");
             List<DeleteObject> deleteObjects = new ArrayList<>();
             for (Result<Item> itemResult : results) {
                 Item item = itemResult.get();
@@ -101,10 +106,13 @@ public class DirectoryDaoImpl implements DirectoryDao {
     }
 
     @Override
-    public void rename(String previousAbsolutePath, String newAbsolutePath, String previousRelPath, String newRelPath, String newName) {
-        checkExistsDirectory(newAbsolutePath + "_meta");
-        Iterable<Result<Item>> results = directoryS3Api.getObjectsRecursive(previousAbsolutePath + "/");
+    public void rename(String previousAbsolutePath, String targetAbsolutePath, String previousRelPath, String newRelPath, String newName) {
         try {
+            String encodePrevPath = PathEncoder.encode(previousAbsolutePath);
+            String encodeTargPath = PathEncoder.encode(targetAbsolutePath);
+
+            checkExistsDirectory(encodeTargPath + POSTFIX);
+            Iterable<Result<Item>> results = directoryS3Api.getObjectsRecursive(encodePrevPath + "/");
             List<Item> items = getListItemsNoIsMinioDir(results);
 
             List<Directory> directories = getDirFromItems(items);
@@ -112,11 +120,11 @@ public class DirectoryDaoImpl implements DirectoryDao {
 
             for (Directory dir : directories) {
                 String absolutePathDir = dir.getAbsolutePath();
-                String newAbsolutePathDir = absolutePathDir.replaceFirst(previousAbsolutePath, newAbsolutePath);
+                String newAbsolutePathDir = absolutePathDir.replaceFirst(previousAbsolutePath, targetAbsolutePath);
                 String newRelPathDir = dir.getRelativePath().replaceFirst(previousRelPath, newRelPath);
                 directoryS3Api.copyObject(
-                        absolutePathDir + "_meta",
-                        newAbsolutePathDir + "_meta",
+                        PathEncoder.encode(absolutePathDir) + POSTFIX,
+                        PathEncoder.encode(newAbsolutePathDir) + POSTFIX,
                         createMetaDataDir(
                                 dir.getName(),
                                 newRelPathDir,
@@ -125,11 +133,11 @@ public class DirectoryDaoImpl implements DirectoryDao {
 
             for (File file : files) {
                 String absolutePathFile = file.getAbsolutePath();
-                String newAbsolutePathFile = absolutePathFile.replaceFirst(previousAbsolutePath, newAbsolutePath);
+                String newAbsolutePathFile = absolutePathFile.replaceFirst(previousAbsolutePath, targetAbsolutePath);
                 String newRelPathFile = file.getRelativePath().replaceFirst(previousRelPath, newRelPath);
                 directoryS3Api.copyObject(
-                        absolutePathFile,
-                        newAbsolutePathFile,
+                        PathEncoder.encode(absolutePathFile),
+                        PathEncoder.encode(newAbsolutePathFile),
                         createMetaDataFile(
                                 file.getName(),
                                 newRelPathFile,
@@ -137,12 +145,12 @@ public class DirectoryDaoImpl implements DirectoryDao {
             }
 
             directoryS3Api.copyObject(
-                    previousAbsolutePath + "_meta",
-                    newAbsolutePath + "_meta",
+                    encodePrevPath + POSTFIX,
+                    encodeTargPath + POSTFIX,
                     createMetaDataDir(
                             newName,
                             newRelPath,
-                            newAbsolutePath));
+                            targetAbsolutePath));
             this.remove(previousAbsolutePath);
 
         } catch (IllegalArgumentException | ServerException | InsufficientDataException | ErrorResponseException |
@@ -156,8 +164,8 @@ public class DirectoryDaoImpl implements DirectoryDao {
 
     @Override
     public Directory getRecursive(String absolutePath) {
-        Iterable<Result<Item>> results = directoryS3Api.getObjectsRecursive(absolutePath + "/");
         try {
+            Iterable<Result<Item>> results = directoryS3Api.getObjectsRecursive(PathEncoder.encode(absolutePath) + "/");
             List<Item> items = getListItemsNoIsMinioDir(results);
             return Directory.builder()
                     .absolutePath(absolutePath)
@@ -192,9 +200,10 @@ public class DirectoryDaoImpl implements DirectoryDao {
         StatObjectResponse stat = null;
         try {
             stat = directoryS3Api.getInfo(absPath);
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
 
-        if(stat != null) {
+        if (stat != null) {
             throw new DirectoryAlreadyExistsException("Directory already exists");
         }
     }
@@ -247,7 +256,7 @@ public class DirectoryDaoImpl implements DirectoryDao {
         return File.builder()
                 .name(info.getName())
                 .relativePath(info.getRelativePath())
-                .absolutePath(item.objectName())
+                .absolutePath(info.getAbsPath())
                 .build();
     }
 

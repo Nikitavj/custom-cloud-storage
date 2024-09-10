@@ -9,6 +9,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class PathDirectoryServiceImpl implements PathDirectoryService {
     private UserRepository userRepository;
@@ -30,7 +36,7 @@ public class PathDirectoryServiceImpl implements PathDirectoryService {
     public String absolutPath(String relativePath) {
         String rootPath = rootPathForUser();
         if (relativePath == null) {
-            return String.format("%s", rootPath);
+            return rootPath;
         } else {
             return String.format("%s/%s",
                     rootPath,
@@ -39,7 +45,7 @@ public class PathDirectoryServiceImpl implements PathDirectoryService {
     }
 
     @Override
-    public String absolutePathNewDir(String currentPath, String name) {
+    public String absolutePathNewDir(String currentPath, String name)  {
         String rootPath = rootPathForUser();
         if (currentPath.isBlank()) {
             return String.format("%s/%s", rootPath, name);
@@ -49,7 +55,7 @@ public class PathDirectoryServiceImpl implements PathDirectoryService {
     }
 
     @Override
-    public String relativePath(String path, String name) {
+    public String relativePath(String path, String name)  {
         if (path.isBlank()) {
             return name;
         } else {
@@ -59,13 +65,13 @@ public class PathDirectoryServiceImpl implements PathDirectoryService {
 
     @Override
     public String renameAbsolutePath(String previousAbsolutePath, String newName) {
-        String path = StringUtils.removeEnd(previousAbsolutePath,"/");
+        String path = StringUtils.removeEnd(previousAbsolutePath, "/");
         return StringUtils.substringBeforeLast(path, "/") + "/" + newName;
     }
 
     @Override
     public String renameRelativePath(String previousPath, String newName) {
-        if(previousPath.contains("/")) {
+        if (previousPath.contains("/")) {
             return StringUtils.substringBeforeLast(previousPath, "/") + "/" + newName;
         } else {
             return newName;

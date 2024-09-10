@@ -4,13 +4,17 @@ import jakarta.persistence.EntityNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.nikita.spingproject.filestorage.account.User;
 import org.nikita.spingproject.filestorage.account.UserRepository;
+import org.nikita.spingproject.filestorage.file.exception.FileUploadException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 @Service
-public class PathFileServiceImpl implements PathFileService{
+public class PathFileServiceImpl implements PathFileService {
     private UserRepository userRepository;
 
     @Autowired
@@ -19,19 +23,19 @@ public class PathFileServiceImpl implements PathFileService{
     }
 
     @Override
-    public String renameAbsolutePath(String oldAsolurtePath, String newName) {
-        String prefix = StringUtils.substringBeforeLast(oldAsolurtePath, "/");
+    public String renameAbsolutePath(String oldAbsolutePath, String newName) {
+        String prefix = StringUtils.substringBeforeLast(oldAbsolutePath, "/");
         String newAsolutePath = prefix + "/" + newName;
         return newAsolutePath;
     }
 
     @Override
-    public String renameLink(String oldAbsolutePath, String newNameFile) {
+    public String renameRelPath(String oldAbsolutePath, String newName) {
         String oldRelativePath = StringUtils.substringAfter(oldAbsolutePath, "/");
         if (oldRelativePath.contains("/")) {
-            return StringUtils.substringBeforeLast(oldRelativePath, "/") + "/" + newNameFile;
+            return StringUtils.substringBeforeLast(oldRelativePath, "/") + "/" + newName;
         } else {
-            return newNameFile;
+            return newName;
         }
     }
 

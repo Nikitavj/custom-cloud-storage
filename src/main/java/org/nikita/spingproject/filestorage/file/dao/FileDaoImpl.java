@@ -3,11 +3,9 @@ package org.nikita.spingproject.filestorage.file.dao;
 import io.minio.StatObjectResponse;
 import io.minio.errors.*;
 import lombok.extern.slf4j.Slf4j;
+import org.nikita.spingproject.filestorage.commons.PathEncoder;
 import org.nikita.spingproject.filestorage.file.File;
-import org.nikita.spingproject.filestorage.file.exception.FileUploadException;
-import org.nikita.spingproject.filestorage.file.exception.FileDownloadException;
-import org.nikita.spingproject.filestorage.file.exception.FileRemoveException;
-import org.nikita.spingproject.filestorage.file.exception.FileRenameException;
+import org.nikita.spingproject.filestorage.file.exception.*;
 import org.nikita.spingproject.filestorage.file.s3Api.FileS3Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -32,12 +30,17 @@ public class FileDaoImpl implements FileDao {
     @Override
     public void add(File file) {
         try {
+            String encodePath = PathEncoder.encode(file.getAbsolutePath());
+            checkExistsFile(encodePath);
             fileS3Api.putFile(
                     createMetaDataFile(
                             file.getName(),
-                            file.getRelativePath()),
-                    file.getAbsolutePath(),
+                            file.getRelativePath(),
+                            file.getAbsolutePath()),
+                    encodePath,
                     file.getInputStream());
+        }catch (FileAlreadyExistsException e) {
+            throw new FileAlreadyExistsException(e.getMessage());
         } catch (Exception e) {
             log.warn("File {} dont add", file.getAbsolutePath());
             throw new FileUploadException("File upload error");
@@ -47,7 +50,8 @@ public class FileDaoImpl implements FileDao {
     @Override
     public void remove(String absolutePath) {
         try {
-            fileS3Api.removeObject(absolutePath);
+            String encodePath = PathEncoder.encode(absolutePath);
+            fileS3Api.removeObject(encodePath);
         } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
                  InternalException e) {
@@ -59,8 +63,9 @@ public class FileDaoImpl implements FileDao {
     @Override
     public File get(String absolutePath) {
         try {
-            InputStream is = fileS3Api.getInputStream(absolutePath);
-            StatObjectResponse stat = fileS3Api.getInfo(absolutePath);
+            String encodePath = PathEncoder.encode(absolutePath);
+            InputStream is = fileS3Api.getInputStream(encodePath);
+            StatObjectResponse stat = fileS3Api.getInfo(encodePath);
 
             return File.builder()
                     .inputStream(is)
@@ -77,11 +82,17 @@ public class FileDaoImpl implements FileDao {
     @Override
     public void rename(String prevAbsolutePath, String targetAbsolutePath, String relativePath, String name) {
         try {
-            fileS3Api.copyFile(
-                    prevAbsolutePath,
-                    targetAbsolutePath,
-                    createMetaDataFile(name, relativePath));
+            String encodePrevPath = PathEncoder.encode(prevAbsolutePath);
+            String encodeTargetPath = PathEncoder.encode(targetAbsolutePath);
 
+            checkExistsFile(encodeTargetPath);
+            fileS3Api.copyFile(
+                    encodePrevPath,
+                    encodeTargetPath,
+                    createMetaDataFile(name, relativePath, targetAbsolutePath));
+
+        }catch (FileAlreadyExistsException e) {
+            throw new FileAlreadyExistsException(e.getMessage());
         } catch (IllegalArgumentException | ServerException | InsufficientDataException | ErrorResponseException | IOException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
                  InternalException e) {
@@ -90,10 +101,25 @@ public class FileDaoImpl implements FileDao {
         }
     }
 
-    private Map<String, String> createMetaDataFile(String name, String relPath) {
+    private void checkExistsFile(String absPath) {
+        StatObjectResponse stat = null;
+        try {
+            stat = fileS3Api.getInfo(absPath);
+            System.out.println();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        if(stat != null) {
+            throw new FileAlreadyExistsException("File already exists");
+        }
+    }
+
+    private Map<String, String> createMetaDataFile(String name, String relPath, String absPath) {
         Map<String, String> metaData = new HashMap<>();
         metaData.put("name", name);
         metaData.put("rel_path", relPath);
+        metaData.put("abs_path", absPath);
         metaData.put("file", "");
         return metaData;
     }

@@ -1,5 +1,6 @@
 package org.nikita.spingproject.filestorage.directory;
 
+import org.nikita.spingproject.filestorage.commons.PathEncoder;
 import org.nikita.spingproject.filestorage.directory.dto.*;
 import org.nikita.spingproject.filestorage.directory.exception.*;
 import org.nikita.spingproject.filestorage.directory.service.DirectoryService;
@@ -54,29 +55,25 @@ public class DirectoryController {
     @PostMapping
     public RedirectView createNewFolder(@RequestParam("name") String nameFolder,
                                         @RequestParam("current_path") String currentPath,
-                                        RedirectAttributes redirectAttributes) throws UnsupportedEncodingException {
-
+                                        RedirectAttributes redirectAttributes) {
         String redirectPath = "/";
-        if (currentPath != null || !currentPath.isBlank()) {
-            redirectPath = "/?path=" + URLEncoder.encode(currentPath, "UTF-8");;
-        }
-
-        if (nameFolder == null || nameFolder.isBlank()) {
-            redirectAttributes.addFlashAttribute("errorCreate", "Empty field");
-            return new RedirectView(redirectPath);
-        }
-
         try {
+            if (currentPath != null && !currentPath.isBlank()) {
+                redirectPath = "/?path=" + PathEncoder.encode(currentPath);
+            }
+
+            if (nameFolder == null || nameFolder.isBlank()) {
+                redirectAttributes.addFlashAttribute("errorCreate", "Empty field");
+                return new RedirectView(redirectPath);
+            }
+
             NameFileValidator.checkDirectoryName(nameFolder);
             DirDto newDirectory = directoryService
                     .createNewDirectory(new NewDirDto(
                             currentPath,
-                            nameFolder));
+                            nameFolder.trim()));
 
-            String pathUTF8 = URLEncoder.encode(
-                    newDirectory.getRelativePath(),
-                    "UTF-8");
-            redirectPath = "/?path=" + pathUTF8;
+            redirectPath = "/?path=" + PathEncoder.encode(newDirectory.getRelativePath());
 
         } catch (UnsupportedEncodingException | DirectoryCreatedException | DirectoryNameException |
                  DirectoryAlreadyExistsException e) {
@@ -89,15 +86,16 @@ public class DirectoryController {
     public RedirectView deleteFolder(@RequestParam(name = "current_path", required = false) String currentPath,
                                      @RequestParam("path") String relativePath,
                                      RedirectAttributes redirectAttributes) {
-        String redirectPath = "/?path=" + currentPath;
-        if (currentPath == null || currentPath.isBlank()) {
-            redirectPath = "/";
-        }
 
+        String redirectPath = "/";
         try {
+            if (currentPath != null && !currentPath.isBlank()) {
+                redirectPath = "/?path=" + PathEncoder.encode(currentPath);
+            }
+
             directoryService.deleteDirectory(
                     new DeleteDirDto(relativePath));
-        } catch (DirectoryRemoveException e) {
+        } catch (DirectoryRemoveException | UnsupportedEncodingException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
 
@@ -109,25 +107,26 @@ public class DirectoryController {
                                         @RequestParam("path") String relativePath,
                                         @RequestParam(name = "current_path", required = false) String currentPath,
                                         RedirectAttributes redirectAttributes) {
-
-        String redirectPath = "/?path=" + currentPath;
-        if (currentPath == null || currentPath.isBlank()) {
-            redirectPath = "/";
-        }
-
-        if (newName == null || newName.isBlank()) {
-            redirectAttributes.addFlashAttribute("errorRenameDir", "Empty field");
-            return new RedirectView(redirectPath);
-        }
-
+        String redirectPath = "/";
         try {
+            if (currentPath != null && !currentPath.isBlank()) {
+                redirectPath = "/?path=" + PathEncoder.encode(currentPath);
+            }
+
+            if (newName == null || newName.isBlank()) {
+                redirectAttributes.addFlashAttribute("errorRenameDir", "Empty field");
+                return new RedirectView(redirectPath);
+            }
+
             NameFileValidator.checkDirectoryName(newName);
             directoryService.renameDirectory(
                     new RenameDirDto(
                             relativePath,
-                            newName));
+                            newName.trim()));
         } catch (DirectoryAlreadyExistsException | DirectoryRenameException | DirectoryNameException e) {
             redirectAttributes.addFlashAttribute("errorRenameDir", e.getMessage());
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
         }
         return new RedirectView(redirectPath);
     }
