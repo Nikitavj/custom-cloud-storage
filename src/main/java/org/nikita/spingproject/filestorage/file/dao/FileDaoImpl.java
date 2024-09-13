@@ -3,7 +3,7 @@ package org.nikita.spingproject.filestorage.file.dao;
 import io.minio.StatObjectResponse;
 import io.minio.errors.*;
 import lombok.extern.slf4j.Slf4j;
-import org.nikita.spingproject.filestorage.commons.PathEncoder;
+import org.nikita.spingproject.filestorage.utils.PathEncoderUtil;
 import org.nikita.spingproject.filestorage.file.File;
 import org.nikita.spingproject.filestorage.file.exception.*;
 import org.nikita.spingproject.filestorage.file.s3Api.FileS3Api;
@@ -30,7 +30,7 @@ public class FileDaoImpl implements FileDao {
     @Override
     public void add(File file) {
         try {
-            String encodePath = PathEncoder.encode(file.getAbsolutePath());
+            String encodePath = PathEncoderUtil.encode(file.getAbsolutePath());
             checkExistsFile(encodePath);
             fileS3Api.putFile(
                     createMetaDataFile(
@@ -50,7 +50,7 @@ public class FileDaoImpl implements FileDao {
     @Override
     public void remove(String absolutePath) {
         try {
-            String encodePath = PathEncoder.encode(absolutePath);
+            String encodePath = PathEncoderUtil.encode(absolutePath);
             fileS3Api.removeObject(encodePath);
         } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
@@ -63,7 +63,7 @@ public class FileDaoImpl implements FileDao {
     @Override
     public File get(String absolutePath) {
         try {
-            String encodePath = PathEncoder.encode(absolutePath);
+            String encodePath = PathEncoderUtil.encode(absolutePath);
             InputStream is = fileS3Api.getInputStream(encodePath);
             StatObjectResponse stat = fileS3Api.getInfo(encodePath);
 
@@ -82,8 +82,8 @@ public class FileDaoImpl implements FileDao {
     @Override
     public void rename(String prevAbsolutePath, String targetAbsolutePath, String relativePath, String name) {
         try {
-            String encodePrevPath = PathEncoder.encode(prevAbsolutePath);
-            String encodeTargetPath = PathEncoder.encode(targetAbsolutePath);
+            String encodePrevPath = PathEncoderUtil.encode(prevAbsolutePath);
+            String encodeTargetPath = PathEncoderUtil.encode(targetAbsolutePath);
 
             checkExistsFile(encodeTargetPath);
             fileS3Api.copyFile(

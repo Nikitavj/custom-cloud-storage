@@ -97,12 +97,16 @@
     <br>
 
     <div th:each="entity:${objects_dir}">
-        <span th:if="${!entity.isDir()}" th:text="File">Type</span>
-        <span th:if="${entity.isDir()}" th:text="Folder">Type</span>
-
-        <div th:if="${!entity.isDir()}" th:text="${entity.name}">File name</div>
+        <div th:if="${!entity.isDir()}">
+            <span  th:text="File">Type</span><br>
+            <span th:text="${entity.getSize()}">Size</span><br>
+            <span th:text="${entity.date}">Date</span><br>
+            <span th:text="${entity.name}">File name</span>
+        </div>
 
         <div th:if="${entity.isDir()}">
+            <span  th:text="Directory">Type</span><br>
+            <span th:text="${entity.date}">Date</span><br>
             <a th:text="${entity.name}" th:href="@{/(path=${entity.relativePath})}">Folder Name</a>
         </div>
 

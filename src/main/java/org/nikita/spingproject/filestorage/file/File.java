@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.InputStream;
+import java.time.ZonedDateTime;
 
 @Data
 @AllArgsConstructor
@@ -16,4 +17,6 @@ public class File{
     private String name;
     private String absolutePath;
     private String relativePath;
+    private ZonedDateTime date;
+    private long size;
 }

@@ -1,4 +1,4 @@
-package org.nikita.spingproject.filestorage.commons;
+package org.nikita.spingproject.filestorage.utils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class PathEncoder {
+public class PathEncoderUtil {
     public static String encode(String path) throws UnsupportedEncodingException {
         if (path.contains("/")) {
             String[] parts = path.split("/");

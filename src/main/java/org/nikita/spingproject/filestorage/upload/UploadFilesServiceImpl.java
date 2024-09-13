@@ -18,8 +18,8 @@ import java.util.List;
 
 @Service
 public class UploadFilesServiceImpl implements UploadFilesService {
-    private FileService fileService;
-    private DirectoryService directoryService;
+    private final FileService fileService;
+    private final DirectoryService directoryService;
 
     @Autowired
     public UploadFilesServiceImpl(FileService fileService, DirectoryService directoryService) {

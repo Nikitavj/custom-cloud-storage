@@ -1,6 +1,6 @@
 package org.nikita.spingproject.filestorage.file;
 
-import org.nikita.spingproject.filestorage.commons.PathEncoder;
+import org.nikita.spingproject.filestorage.utils.PathEncoderUtil;
 import org.nikita.spingproject.filestorage.file.dto.FileDownloadDto;
 import org.nikita.spingproject.filestorage.file.dto.FileDto;
 import org.nikita.spingproject.filestorage.file.dto.FileRenameDto;
@@ -56,7 +56,7 @@ public class FileController {
         String redirectPath = "/";
         try {
             if (currentPath != null && !currentPath.isBlank()) {
-                redirectPath = "/?path=" + PathEncoder.encode(currentPath);
+                redirectPath = "/?path=" + PathEncoderUtil.encode(currentPath);
             }
 
             if (newName == null || newName.isBlank()) {
@@ -83,7 +83,7 @@ public class FileController {
         String redirectPath = "/";
         try {
             if (currentPath != null && !currentPath.isBlank()) {
-                redirectPath = "/?path=" + PathEncoder.encode(currentPath);
+                redirectPath = "/?path=" + PathEncoderUtil.encode(currentPath);
             }
 
             fileService.deleteFile(new FileDto(path));

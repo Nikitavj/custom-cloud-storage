@@ -21,7 +21,7 @@ public class UserServiceImpl implements UserService {
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public UserDto registerNewUserAccount(UserDto userDto) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    public UserDto registerNewUserAccount(UserDto userDto) {
         User user = buildUser(userDto);
 
         if (userExist(user)) {

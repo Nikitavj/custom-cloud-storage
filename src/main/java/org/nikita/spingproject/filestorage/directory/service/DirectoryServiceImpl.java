@@ -1,5 +1,6 @@
 package org.nikita.spingproject.filestorage.directory.service;
 
+import org.apache.commons.io.FileUtils;
 import org.nikita.spingproject.filestorage.commons.ObjectStorageDto;
 import org.nikita.spingproject.filestorage.directory.Directory;
 import org.nikita.spingproject.filestorage.directory.dao.DirectoryDao;
@@ -7,6 +8,7 @@ import org.nikita.spingproject.filestorage.directory.dto.*;
 import org.nikita.spingproject.filestorage.directory.exception.DirectoryDownloadException;
 import org.nikita.spingproject.filestorage.file.File;
 import org.nikita.spingproject.filestorage.file.dao.FileDao;
+import org.nikita.spingproject.filestorage.utils.DateFormatUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,6 +55,7 @@ public class DirectoryServiceImpl implements DirectoryService {
     public List<ObjectStorageDto> getObjectsDirectory(ObjectsDirDto dto) {
         String absolutePath = pathDirectoryService.absolutPath(dto.getRelativePath());
         Directory directory = directoryDao.get(absolutePath);
+
         List<ObjectStorageDto> objects = new ArrayList<>();
         for (Directory dir : directory.getDirectories()) {
             objects.add(mapDirToObjStorage(dir));
@@ -103,14 +106,17 @@ public class DirectoryServiceImpl implements DirectoryService {
         return ObjectStorageDto.builder()
                 .name(file.getName())
                 .relativePath(file.getRelativePath())
+                .date(DateFormatUtil.format(file.getDate()))
+                .size(FileUtils.byteCountToDisplaySize(file.getSize()))
                 .isDir(false)
                 .build();
     }
 
-    private ObjectStorageDto mapDirToObjStorage(Directory directory) {
+    private ObjectStorageDto mapDirToObjStorage(Directory dir) {
         return ObjectStorageDto.builder()
-                .name(directory.getName())
-                .relativePath(directory.getRelativePath())
+                .name(dir.getName())
+                .relativePath(dir.getRelativePath())
+                .date(DateFormatUtil.format(dir.getDate()))
                 .isDir(true)
                 .build();
     }

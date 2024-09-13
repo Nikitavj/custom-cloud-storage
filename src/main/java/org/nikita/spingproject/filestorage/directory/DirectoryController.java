@@ -1,6 +1,6 @@
 package org.nikita.spingproject.filestorage.directory;
 
-import org.nikita.spingproject.filestorage.commons.PathEncoder;
+import org.nikita.spingproject.filestorage.utils.PathEncoderUtil;
 import org.nikita.spingproject.filestorage.directory.dto.*;
 import org.nikita.spingproject.filestorage.directory.exception.*;
 import org.nikita.spingproject.filestorage.directory.service.DirectoryService;
@@ -11,7 +11,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -19,7 +18,6 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 @Controller
 @Validated
@@ -53,13 +51,13 @@ public class DirectoryController {
     }
 
     @PostMapping
-    public RedirectView createNewFolder(@RequestParam("name") String nameFolder,
-                                        @RequestParam("current_path") String currentPath,
-                                        RedirectAttributes redirectAttributes) {
+    public RedirectView createNewDirectory(@RequestParam("name") String nameFolder,
+                                           @RequestParam("current_path") String currentPath,
+                                           RedirectAttributes redirectAttributes) {
         String redirectPath = "/";
         try {
             if (currentPath != null && !currentPath.isBlank()) {
-                redirectPath = "/?path=" + PathEncoder.encode(currentPath);
+                redirectPath = "/?path=" + PathEncoderUtil.encode(currentPath);
             }
 
             if (nameFolder == null || nameFolder.isBlank()) {
@@ -73,7 +71,7 @@ public class DirectoryController {
                             currentPath,
                             nameFolder.trim()));
 
-            redirectPath = "/?path=" + PathEncoder.encode(newDirectory.getRelativePath());
+            redirectPath = "/?path=" + PathEncoderUtil.encode(newDirectory.getRelativePath());
 
         } catch (UnsupportedEncodingException | DirectoryCreatedException | DirectoryNameException |
                  DirectoryAlreadyExistsException e) {
@@ -83,14 +81,14 @@ public class DirectoryController {
     }
 
     @DeleteMapping
-    public RedirectView deleteFolder(@RequestParam(name = "current_path", required = false) String currentPath,
-                                     @RequestParam("path") String relativePath,
-                                     RedirectAttributes redirectAttributes) {
+    public RedirectView deleteDirectory(@RequestParam(name = "current_path", required = false) String currentPath,
+                                        @RequestParam("path") String relativePath,
+                                        RedirectAttributes redirectAttributes) {
 
         String redirectPath = "/";
         try {
             if (currentPath != null && !currentPath.isBlank()) {
-                redirectPath = "/?path=" + PathEncoder.encode(currentPath);
+                redirectPath = "/?path=" + PathEncoderUtil.encode(currentPath);
             }
 
             directoryService.deleteDirectory(
@@ -110,7 +108,7 @@ public class DirectoryController {
         String redirectPath = "/";
         try {
             if (currentPath != null && !currentPath.isBlank()) {
-                redirectPath = "/?path=" + PathEncoder.encode(currentPath);
+                redirectPath = "/?path=" + PathEncoderUtil.encode(currentPath);
             }
 
             if (newName == null || newName.isBlank()) {
