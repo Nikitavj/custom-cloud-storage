@@ -98,14 +98,14 @@
 
     <div th:each="entity:${objects_dir}">
         <div th:if="${!entity.isDir()}">
-            <span  th:text="File">Type</span><br>
+            <span th:text="File">Type</span><br>
             <span th:text="${entity.getSize()}">Size</span><br>
             <span th:text="${entity.date}">Date</span><br>
             <span th:text="${entity.name}">File name</span>
         </div>
 
         <div th:if="${entity.isDir()}">
-            <span  th:text="Directory">Type</span><br>
+            <span th:text="Directory">Type</span><br>
             <span th:text="${entity.date}">Date</span><br>
             <a th:text="${entity.name}" th:href="@{/(path=${entity.relativePath})}">Folder Name</a>
         </div>
@@ -148,7 +148,7 @@
 
             <div th:if="${entity.isDir()}">
                 <button th:data-path="'/directory?path=' + ${entity.relativePath}"
-                        th:data-name="${entity.name}"
+                        th:data-name="${entity.name} + '.zip'"
                         th:onclick="downloadFile(this.getAttribute('data-path'), this.getAttribute('data-name'))">
                     Download
                 </button>
@@ -194,16 +194,8 @@
 
 <script th:inline="javascript">
     function downloadFile(path, name) {
-        var header;
-        var filename = "";
         fetch(path)
             .then(response => {
-                header = response.headers.get('Content-Disposition');
-                var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-                var matches = filenameRegex.exec(header);
-                if (matches != null && matches[1]) {
-                    filename = matches[1].replace(/['"]/g, '');
-                }
                 if (response.ok) {
                     return response.blob();
                 }
@@ -216,10 +208,9 @@
             .then(blob => {
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
-
                 a.style.display = 'none';
                 a.href = url;
-                a.download = filename; // Укажите имя файла
+                a.download = name;
                 document.body.appendChild(a);
                 a.click();
                 window.URL.revokeObjectURL(url);
