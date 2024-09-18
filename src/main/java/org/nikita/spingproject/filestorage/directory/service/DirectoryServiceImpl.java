@@ -5,7 +5,6 @@ import org.nikita.spingproject.filestorage.commons.ObjectStorageDto;
 import org.nikita.spingproject.filestorage.directory.Directory;
 import org.nikita.spingproject.filestorage.directory.dao.DirectoryDao;
 import org.nikita.spingproject.filestorage.directory.dto.*;
-import org.nikita.spingproject.filestorage.directory.exception.DirectoryDownloadException;
 import org.nikita.spingproject.filestorage.file.File;
 import org.nikita.spingproject.filestorage.file.dao.FileDao;
 import org.nikita.spingproject.filestorage.utils.DateFormatUtil;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -63,6 +61,12 @@ public class DirectoryServiceImpl implements DirectoryService {
         for (File file : directory.getFiles()) {
             objects.add(mapFileToObjStorage(file));
         }
+
+        long id = 1;
+        for (ObjectStorageDto o: objects) {
+            o.setId(id++);
+        }
+
         return objects;
     }
 

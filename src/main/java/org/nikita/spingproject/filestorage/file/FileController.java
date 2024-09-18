@@ -1,6 +1,5 @@
 package org.nikita.spingproject.filestorage.file;
 
-import org.nikita.spingproject.filestorage.utils.PathEncoderUtil;
 import org.nikita.spingproject.filestorage.file.dto.FileDownloadDto;
 import org.nikita.spingproject.filestorage.file.dto.FileDto;
 import org.nikita.spingproject.filestorage.file.dto.FileRenameDto;
@@ -11,6 +10,7 @@ import org.nikita.spingproject.filestorage.file.exception.FileRenameException;
 import org.nikita.spingproject.filestorage.file.service.FileService;
 import org.nikita.spingproject.filestorage.file.service.FileServiceImpl;
 import org.nikita.spingproject.filestorage.utils.NameFileValidator;
+import org.nikita.spingproject.filestorage.utils.PathEncoderUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -60,7 +60,7 @@ public class FileController {
             }
 
             if (newName == null || newName.isBlank()) {
-                redirectAttributes.addFlashAttribute("errorRenameFile", "Empty field");
+                redirectAttributes.addFlashAttribute("errorMessage", "Empty field");
                 return new RedirectView(redirectPath);
             }
 
@@ -70,7 +70,7 @@ public class FileController {
                             path,
                             newName.trim()));
         } catch (FileAlreadyExistsException | FileRenameException | FileNameException | UnsupportedEncodingException e) {
-            redirectAttributes.addFlashAttribute("errorRenameFile", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
         return new RedirectView(redirectPath);
     }

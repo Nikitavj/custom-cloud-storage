@@ -1,7 +1,5 @@
 package org.nikita.spingproject.filestorage.commons;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.nikita.spingproject.filestorage.commons.breadcrumbs.BreadcrumbsUtil;
 import org.nikita.spingproject.filestorage.directory.dto.ObjectsDirDto;
 import org.nikita.spingproject.filestorage.directory.exception.DirectoryAlreadyExistsException;
@@ -20,14 +18,10 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.HandlerExceptionResolver;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -81,9 +75,9 @@ public class StorageController {
                     new FilesUploadDto(multFiles, path));
 
         } catch (IOException | FileUploadException | DirectoryCreatedException e) {
-            redirectAttributes.addFlashAttribute("errorUpload", "Error upload object");
+            redirectAttributes.addFlashAttribute("errorMessage", "Error upload object");
         } catch (FileAlreadyExistsException | DirectoryAlreadyExistsException | DirectoryNameException | FileNameException e) {
-            redirectAttributes.addFlashAttribute("errorUpload", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
         return new RedirectView(redirectPath);
     }

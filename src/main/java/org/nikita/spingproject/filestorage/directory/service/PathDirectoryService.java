@@ -1,7 +1,5 @@
 package org.nikita.spingproject.filestorage.directory.service;
 
-import java.io.UnsupportedEncodingException;
-
 public interface PathDirectoryService {
     String rootPathForUser();
 

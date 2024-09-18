@@ -1,10 +1,10 @@
 package org.nikita.spingproject.filestorage.directory;
 
-import org.nikita.spingproject.filestorage.utils.PathEncoderUtil;
 import org.nikita.spingproject.filestorage.directory.dto.*;
 import org.nikita.spingproject.filestorage.directory.exception.*;
 import org.nikita.spingproject.filestorage.directory.service.DirectoryService;
 import org.nikita.spingproject.filestorage.utils.NameFileValidator;
+import org.nikita.spingproject.filestorage.utils.PathEncoderUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -61,7 +61,7 @@ public class DirectoryController {
             }
 
             if (nameFolder == null || nameFolder.isBlank()) {
-                redirectAttributes.addFlashAttribute("errorCreate", "Empty field");
+                redirectAttributes.addFlashAttribute("errorMessage", "Empty field");
                 return new RedirectView(redirectPath);
             }
 
@@ -75,7 +75,7 @@ public class DirectoryController {
 
         } catch (UnsupportedEncodingException | DirectoryCreatedException | DirectoryNameException |
                  DirectoryAlreadyExistsException e) {
-            redirectAttributes.addFlashAttribute("errorCreate", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
         return new RedirectView(redirectPath);
     }
@@ -112,7 +112,7 @@ public class DirectoryController {
             }
 
             if (newName == null || newName.isBlank()) {
-                redirectAttributes.addFlashAttribute("errorRenameDir", "Empty field");
+                redirectAttributes.addFlashAttribute("errorMessage", "Empty field");
                 return new RedirectView(redirectPath);
             }
 
@@ -122,7 +122,7 @@ public class DirectoryController {
                             relativePath,
                             newName.trim()));
         } catch (DirectoryAlreadyExistsException | DirectoryRenameException | DirectoryNameException e) {
-            redirectAttributes.addFlashAttribute("errorRenameDir", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }

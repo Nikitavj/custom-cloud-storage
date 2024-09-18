@@ -4,14 +4,10 @@ import jakarta.persistence.EntityNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.nikita.spingproject.filestorage.account.User;
 import org.nikita.spingproject.filestorage.account.UserRepository;
-import org.nikita.spingproject.filestorage.file.exception.FileUploadException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 @Service
 public class PathFileServiceImpl implements PathFileService {

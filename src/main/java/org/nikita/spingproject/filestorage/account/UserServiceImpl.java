@@ -1,16 +1,11 @@
 package org.nikita.spingproject.filestorage.account;
 
-import io.minio.errors.*;
 import jakarta.persistence.EntityNotFoundException;
 import org.nikita.spingproject.filestorage.account.exception.UserAlreadyExistException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 
 @Service
 @Transactional

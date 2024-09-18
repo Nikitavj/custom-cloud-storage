@@ -1,13 +1,8 @@
 package org.nikita.spingproject.filestorage.utils;
 
-import org.apache.commons.lang3.StringUtils;
 import org.nikita.spingproject.filestorage.directory.exception.DirectoryNameException;
-import org.nikita.spingproject.filestorage.directory.exception.DirectoryRenameException;
 import org.nikita.spingproject.filestorage.file.exception.FileNameException;
-import org.nikita.spingproject.filestorage.file.exception.FileRenameException;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;

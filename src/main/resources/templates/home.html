@@ -7,179 +7,310 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <title>Home</title>
 </head>
 <body>
-<header>
-    <div sec:authorize="isAuthenticated()">
-        <div sec:authentication="name">User name</div>
+<main class="container">
 
-        <form method="POST" th:action="@{/log-out}">
-            <input type="submit" value="Log-out"/>
-        </form>
-    </div>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/">
+            <img th:src="@{/images/cloud.png}" alt="Логотип" width="40" height="40"
+                 class="d-inline-block align-top">
+            Storage
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-    <div sec:authorize="isAnonymous()">
-        <form method="get" action="/log-in">
-            <button>Log-in</button>
-        </form>
-        <form method="get" action="/log-up">
-            <button>Registration</button>
-        </form>
-    </div>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false">
+                        <span sec:authorize="isAuthenticated()" sec:authentication="name">User name</span>
 
+                        <img sec:authorize="isAuthenticated()" th:src="@{/images/user.png}" width="40" height="40">
+                        <img sec:authorize="isAnonymous()" th:src="@{/images/who.png}" width="40" height="40">
+                    </a>
 
-</header>
-
-<main sec:authorize="isAuthenticated()">
-
-    Search
-    <form method="get" th:action="@{/search}">
-        <input type="text" name="query">
-        <input type="submit" value="Search">
-        <div>
-            <p th:if="${errorSearch}" th:text="${errorSearch}" style="color:red">Create directory error</p>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                        <form sec:authorize="isAnonymous()" method="get" action="/log-in">
+                            <button class="btn btn-primary mt-2 w-100">Log-in</button>
+                        </form>
+                        <form sec:authorize="isAnonymous()" method="get" action="/log-up">
+                            <button class="btn btn-primary mt-2 w-100">Registration</button>
+                        </form>
+                        <form sec:authorize="isAuthenticated()" method="POST" th:action="@{/log-out}">
+                            <button type="submit" class="btn btn-primary mt-2 w-100">Logout</button>
+                        </form>
+                    </div>
+                </li>
+            </ul>
         </div>
-    </form>
-
-    <br>
-
-    Create new folder
-    <form method="post" th:action="@{/directory}">
-        <input type="hidden" name="current_path" th:value="${current_path}">
-        <input type="text" name="name">
-        <input type="submit" name="create" value="Create">
-        <div>
-            <p th:if="${errorCreate}" th:text="${errorCreate}" style="color:red">Create directory error</p>
-        </div>
-
-    </form>
-
-    <br>
-
-    File to upload:
-    <form th:method="post" enctype="multipart/form-data" th:action="@{/}">
-        <input type="file" name="file" multiple>
-        <input name="path" type="hidden" th:value="${current_path}">
-        <br/>
-        <input type="submit" value="Upload">
-        <div>
-            <p th:if="${errorUpload}" th:text="${errorUpload}" style="color:red">Create directory error</p>
-        </div>
-    </form>
-
-    <br>
-
-    Directory to upload:
-    <form th:method="post" th:action="@{/}" enctype="multipart/form-data">
-        <input type="file" name="file" multiple webkitdirectory>
-        <input name="path" type="hidden" th:value="${current_path}">
-        <br/>
-        <input type="submit" value="Upload">
-        <div>
-            <p th:if="${errorUpload}" th:text="${errorUpload}" style="color:red">Error</p>
-        </div>
-    </form>
-
-    <br>
-
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-                <a th:href="@{/}" th:text="root"></a>
-            </li>
-            <li class="breadcrumb-item" th:each="breadCrumb:${bread_crumbs}">
-                <a th:href="@{/(path=${breadCrumb.link})}" th:text="${breadCrumb.name}"></a>
-            </li>
-        </ol>
     </nav>
 
-    <br>
+    <div class="row" sec:authorize="isAuthenticated()">
 
-    <div th:each="entity:${objects_dir}">
-        <div th:if="${!entity.isDir()}">
-            <span th:text="File">Type</span><br>
-            <span th:text="${entity.getSize()}">Size</span><br>
-            <span th:text="${entity.date}">Date</span><br>
-            <span th:text="${entity.name}">File name</span>
+        <div class="sidebar col-sm-2">
+            <ul class="nav flex-column pt-5">
+                <li class="nav-item p-2">
+                    <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal"
+                            data-bs-target="#uploadFile">
+                        <i class="bi bi-upload"></i>   <i class="bi bi-file-earmark"></i>
+                    </button>
+                </li>
+                <li class="nav-item p-2">
+                    <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal"
+                            data-bs-target="#uploadDir">
+                        <i class="bi bi-upload"></i>   <i class="bi bi-folder-fill"></i>
+                    </button>
+                </li>
+                <li class="nav-item p-2">
+                    <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal"
+                            data-bs-target="#createDir">
+                        <i class="bi bi-plus-lg"></i>   <i class="bi bi-folder-fill"></i>
+                    </button>
+                </li>
+            </ul>
         </div>
 
-        <div th:if="${entity.isDir()}">
-            <span th:text="Directory">Type</span><br>
-            <span th:text="${entity.date}">Date</span><br>
-            <a th:text="${entity.name}" th:href="@{/(path=${entity.relativePath})}">Folder Name</a>
-        </div>
+        <div class="content col-sm-10">
 
-        <div th:if="${!entity.isDir()}">
-            <form th:method="PUT" th:action="@{/file}">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                <input type="hidden" name="current_path" th:value="${current_path}">
-                <input type="hidden" name="path" th:value="${entity.relativePath}">
-                <input type="text" name="new_name">
-                <input type="submit" name="rename" value="Rename">
-                <div>
-                    <p th:if="${errorRenameFile}" th:text="${errorRenameFile}" style="color:red">Error</p>
-                </div>
-            </form>
-        </div>
-
-        <div th:if="${entity.isDir()}">
-            <form th:method="PUT" th:action="@{/directory}">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                <input type="hidden" name="current_path" th:value="${current_path}">
-                <input type="hidden" name="path" th:value="${entity.relativePath}">
-                <input type="text" name="new_name">
-                <input type="submit" name="rename" value="Rename">
-                <div>
-                    <p th:if="${errorRenameDir}" th:text="${errorRenameDir}" style="color:red">Error</p>
-                </div>
-            </form>
-        </div>
-
-        <div>
-            <div th:if="${!entity.isDir()}">
-                <button th:data-path="'/file?path=' + ${entity.relativePath}"
-                        th:data-name="${entity.name}"
-                        th:onclick="downloadFile(this.getAttribute('data-path'), this.getAttribute('data-name'))">
-                    Download
+            <form class="d-flex p-3 col-sm-6 offset-sm-3" method="get" th:action="@{/search}">
+                <input name="query" type="text" placeholder="Name file" class="form-control me-2">
+                <button class="btn btn-primary" type="submit">
+                    <i class="bi bi-search"></i>
                 </button>
+            </form>
+
+            <div class="p-3" id="error-message" style="color:red" th:text="${errorMessage}"></div>
+
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb p-3">
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/}" th:text="root"></a>
+                    </li>
+                    <li class="breadcrumb-item" th:each="breadCrumb:${bread_crumbs}">
+                        <a th:href="@{/(path=${breadCrumb.link})}" th:text="${breadCrumb.name}"></a>
+                    </li>
+                </ol>
+            </nav>
+
+            <div class="container p-3">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th scope="col"></th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Size</th>
+                            <th scope="col">Last Modified</th>
+                            <th scope="col"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <div th:each="entity:${objects_dir}">
+                            <tr>
+                                <td>
+                                    <div th:if="${!entity.isDir()}">
+                                        <i class="bi bi-file-earmark"></i>
+                                    </div>
+                                    <div th:if="${entity.isDir()}">
+                                        <i class="bi bi-folder-fill"></i>
+                                    </div>
+                                </td>
+                                <td>
+                                    <a th:if="${entity.isDir()}" th:text="${entity.name}" th:href="@{/(path=${entity.relativePath})}"></a>
+                                    <span th:if="${!entity.isDir()}"th:text="${entity.name}"></span>
+                                </td>
+                                <td th:text="${entity.getSize()}">Size</td>
+                                <td th:text="${entity.date}">Date</td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary" type="button"
+                                                id="dropdownMenuButton1" data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                            <i class="bi bi-three-dots"></i>
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+<!--                                            download-->
+                                            <li>
+                                                <button th:if="${!entity.isDir()}" class="btn btn-secondary"
+                                                        th:data-path="'/file?path=' + ${entity.relativePath}"
+                                                        th:data-name="${entity.name}"
+                                                        th:onclick="downloadFile(this.getAttribute('data-path'), this.getAttribute('data-name'))">
+                                                    <i class="bi bi-floppy"></i>
+                                                </button>
+                                                <button th:if="${entity.isDir()}" class="btn btn-secondary"
+                                                        th:data-path="'/directory?path=' + ${entity.relativePath}"
+                                                        th:data-name="${entity.name} + '.zip'"
+                                                        th:onclick="downloadFile(this.getAttribute('data-path'), this.getAttribute('data-name'))">
+                                                    <i class="bi bi-floppy"></i>
+                                                </button>
+                                            </li>
+<!--                                            rename-->
+                                            <li>
+                                                <button type="button" class="btn btn-secondary" data-bs-toggle="modal"
+                                                        th:data-bs-target="'#renameFile' + ${entity.id}">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </button>
+                                            </li>
+<!--                                            delete-->
+                                            <li>
+                                                <button class="btn btn-secondary" th:form="'formDelete' + ${entity.id}">
+                                                    <i class="bi bi-trash3"></i>
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            <div id="deleteFormDir" th:if="${entity.isDir()}">
+                                <form th:id="'formDelete' + ${entity.id}" th:method="DELETE"
+                                      th:action="@{/directory(path=${entity.relativePath})}">
+                                    <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}"
+                                           type="hidden">
+                                    <input type="hidden" name="current_path" th:value="${current_path}">
+                                </form>
+                            </div>
+
+                            <div id="deleteFormFile" th:if="${!entity.isDir()}">
+                                <form th:id="'formDelete' + ${entity.id}" th:method="DELETE"
+                                      th:action="@{/file(path=${entity.relativePath})}">
+                                    <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}"
+                                           type="hidden">
+                                    <input type="hidden" name="current_path" th:value="${current_path}">
+                                </form>
+                            </div>
+
+                            <div class="modal fade" th:id="'renameFile' + ${entity.id}" tabindex="-1"
+                                 th:aria-labelledby="'renameFileModalLabel' + ${entity.id}"
+                                 aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h3 class="modal-title fs-5"
+                                                th:id="'renameFileModalLabel' + ${entity.id}"
+                                            th:text="'Rename ' + ${entity.name}">Rename text</h3>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Закрыть"></button>
+                                        </div>
+                                        <div class="modal-body" th:if="${!entity.isDir()}">
+                                            <form th:id="'renameFileForm' + ${entity.id}" th:method="PUT"
+                                                  th:action="@{/file}">
+                                                <input type="hidden" th:name="${_csrf.parameterName}"
+                                                       th:value="${_csrf.token}">
+                                                <input type="hidden" name="current_path" th:value="${current_path}">
+                                                <input type="hidden" name="path" th:value="${entity.relativePath}">
+                                                <input type="text" name="new_name">
+                                            </form>
+                                        </div>
+                                        <div class="modal-body" th:if="${entity.isDir()}">
+                                            <form th:id="'renameFileForm' + ${entity.id}" th:method="PUT"
+                                                  th:action="@{/directory}">
+                                                <input type="hidden" th:name="${_csrf.parameterName}"
+                                                       th:value="${_csrf.token}">
+                                                <input type="hidden" name="current_path" th:value="${current_path}">
+                                                <input type="hidden" name="path" th:value="${entity.relativePath}">
+                                                <input type="text" name="new_name">
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                Close
+                                            </button>
+                                            <button th:form="'renameFileForm' + ${entity.id}" type="submit"
+                                                    class="btn btn-primary">Rename
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-
-
-            <div th:if="${entity.isDir()}">
-                <button th:data-path="'/directory?path=' + ${entity.relativePath}"
-                        th:data-name="${entity.name} + '.zip'"
-                        th:onclick="downloadFile(this.getAttribute('data-path'), this.getAttribute('data-name'))">
-                    Download
-                </button>
-            </div>
-
-
-            <div th:if="${!entity.isDir()}">
-                <form th:method="DELETE" th:action="@{/file(path=${entity.relativePath})}">
-                    <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden">
-                    <input type="hidden" name="current_path" th:value="${current_path}">
-                    <input type="submit" name="delete" value="Delete">
-                </form>
-            </div>
-
-            <div th:if="${entity.isDir()}">
-                <form th:method="DELETE" th:action="@{/directory(path=${entity.relativePath})}">
-                    <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden">
-                    <input type="hidden" name="current_path" th:value="${current_path}">
-                    <input type="submit" name="delete" value="Delete">
-                </form>
-            </div>
-            <br>
         </div>
     </div>
 
-
-    <div id="error-message" style="color:red" th:text="${errorMessage}">
-
-    </div>
 </main>
+</body>
 
+<!-- Модальное окно создать новую папку-->
+<div class="modal fade" id="createDir" tabindex="-1" aria-labelledby="createDirModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title fs-5" id="createDirModalLabel">Create new directory</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createDirForm" method="post" th:action="@{/directory}">
+                    <input type="hidden" name="current_path" th:value="${current_path}">
+                    Name: <input type="text" name="name">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button form="createDirForm" type="submit" class="btn btn-primary">Create</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно загрузить файл-->
+<div class="modal fade" id="uploadFile" tabindex="-1" aria-labelledby="uploadFileModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title fs-5" id="uploadFileModalLabel">Upload File</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <form id="uploadFileForm" th:method="post" enctype="multipart/form-data" th:action="@{/}">
+                    <input type="file" name="file" multiple>
+                    <input name="path" type="hidden" th:value="${current_path}">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button form="uploadFileForm" type="submit" class="btn btn-primary">Upload</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно загрузить папку-->
+<div class="modal fade" id="uploadDir" tabindex="-1" aria-labelledby="uploadDirModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title fs-5" id="uploadDirModalLabel">Upload directory</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <form id="uploadDirform" th:method="post" th:action="@{/}" enctype="multipart/form-data">
+                    <input type="file" name="file" multiple webkitdirectory>
+                    <input name="path" type="hidden" th:value="${current_path}">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button form="uploadDirform" type="submit" class="btn btn-primary">Upload</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
         integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
@@ -190,7 +321,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
         integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"></script>
-</body>
 
 <script th:inline="javascript">
     function downloadFile(path, name) {
@@ -217,4 +347,11 @@
             })
     }
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+        integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+        crossorigin="anonymous"></script>
 </html>
