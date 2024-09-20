@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @ControllerAdvice
@@ -20,9 +21,11 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public String handleMaxSizeUploadFile(Model model) {
         model.addAttribute("errorMessage", "Upload size exceeded maximum: " + maxSize);
+        model.addAttribute("statusCode", HttpStatus.BAD_REQUEST.value());
         return "error";
     }
 }

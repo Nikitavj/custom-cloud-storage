@@ -1,5 +1,6 @@
 package org.nikita.spingproject.filestorage.search;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.nikita.spingproject.filestorage.commons.ObjectStorageDto;
 import org.nikita.spingproject.filestorage.directory.Directory;
@@ -8,6 +9,7 @@ import org.nikita.spingproject.filestorage.directory.dao.DirectoryDaoImpl;
 import org.nikita.spingproject.filestorage.directory.service.PathDirectoryService;
 import org.nikita.spingproject.filestorage.directory.service.PathDirectoryServiceImpl;
 import org.nikita.spingproject.filestorage.file.File;
+import org.nikita.spingproject.filestorage.utils.DateFormatUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,6 +51,8 @@ public class SearchFileServiceImpl implements SearchFileService {
         return ObjectStorageDto.builder()
                 .name(file.getName())
                 .relativePath(link)
+                .size(FileUtils.byteCountToDisplaySize(file.getSize()))
+                .date(DateFormatUtil.format(file.getDate()))
                 .isDir(false)
                 .build();
     }
@@ -58,6 +62,7 @@ public class SearchFileServiceImpl implements SearchFileService {
         return ObjectStorageDto.builder()
                 .name(directory.getName())
                 .relativePath(link)
+                .date(DateFormatUtil.format(directory.getDate()))
                 .isDir(true)
                 .build();
     }

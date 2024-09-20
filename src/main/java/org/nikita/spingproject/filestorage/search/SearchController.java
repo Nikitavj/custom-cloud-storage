@@ -22,7 +22,7 @@ public class SearchController {
                          Model model) {
 
         if (query == null || query.isBlank()) {
-            model.addAttribute("errorSearch", "Empty field");
+            model.addAttribute("errorMessage", "Empty field");
             return "search";
         }
 
@@ -31,13 +31,14 @@ public class SearchController {
             List<ObjectStorageDto> findObjects = searchFileService
                     .search(new SearchFileDto(query));
 
+            model.addAttribute("query", query);
             if (findObjects.isEmpty()) {
-                model.addAttribute("errorSearch", "Nothing found");
+                model.addAttribute("errorMessage", "Nothing found");
             } else {
                 model.addAttribute("find_objects", findObjects);
             }
         } catch (DirectorySearchFilesException e) {
-            model.addAttribute("errorSearch", e.getMessage());
+            model.addAttribute("errorMessage", e.getMessage());
         }
         return "search";
     }

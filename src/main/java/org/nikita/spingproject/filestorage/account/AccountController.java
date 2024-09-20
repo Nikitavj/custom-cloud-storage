@@ -32,7 +32,7 @@ public class AccountController {
     @PostMapping("/log-up")
     public String registerUserAccount(HttpServletRequest request,
                                       @ModelAttribute("user") @Valid UserDto userDto,
-                                      BindingResult bindingResult) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+                                      BindingResult bindingResult) {
 
         try {
             userService.registerNewUserAccount(userDto);

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<div th:fragment="search_form">
+    <form class="d-flex p-3 col-sm-6 offset-sm-3" method="get" th:action="@{/search}">
+        <input name="query" th:value="${query}" type="text" placeholder="Name file" class="form-control me-2">
+        <button class="btn btn-primary" type="submit">
+            <i class="bi bi-search"></i>
+        </button>
+    </form>
+</div>
+
+</body>
+</html>

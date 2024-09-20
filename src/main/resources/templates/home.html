@@ -53,12 +53,7 @@
 
         <div class="content col-sm-10">
 
-            <form class="d-flex p-3 col-sm-6 offset-sm-3" method="get" th:action="@{/search}">
-                <input name="query" type="text" placeholder="Name file" class="form-control me-2">
-                <button class="btn btn-primary" type="submit">
-                    <i class="bi bi-search"></i>
-                </button>
-            </form>
+            <div th:replace="search_form::search_form"></div>
 
             <div class="p-3" id="error-message" style="color:red" th:text="${errorMessage}"></div>
 
