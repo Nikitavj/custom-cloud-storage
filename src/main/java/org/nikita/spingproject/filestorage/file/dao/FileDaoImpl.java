@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.nikita.spingproject.filestorage.file.File;
 import org.nikita.spingproject.filestorage.file.exception.*;
 import org.nikita.spingproject.filestorage.file.s3Api.FileS3Api;
+import org.nikita.spingproject.filestorage.utils.FileUtil;
 import org.nikita.spingproject.filestorage.utils.PathEncoderUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -33,7 +34,7 @@ public class FileDaoImpl implements FileDao {
             String encodePath = PathEncoderUtil.encode(file.getAbsolutePath());
             checkExistsFile(encodePath);
             fileS3Api.putFile(
-                    createMetaDataFile(
+                    FileUtil.createMetaDataFile(
                             file.getName(),
                             file.getRelativePath(),
                             file.getAbsolutePath()),
@@ -89,7 +90,7 @@ public class FileDaoImpl implements FileDao {
             fileS3Api.copyFile(
                     encodePrevPath,
                     encodeTargetPath,
-                    createMetaDataFile(name, relativePath, targetAbsolutePath));
+                    FileUtil.createMetaDataFile(name, relativePath, targetAbsolutePath));
 
         }catch (FileAlreadyExistsException e) {
             throw new FileAlreadyExistsException(e.getMessage());
@@ -113,14 +114,5 @@ public class FileDaoImpl implements FileDao {
         if(stat != null) {
             throw new FileAlreadyExistsException("File already exists");
         }
-    }
-
-    private Map<String, String> createMetaDataFile(String name, String relPath, String absPath) {
-        Map<String, String> metaData = new HashMap<>();
-        metaData.put("name", name);
-        metaData.put("rel_path", relPath);
-        metaData.put("abs_path", absPath);
-        metaData.put("file", "");
-        return metaData;
     }
 }
