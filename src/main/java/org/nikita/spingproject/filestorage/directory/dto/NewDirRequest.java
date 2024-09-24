@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DirDownloadRequest {
-    private String path;
+public class NewDirRequest {
+    private String currentPath;
+    private String name;
 }

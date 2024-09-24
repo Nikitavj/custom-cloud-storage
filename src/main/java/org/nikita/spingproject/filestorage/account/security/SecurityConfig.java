@@ -1,4 +1,4 @@
-package org.nikita.spingproject.filestorage.security;
+package org.nikita.spingproject.filestorage.account.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

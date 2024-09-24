@@ -1,7 +1,7 @@
 package org.nikita.spingproject.filestorage.utils;
 
 import io.minio.messages.Item;
-import org.nikita.spingproject.filestorage.commons.InfoOfObjectS3;
+import org.nikita.spingproject.filestorage.commons.InfoMetaS3;
 import org.nikita.spingproject.filestorage.file.File;
 
 import java.util.HashMap;
@@ -27,7 +27,7 @@ public class FileUtil {
     }
 
     private static File itemMapToFile(Item item) {
-        InfoOfObjectS3 info = buildInfo(item.userMetadata());
+        InfoMetaS3 info = buildInfo(item.userMetadata());
         return File.builder()
                 .name(info.getName())
                 .relativePath(info.getRelativePath())
@@ -37,8 +37,8 @@ public class FileUtil {
                 .build();
     }
 
-    private static InfoOfObjectS3 buildInfo(Map<String, String> metaData) {
-        return InfoOfObjectS3.builder()
+    private static InfoMetaS3 buildInfo(Map<String, String> metaData) {
+        return InfoMetaS3.builder()
                 .name(metaData.get("X-Amz-Meta-Name"))
                 .relativePath(metaData.get("X-Amz-Meta-Rel_path"))
                 .absPath(metaData.get("X-Amz-Meta-Abs_path"))

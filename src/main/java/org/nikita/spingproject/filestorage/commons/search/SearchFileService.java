@@ -1,4 +1,4 @@
-package org.nikita.spingproject.filestorage.search;
+package org.nikita.spingproject.filestorage.commons.search;
 
 import org.nikita.spingproject.filestorage.commons.ObjectStorageDto;
 

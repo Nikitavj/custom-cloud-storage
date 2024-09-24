@@ -4,10 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.InputStream;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RenameDirDto {
-    private String previousPath;
-    private String newName;
+public class DownloadDirResponse {
+    private InputStream inputStream;
+    private String name;
 }

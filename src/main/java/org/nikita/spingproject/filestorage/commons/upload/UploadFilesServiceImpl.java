@@ -1,7 +1,7 @@
-package org.nikita.spingproject.filestorage.upload;
+package org.nikita.spingproject.filestorage.commons.upload;
 
 import org.apache.commons.lang3.StringUtils;
-import org.nikita.spingproject.filestorage.directory.dto.NewDirDto;
+import org.nikita.spingproject.filestorage.directory.dto.NewDirRequest;
 import org.nikita.spingproject.filestorage.directory.exception.DirectoryAlreadyExistsException;
 import org.nikita.spingproject.filestorage.directory.service.DirectoryService;
 import org.nikita.spingproject.filestorage.file.dto.FileUploadDto;
@@ -35,7 +35,7 @@ public class UploadFilesServiceImpl implements UploadFilesService {
         if (isDirectory(firstFile.getOriginalFilename())) {
             String nameRootDir = StringUtils.substringBefore(firstFile.getOriginalFilename(), "/");
             directoryService.createNewDirectory(
-                    new NewDirDto(dto.getPath(), nameRootDir));
+                    new NewDirRequest(dto.getPath(), nameRootDir));
             uploadFileOfDir(firstFile, dto.getPath());
             multFiles.removeFirst();
 
@@ -62,7 +62,7 @@ public class UploadFilesServiceImpl implements UploadFilesService {
         for (String nameDir : namesDir) {
             try {
                 directoryService.createNewDirectory(
-                        new NewDirDto(pathNewDir, nameDir));
+                        new NewDirRequest(pathNewDir, nameDir));
             } catch (DirectoryAlreadyExistsException e) {
             }
 

@@ -23,9 +23,9 @@ import java.util.zip.ZipOutputStream;
 
 @Service
 public class DirectoryServiceImpl implements DirectoryService {
-    private PathDirectoryService pathDirectoryService;
-    private DirectoryDao directoryDao;
-    private FileDao fileDao;
+    private final PathDirectoryService pathDirectoryService;
+    private final DirectoryDao directoryDao;
+    private final FileDao fileDao;
 
     @Autowired
     public DirectoryServiceImpl(PathDirectoryService pathDirectoryService, DirectoryDao directoryDao, FileDao fileDao) {
@@ -35,9 +35,8 @@ public class DirectoryServiceImpl implements DirectoryService {
     }
 
     @Override
-    public DirDownloadResponse downloadDirectory(DirDownloadRequest request) throws IOException {
-        String absolutePath = pathDirectoryService.absolutPath(request.getPath());
-        Directory directory = directoryDao.get(absolutePath);
+    public DownloadDirResponse downloadDirectory(DownloadDirRequest request) throws IOException {
+        Directory directory = directoryDao.get(request.getPath());
 
         String nameZipFile = directory.getName() + ".zip";
         Path zipPath = Files.createTempFile(directory.getName(), ".zip");
@@ -45,14 +44,13 @@ public class DirectoryServiceImpl implements DirectoryService {
         try (ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(zipPath))) {
             zipDirectory(directory, directory.getName(), zos);
             FileInputStream fis = new FileInputStream(zipPath.toFile());
-            return new DirDownloadResponse(fis, nameZipFile);
+            return new DownloadDirResponse(fis, nameZipFile);
         }
     }
 
     @Override
     public List<ObjectStorageDto> getObjectsDirectory(ObjectsDirDto dto) {
-        String absolutePath = pathDirectoryService.absolutPath(dto.getRelativePath());
-        Directory directory = directoryDao.get(absolutePath);
+        Directory directory = directoryDao.get(dto.getRelativePath());
 
         List<ObjectStorageDto> objects = new ArrayList<>();
         for (Directory dir : directory.getDirectories()) {
@@ -71,14 +69,10 @@ public class DirectoryServiceImpl implements DirectoryService {
     }
 
     @Override
-    public DirDto createNewDirectory(NewDirDto dto) {
-        String absolutePath = pathDirectoryService.absolutePathNewDir(dto.getCurrentPath(), dto.getName());
+    public DirDto createNewDirectory(NewDirRequest dto) {
         String relativePath = pathDirectoryService.relativePath(dto.getCurrentPath(), dto.getName());
-
-
         Directory directory = Directory.builder()
                 .name(dto.getName())
-                .absolutePath(absolutePath)
                 .relativePath(relativePath)
                 .build();
         directoryDao.add(directory);
@@ -87,20 +81,16 @@ public class DirectoryServiceImpl implements DirectoryService {
     }
 
     @Override
-    public void deleteDirectory(DeleteDirDto dto) {
-        String absolutePath = pathDirectoryService.absolutPath(dto.getRelativePath());
-        directoryDao.remove(absolutePath);
+    public void deleteDirectory(DeleteDirRequest dto) {
+
+        directoryDao.remove(dto.getRelativePath());
     }
 
     @Override
-    public void renameDirectory(RenameDirDto dto) {
-        String previousAbsolutePath = pathDirectoryService.absolutPath(dto.getPreviousPath());
-        String newAbsolutePath = pathDirectoryService.renameAbsolutePath(previousAbsolutePath, dto.getNewName());
+    public void renameDirectory(RenameDirRequest dto) {
         String newRelativePath = pathDirectoryService.renameRelativePath(dto.getPreviousPath(), dto.getNewName());
 
         directoryDao.rename(
-                previousAbsolutePath,
-                newAbsolutePath,
                 dto.getPreviousPath(),
                 newRelativePath,
                 dto.getNewName());

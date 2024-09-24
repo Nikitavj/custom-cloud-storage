@@ -1,4 +1,4 @@
-package org.nikita.spingproject.filestorage.upload;
+package org.nikita.spingproject.filestorage.commons.upload;
 
 import org.nikita.spingproject.filestorage.file.dto.FilesUploadDto;
 

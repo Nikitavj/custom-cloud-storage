@@ -23,7 +23,7 @@ import java.io.UnsupportedEncodingException;
 @Validated
 @RequestMapping("/directory")
 public class DirectoryController {
-    private DirectoryService directoryService;
+    private final DirectoryService directoryService;
 
     @Autowired
     public DirectoryController(DirectoryService directoryService) {
@@ -34,8 +34,8 @@ public class DirectoryController {
     public ResponseEntity<InputStreamResource> downloadDirectory(
             @RequestParam String path) {
         try {
-            DirDownloadResponse response = directoryService
-                    .downloadDirectory(new DirDownloadRequest(path));
+            DownloadDirResponse response = directoryService
+                    .downloadDirectory(new DownloadDirRequest(path));
 
             HttpHeaders responseHeaders = new HttpHeaders();
             responseHeaders.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + response.getName());
@@ -67,7 +67,7 @@ public class DirectoryController {
 
             NameFileValidator.checkDirectoryName(nameFolder);
             DirDto newDirectory = directoryService
-                    .createNewDirectory(new NewDirDto(
+                    .createNewDirectory(new NewDirRequest(
                             currentPath,
                             nameFolder.trim()));
 
@@ -92,7 +92,7 @@ public class DirectoryController {
             }
 
             directoryService.deleteDirectory(
-                    new DeleteDirDto(relativePath));
+                    new DeleteDirRequest(relativePath));
         } catch (DirectoryRemoveException | UnsupportedEncodingException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
@@ -117,8 +117,8 @@ public class DirectoryController {
             }
 
             NameFileValidator.checkDirectoryName(newName);
-            directoryService.renameDirectory(
-                    new RenameDirDto(
+           directoryService.renameDirectory(
+                    new RenameDirRequest(
                             relativePath,
                             newName.trim()));
         } catch (DirectoryAlreadyExistsException | DirectoryRenameException | DirectoryNameException e) {

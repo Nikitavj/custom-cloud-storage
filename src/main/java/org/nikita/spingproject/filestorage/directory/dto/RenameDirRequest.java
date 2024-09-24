@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DeleteDirDto {
-    private String relativePath;
+public class RenameDirRequest {
+    private String previousPath;
+    private String newName;
 }

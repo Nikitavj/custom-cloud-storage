@@ -4,12 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.InputStream;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DirDownloadResponse {
-    private InputStream inputStream;
-    private String name;
+public class DeleteDirRequest {
+    private String relativePath;
 }

@@ -1,4 +1,4 @@
-package org.nikita.spingproject.filestorage.security;
+package org.nikita.spingproject.filestorage.account.security;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.nikita.spingproject.filestorage.account.User;
