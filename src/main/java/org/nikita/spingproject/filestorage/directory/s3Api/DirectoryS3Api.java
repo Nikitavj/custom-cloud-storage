@@ -16,7 +16,6 @@ import java.util.Map;
 public interface DirectoryS3Api extends S3Api<Directory> {
     void create(Map<String, String> metaData, String path) throws MinioException, IOException, NoSuchAlgorithmException, InvalidKeyException;
     Iterable<Result<Item>> getObjects(String path);
-    Iterable<Result<Item>> getObjectsRecursive(String path);
     void deleteObjects(List<DeleteObject> objects) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException;
     void copyObject(String path, String newPath, Map<String, String> metaData) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException;
 }

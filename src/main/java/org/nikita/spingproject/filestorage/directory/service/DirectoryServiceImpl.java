@@ -2,11 +2,12 @@ package org.nikita.spingproject.filestorage.directory.service;
 
 import org.apache.commons.io.FileUtils;
 import org.nikita.spingproject.filestorage.commons.ObjectStorageDto;
+import org.nikita.spingproject.filestorage.dao.FileDao;
 import org.nikita.spingproject.filestorage.directory.Directory;
-import org.nikita.spingproject.filestorage.directory.dao.DirectoryDao;
+import org.nikita.spingproject.filestorage.dao.DirectoryDao;
 import org.nikita.spingproject.filestorage.directory.dto.*;
 import org.nikita.spingproject.filestorage.file.File;
-import org.nikita.spingproject.filestorage.file.dao.FileDao;
+
 import org.nikita.spingproject.filestorage.utils.DateFormatUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

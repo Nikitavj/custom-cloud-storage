@@ -10,7 +10,7 @@ import org.nikita.spingproject.filestorage.file.dto.FilesUploadDto;
 import org.nikita.spingproject.filestorage.file.exception.FileAlreadyExistsException;
 import org.nikita.spingproject.filestorage.file.exception.FileNameException;
 import org.nikita.spingproject.filestorage.file.exception.FileUploadException;
-import org.nikita.spingproject.filestorage.commons.upload.UploadFilesServiceImpl;
+import org.nikita.spingproject.filestorage.commons.uploadfiles.UploadFilesServiceImpl;
 import org.nikita.spingproject.filestorage.utils.NameFileValidator;
 import org.nikita.spingproject.filestorage.utils.PathEncoderUtil;
 import org.springframework.beans.factory.annotation.Autowired;

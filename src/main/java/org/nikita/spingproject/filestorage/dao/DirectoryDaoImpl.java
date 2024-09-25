@@ -1,4 +1,4 @@
-package org.nikita.spingproject.filestorage.directory.dao;
+package org.nikita.spingproject.filestorage.dao;
 
 import io.minio.Result;
 import io.minio.StatObjectResponse;
@@ -173,20 +173,17 @@ public class DirectoryDaoImpl implements DirectoryDao {
     }
 
     @Override
-    public Directory getRecursive(String absolutePath) {
+    public List<Directory> getAll() {
+        String rootPath = pathDirectoryService.rootPathForUser();
         try {
             Iterable<Result<Item>> results = directoryS3Api
-                    .getObjectsRecursive(PathEncoderUtil.encode(absolutePath) + "/");
+                    .getObjectsRecursive(PathEncoderUtil.encode(rootPath) + "/");
             List<Item> items = DirectoryUtil.getListItemsNoIsMinioDir(results);
-            return Directory.builder()
-                    .absolutePath(absolutePath)
-                    .directories(DirectoryUtil.getDirFromItems(items))
-                    .files(FileUtil.getFilesFromItems(items))
-                    .build();
+            return DirectoryUtil.getDirFromItems(items);
         } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
                  InternalException e) {
-            log.warn("Directory {} dont get all objects", absolutePath);
+            log.warn("Directory {} dont get all objects", rootPath);
             throw new DirectorySearchFilesException("File search error");
         }
     }

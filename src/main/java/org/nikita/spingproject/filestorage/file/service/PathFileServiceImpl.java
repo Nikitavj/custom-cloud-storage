@@ -47,7 +47,7 @@ public class PathFileServiceImpl implements PathFileService {
     @Override
     public String createAbsolutePath(String path) {
         return String.format("%s/%s",
-                createRootPathForUser(),
+                rootPathForUser(),
                 path);
     }
 
@@ -60,12 +60,12 @@ public class PathFileServiceImpl implements PathFileService {
         }
 
         return String.format("%s/%s%s",
-                createRootPathForUser(),
+                rootPathForUser(),
                 path,
                 nameFile);
     }
 
-    private String createRootPathForUser() {
+    public String rootPathForUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userRepository.findUserByEmail(auth.getName())
                 .orElseThrow(() -> new EntityNotFoundException("User " + auth.getName() + "not exist"));

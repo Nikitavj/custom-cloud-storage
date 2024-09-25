@@ -1,4 +1,4 @@
-package org.nikita.spingproject.filestorage.commons.search;
+package org.nikita.spingproject.filestorage.commons.searchfiles;
 
 
 import lombok.AllArgsConstructor;
@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SearchFileDto {
+public class SearchRequest {
     private String name;
 }

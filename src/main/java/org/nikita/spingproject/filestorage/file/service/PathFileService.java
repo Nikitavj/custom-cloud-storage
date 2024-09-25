@@ -12,4 +12,6 @@ public interface PathFileService {
     String createAbsolutePath(String path);
 
     String createAbsolutePathNewFile(String path, String nameFile) throws UnsupportedEncodingException;
+
+    String rootPathForUser();
 }

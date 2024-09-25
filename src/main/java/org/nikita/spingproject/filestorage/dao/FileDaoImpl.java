@@ -1,11 +1,16 @@
-package org.nikita.spingproject.filestorage.file.dao;
+package org.nikita.spingproject.filestorage.dao;
 
+import io.minio.Result;
 import io.minio.StatObjectResponse;
 import io.minio.errors.*;
+import io.minio.messages.Item;
 import lombok.extern.slf4j.Slf4j;
+import org.nikita.spingproject.filestorage.directory.exception.DirectorySearchFilesException;
 import org.nikita.spingproject.filestorage.file.File;
 import org.nikita.spingproject.filestorage.file.exception.*;
 import org.nikita.spingproject.filestorage.file.s3Api.FileS3Api;
+import org.nikita.spingproject.filestorage.file.service.PathFileService;
+import org.nikita.spingproject.filestorage.utils.DirectoryUtil;
 import org.nikita.spingproject.filestorage.utils.FileUtil;
 import org.nikita.spingproject.filestorage.utils.PathEncoderUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,16 +21,19 @@ import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
 @Repository
 public class FileDaoImpl implements FileDao {
-    private FileS3Api fileS3Api;
+    private final FileS3Api fileS3Api;
+    private final PathFileService pathFileService;
 
     @Autowired
-    public FileDaoImpl(FileS3Api fileS3Api) {
+    public FileDaoImpl(FileS3Api fileS3Api, PathFileService pathFileService) {
         this.fileS3Api = fileS3Api;
+        this.pathFileService = pathFileService;
     }
 
     @Override
@@ -99,6 +107,23 @@ public class FileDaoImpl implements FileDao {
                  InternalException e) {
             log.warn("File {} dont rename", prevAbsolutePath);
             throw new FileRenameException("File not rename");
+        }
+    }
+
+
+    @Override
+    public List<File> getAll() {
+        String rootPath = pathFileService.rootPathForUser();
+        try {
+            Iterable<Result<Item>> results = fileS3Api
+                    .getObjectsRecursive(PathEncoderUtil.encode(rootPath) + "/");
+            List<Item> items = DirectoryUtil.getListItemsNoIsMinioDir(results);
+            return FileUtil.getFilesFromItems(items);
+        } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
+                 NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
+                 InternalException e) {
+            log.warn("Directory {} dont get all objects", rootPath);
+            throw new DirectorySearchFilesException("File search error");
         }
     }
 

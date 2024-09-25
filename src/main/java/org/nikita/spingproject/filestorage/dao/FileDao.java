@@ -1,6 +1,6 @@
-package org.nikita.spingproject.filestorage.file.dao;
+package org.nikita.spingproject.filestorage.dao;
 
-import org.nikita.spingproject.filestorage.commons.BaseDao;
+import org.nikita.spingproject.filestorage.dao.BaseDao;
 import org.nikita.spingproject.filestorage.file.File;
 
 public interface FileDao extends BaseDao<File> {

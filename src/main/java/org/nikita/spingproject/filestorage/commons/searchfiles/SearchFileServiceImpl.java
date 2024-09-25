@@ -1,14 +1,14 @@
-package org.nikita.spingproject.filestorage.commons.search;
+package org.nikita.spingproject.filestorage.commons.searchfiles;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.nikita.spingproject.filestorage.commons.ObjectStorageDto;
+import org.nikita.spingproject.filestorage.dao.FileDao;
 import org.nikita.spingproject.filestorage.directory.Directory;
-import org.nikita.spingproject.filestorage.directory.dao.DirectoryDao;
-import org.nikita.spingproject.filestorage.directory.dao.DirectoryDaoImpl;
-import org.nikita.spingproject.filestorage.directory.service.PathDirectoryService;
-import org.nikita.spingproject.filestorage.directory.service.PathDirectoryServiceImpl;
+import org.nikita.spingproject.filestorage.dao.DirectoryDao;
+import org.nikita.spingproject.filestorage.dao.DirectoryDaoImpl;
 import org.nikita.spingproject.filestorage.file.File;
+
 import org.nikita.spingproject.filestorage.utils.DateFormatUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,27 +18,27 @@ import java.util.List;
 
 @Service
 public class SearchFileServiceImpl implements SearchFileService {
-    private PathDirectoryService pathDirectoryService;
-    private DirectoryDao directoryDao;
+    private final DirectoryDao directoryDao;
+    private  final FileDao fileDao;
 
     @Autowired
-    public SearchFileServiceImpl(PathDirectoryServiceImpl pathDirectoryService, DirectoryDaoImpl directoryDao) {
-        this.pathDirectoryService = pathDirectoryService;
+    public SearchFileServiceImpl(DirectoryDaoImpl directoryDao, FileDao fileDao) {
         this.directoryDao = directoryDao;
+        this.fileDao = fileDao;
     }
 
     @Override
-    public List<ObjectStorageDto> search(SearchFileDto dto) {
+    public List<ObjectStorageDto> search(SearchRequest dto) {
         List<ObjectStorageDto> findObjects = new ArrayList<>();
-        String rootPath = pathDirectoryService.rootPathForUser();
-        Directory directory = directoryDao.getRecursive(rootPath);
+        List<Directory> directories = directoryDao.getAll();
+        List<File> files = fileDao.getAll();
 
-        for (Directory dir: directory.getDirectories()) {
+        for (Directory dir: directories) {
             if(dir.getName().contains(dto.getName())) {
                 findObjects.add(mapDirToObjStorage(dir));
             }
         }
-        for (File file: directory.getFiles()) {
+        for (File file: files) {
             if(file.getName().contains(dto.getName())) {
                 findObjects.add(mapFileToObjStorage(file));
             }

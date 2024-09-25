@@ -2,6 +2,7 @@ package org.nikita.spingproject.filestorage.file.s3Api;
 
 import io.minio.*;
 import io.minio.errors.*;
+import io.minio.messages.Item;
 import org.nikita.spingproject.filestorage.commons.s3Api.S3ApiImpl;
 import org.nikita.spingproject.filestorage.file.File;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,17 @@ public class FileS3ApiImpl extends S3ApiImpl<File> implements FileS3Api {
                         .build())
                 .metadataDirective(Directive.REPLACE)
                 .userMetadata(metaData)
+                .build());
+    }
+
+    @Override
+    public Iterable<Result<Item>> getObjectsRecursive(String path) {
+        return minioClient.listObjects(ListObjectsArgs
+                .builder()
+                .bucket(BUCKET_NAME)
+                .prefix(path)
+                .recursive(true)
+                .includeUserMetadata(true)
                 .build());
     }
 }
