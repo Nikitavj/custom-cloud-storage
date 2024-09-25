@@ -8,10 +8,10 @@ import io.minio.messages.Item;
 import lombok.extern.slf4j.Slf4j;
 import org.nikita.spingproject.filestorage.commons.InfoMetaS3;
 import org.nikita.spingproject.filestorage.directory.Directory;
-import org.nikita.spingproject.filestorage.directory.service.PathDirectoryService;
-import org.nikita.spingproject.filestorage.utils.DirectoryUtil;
 import org.nikita.spingproject.filestorage.directory.exception.*;
-import org.nikita.spingproject.filestorage.directory.s3Api.DirectoryS3Api;
+import org.nikita.spingproject.filestorage.service.PathDirectoryService;
+import org.nikita.spingproject.filestorage.s3Api.DirectoryS3Api;
+import org.nikita.spingproject.filestorage.utils.DirectoryUtil;
 import org.nikita.spingproject.filestorage.file.File;
 import org.nikita.spingproject.filestorage.utils.FileUtil;
 import org.nikita.spingproject.filestorage.utils.PathEncoderUtil;
@@ -40,9 +40,7 @@ public class DirectoryDaoImpl implements DirectoryDao {
 
     @Override
     public void add(Directory directory) {
-        String absolutePath = pathDirectoryService.absolutePathNewDir(
-                directory.getRelativePath(),
-                directory.getName());
+        String absolutePath = pathDirectoryService.absolutPath(directory.getRelativePath());
         try {
             String encodePath = PathEncoderUtil.encode(absolutePath);
             String pathForMeta = encodePath + POSTFIX;
@@ -52,7 +50,7 @@ public class DirectoryDaoImpl implements DirectoryDao {
                     DirectoryUtil.createMetaDataDir(
                             directory.getName(),
                             directory.getRelativePath(),
-                            directory.getAbsolutePath()
+                            absolutePath
                     ),
                     pathForMeta);
         } catch (DirectoryAlreadyExistsException e) {
@@ -142,9 +140,9 @@ public class DirectoryDaoImpl implements DirectoryDao {
             }
 
             for (File file : files) {
-                String absolutePathFile = file.getAbsolutePath();
+                String absolutePathFile = file.getPathS3();
                 String newAbsolutePathFile = absolutePathFile.replaceFirst(previousAbsolutePath, targetAbsolutePath);
-                String newRelPathFile = file.getRelativePath().replaceFirst(previousRelPath, newRelPath);
+                String newRelPathFile = file.getPath().replaceFirst(previousRelPath, newRelPath);
                 directoryS3Api.copyObject(
                         PathEncoderUtil.encode(absolutePathFile),
                         PathEncoderUtil.encode(newAbsolutePathFile),

@@ -1,16 +1,17 @@
-package org.nikita.spingproject.filestorage.commons;
+package org.nikita.spingproject.filestorage.controller;
 
+import org.nikita.spingproject.filestorage.commons.ObjectStorageDto;
 import org.nikita.spingproject.filestorage.commons.breadcrumbs.BreadcrumbsUtil;
 import org.nikita.spingproject.filestorage.directory.dto.ObjectsDirDto;
 import org.nikita.spingproject.filestorage.directory.exception.DirectoryAlreadyExistsException;
 import org.nikita.spingproject.filestorage.directory.exception.DirectoryCreatedException;
 import org.nikita.spingproject.filestorage.directory.exception.DirectoryNameException;
-import org.nikita.spingproject.filestorage.directory.service.DirectoryService;
+import org.nikita.spingproject.filestorage.service.DirectoryService;
 import org.nikita.spingproject.filestorage.file.dto.FilesUploadDto;
 import org.nikita.spingproject.filestorage.file.exception.FileAlreadyExistsException;
 import org.nikita.spingproject.filestorage.file.exception.FileNameException;
 import org.nikita.spingproject.filestorage.file.exception.FileUploadException;
-import org.nikita.spingproject.filestorage.commons.uploadfiles.UploadFilesServiceImpl;
+import org.nikita.spingproject.filestorage.service.UploadFilesServiceImpl;
 import org.nikita.spingproject.filestorage.utils.NameFileValidator;
 import org.nikita.spingproject.filestorage.utils.PathEncoderUtil;
 import org.springframework.beans.factory.annotation.Autowired;

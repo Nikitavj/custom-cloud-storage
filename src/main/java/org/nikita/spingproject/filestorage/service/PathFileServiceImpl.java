@@ -1,4 +1,4 @@
-package org.nikita.spingproject.filestorage.file.service;
+package org.nikita.spingproject.filestorage.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.apache.commons.lang3.StringUtils;
@@ -26,8 +26,7 @@ public class PathFileServiceImpl implements PathFileService {
     }
 
     @Override
-    public String renameRelPath(String oldAbsolutePath, String newName) {
-        String oldRelativePath = StringUtils.substringAfter(oldAbsolutePath, "/");
+    public String renameRelPath(String oldRelativePath, String newName) {
         if (oldRelativePath.contains("/")) {
             return StringUtils.substringBeforeLast(oldRelativePath, "/") + "/" + newName;
         } else {

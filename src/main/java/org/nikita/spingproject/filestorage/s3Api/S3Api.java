@@ -1,4 +1,4 @@
-package org.nikita.spingproject.filestorage.commons.s3Api;
+package org.nikita.spingproject.filestorage.s3Api;
 
 import io.minio.Result;
 import io.minio.StatObjectResponse;

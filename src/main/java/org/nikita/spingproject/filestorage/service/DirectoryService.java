@@ -1,4 +1,4 @@
-package org.nikita.spingproject.filestorage.directory.service;
+package org.nikita.spingproject.filestorage.service;
 
 import org.nikita.spingproject.filestorage.commons.ObjectStorageDto;
 import org.nikita.spingproject.filestorage.directory.dto.*;

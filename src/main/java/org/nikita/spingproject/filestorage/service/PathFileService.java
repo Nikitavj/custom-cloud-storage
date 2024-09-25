@@ -1,4 +1,4 @@
-package org.nikita.spingproject.filestorage.file.service;
+package org.nikita.spingproject.filestorage.service;
 
 import java.io.UnsupportedEncodingException;
 

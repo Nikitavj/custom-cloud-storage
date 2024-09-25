@@ -1,9 +1,8 @@
-package org.nikita.spingproject.filestorage.file.s3Api;
+package org.nikita.spingproject.filestorage.s3Api;
 
 import io.minio.*;
 import io.minio.errors.*;
 import io.minio.messages.Item;
-import org.nikita.spingproject.filestorage.commons.s3Api.S3ApiImpl;
 import org.nikita.spingproject.filestorage.file.File;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -16,8 +15,8 @@ import java.util.Map;
 
 @Repository
 public class FileS3ApiImpl extends S3ApiImpl<File> implements FileS3Api {
-    private static String BUCKET_NAME = "user-files";
-    private MinioClient minioClient;
+    private static final String BUCKET_NAME = "user-files";
+    private final MinioClient minioClient;
 
     @Autowired
     public FileS3ApiImpl(MinioClient minioClient) {

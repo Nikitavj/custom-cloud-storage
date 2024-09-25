@@ -1,8 +1,8 @@
-package org.nikita.spingproject.filestorage.directory;
+package org.nikita.spingproject.filestorage.controller;
 
 import org.nikita.spingproject.filestorage.directory.dto.*;
 import org.nikita.spingproject.filestorage.directory.exception.*;
-import org.nikita.spingproject.filestorage.directory.service.DirectoryService;
+import org.nikita.spingproject.filestorage.service.DirectoryService;
 import org.nikita.spingproject.filestorage.utils.NameFileValidator;
 import org.nikita.spingproject.filestorage.utils.PathEncoderUtil;
 import org.springframework.beans.factory.annotation.Autowired;

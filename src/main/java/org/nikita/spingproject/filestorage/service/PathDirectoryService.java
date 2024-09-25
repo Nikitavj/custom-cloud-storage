@@ -1,4 +1,4 @@
-package org.nikita.spingproject.filestorage.directory.service;
+package org.nikita.spingproject.filestorage.service;
 
 public interface PathDirectoryService {
     String rootPathForUser();

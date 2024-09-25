@@ -1,4 +1,4 @@
-package org.nikita.spingproject.filestorage.directory.service;
+package org.nikita.spingproject.filestorage.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.apache.commons.lang3.StringUtils;

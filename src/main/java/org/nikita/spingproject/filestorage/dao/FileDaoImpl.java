@@ -8,8 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.nikita.spingproject.filestorage.directory.exception.DirectorySearchFilesException;
 import org.nikita.spingproject.filestorage.file.File;
 import org.nikita.spingproject.filestorage.file.exception.*;
-import org.nikita.spingproject.filestorage.file.s3Api.FileS3Api;
-import org.nikita.spingproject.filestorage.file.service.PathFileService;
+
+import org.nikita.spingproject.filestorage.path.S3FilePathBuilder;
+import org.nikita.spingproject.filestorage.s3Api.FileS3Api;
 import org.nikita.spingproject.filestorage.utils.DirectoryUtil;
 import org.nikita.spingproject.filestorage.utils.FileUtil;
 import org.nikita.spingproject.filestorage.utils.PathEncoderUtil;
@@ -20,59 +21,60 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Repository
 public class FileDaoImpl implements FileDao {
     private final FileS3Api fileS3Api;
-    private final PathFileService pathFileService;
+    private final S3FilePathBuilder s3pathBuilder;
 
     @Autowired
-    public FileDaoImpl(FileS3Api fileS3Api, PathFileService pathFileService) {
+    public FileDaoImpl(FileS3Api fileS3Api, S3FilePathBuilder s3pathBuilder) {
         this.fileS3Api = fileS3Api;
-        this.pathFileService = pathFileService;
+        this.s3pathBuilder = s3pathBuilder;
     }
 
     @Override
     public void add(File file) {
         try {
-            String encodePath = PathEncoderUtil.encode(file.getAbsolutePath());
-            checkExistsFile(encodePath);
+            String pathS3 = s3pathBuilder.buildPath(file.getPath());
+            String encodePathS3 = PathEncoderUtil.encode(pathS3);
+            checkExistsFile(encodePathS3);
             fileS3Api.putFile(
                     FileUtil.createMetaDataFile(
                             file.getName(),
-                            file.getRelativePath(),
-                            file.getAbsolutePath()),
-                    encodePath,
+                            file.getPath(),
+                            pathS3),
+                    encodePathS3,
                     file.getInputStream());
         }catch (FileAlreadyExistsException e) {
             throw new FileAlreadyExistsException(e.getMessage());
         } catch (Exception e) {
-            log.warn("File {} dont add", file.getAbsolutePath());
+            log.warn("File {} dont add", file.getPathS3());
             throw new FileUploadException("File upload error");
         }
     }
 
     @Override
-    public void remove(String absolutePath) {
+    public void remove(String relPath) {
+        String pathS3 = s3pathBuilder.buildPath(relPath);
         try {
-            String encodePath = PathEncoderUtil.encode(absolutePath);
-            fileS3Api.removeObject(encodePath);
+            String encodePathS3 = PathEncoderUtil.encode(pathS3);
+            fileS3Api.removeObject(encodePathS3);
         } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
                  InternalException e) {
-            log.warn("File {} dont remove", absolutePath);
+            log.warn("File {} dont remove", pathS3);
             throw new FileRemoveException("File not deleted");
         }
     }
 
     @Override
-    public File get(String absolutePath) {
+    public File get(String relPath) {
+        String pathS3 = s3pathBuilder.buildPath(relPath);
         try {
-            String encodePath = PathEncoderUtil.encode(absolutePath);
+            String encodePath = PathEncoderUtil.encode(pathS3);
             InputStream is = fileS3Api.getInputStream(encodePath);
             StatObjectResponse stat = fileS3Api.getInfo(encodePath);
 
@@ -83,29 +85,32 @@ public class FileDaoImpl implements FileDao {
         } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
                  InternalException e) {
-            log.warn("File {} dont get", absolutePath);
+            log.warn("File {} dont get", pathS3);
             throw new FileDownloadException("File download error");
         }
     }
 
     @Override
-    public void rename(String prevAbsolutePath, String targetAbsolutePath, String relativePath, String name) {
+    public void rename(String relativePath, String newRelativePath, String name) {
+        String prevPathS3 = s3pathBuilder.buildPath(relativePath);
+        String targPathS3 = s3pathBuilder.buildPath(newRelativePath);
         try {
-            String encodePrevPath = PathEncoderUtil.encode(prevAbsolutePath);
-            String encodeTargetPath = PathEncoderUtil.encode(targetAbsolutePath);
+            String encodePrevPathS3 = PathEncoderUtil.encode(prevPathS3);
+            String encodeTargetPathS3 = PathEncoderUtil.encode(targPathS3);
 
-            checkExistsFile(encodeTargetPath);
+            checkExistsFile(encodeTargetPathS3);
             fileS3Api.copyFile(
-                    encodePrevPath,
-                    encodeTargetPath,
-                    FileUtil.createMetaDataFile(name, relativePath, targetAbsolutePath));
+                    encodePrevPathS3,
+                    encodeTargetPathS3,
+                    FileUtil.createMetaDataFile(name, relativePath, newRelativePath));
 
+            this.remove(relativePath);
         }catch (FileAlreadyExistsException e) {
             throw new FileAlreadyExistsException(e.getMessage());
         } catch (IllegalArgumentException | ServerException | InsufficientDataException | ErrorResponseException | IOException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
                  InternalException e) {
-            log.warn("File {} dont rename", prevAbsolutePath);
+            log.warn("File {} dont rename", prevPathS3);
             throw new FileRenameException("File not rename");
         }
     }
@@ -113,16 +118,18 @@ public class FileDaoImpl implements FileDao {
 
     @Override
     public List<File> getAll() {
-        String rootPath = pathFileService.rootPathForUser();
+        String pathS3 = s3pathBuilder.rootPathForUser();
         try {
+            String encodePathS3 = PathEncoderUtil.encode(pathS3);
             Iterable<Result<Item>> results = fileS3Api
-                    .getObjectsRecursive(PathEncoderUtil.encode(rootPath) + "/");
+                    .getObjectsRecursive(encodePathS3 + "/");
             List<Item> items = DirectoryUtil.getListItemsNoIsMinioDir(results);
             return FileUtil.getFilesFromItems(items);
+
         } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
                  InternalException e) {
-            log.warn("Directory {} dont get all objects", rootPath);
+            log.warn("Directory {} dont get all objects", pathS3);
             throw new DirectorySearchFilesException("File search error");
         }
     }

@@ -1,11 +1,10 @@
-package org.nikita.spingproject.filestorage.directory.s3Api;
+package org.nikita.spingproject.filestorage.s3Api;
 
 import io.minio.*;
 import io.minio.errors.*;
 import io.minio.messages.DeleteError;
 import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
-import org.nikita.spingproject.filestorage.commons.s3Api.S3ApiImpl;
 import org.nikita.spingproject.filestorage.directory.Directory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -20,7 +19,7 @@ import java.util.Map;
 @Repository
 public class DirectoryS3ApiImpl extends S3ApiImpl<Directory> implements DirectoryS3Api {
     private final static String BUCKET_NAME = "user-files";
-    private MinioClient minioClient;
+    private final MinioClient minioClient;
 
     @Autowired
     public DirectoryS3ApiImpl(MinioClient minioClient) {

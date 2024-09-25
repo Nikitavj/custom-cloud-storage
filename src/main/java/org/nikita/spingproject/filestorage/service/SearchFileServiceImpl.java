@@ -1,12 +1,13 @@
-package org.nikita.spingproject.filestorage.commons.searchfiles;
+package org.nikita.spingproject.filestorage.service;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.nikita.spingproject.filestorage.commons.ObjectStorageDto;
+import org.nikita.spingproject.filestorage.commons.SearchRequest;
 import org.nikita.spingproject.filestorage.dao.FileDao;
-import org.nikita.spingproject.filestorage.directory.Directory;
 import org.nikita.spingproject.filestorage.dao.DirectoryDao;
 import org.nikita.spingproject.filestorage.dao.DirectoryDaoImpl;
+import org.nikita.spingproject.filestorage.directory.Directory;
 import org.nikita.spingproject.filestorage.file.File;
 
 import org.nikita.spingproject.filestorage.utils.DateFormatUtil;
@@ -47,7 +48,7 @@ public class SearchFileServiceImpl implements SearchFileService {
     }
 
     private ObjectStorageDto mapFileToObjStorage(File file) {
-        String link = linkObjectIncludeInDirectory(file.getRelativePath());
+        String link = linkObjectIncludeInDirectory(file.getPath());
         return ObjectStorageDto.builder()
                 .name(file.getName())
                 .relativePath(link)

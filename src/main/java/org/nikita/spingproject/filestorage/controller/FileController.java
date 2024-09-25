@@ -1,14 +1,14 @@
-package org.nikita.spingproject.filestorage.file;
+package org.nikita.spingproject.filestorage.controller;
 
 import org.nikita.spingproject.filestorage.file.dto.FileDownloadDto;
 import org.nikita.spingproject.filestorage.file.dto.FileDto;
-import org.nikita.spingproject.filestorage.file.dto.FileRenameDto;
+import org.nikita.spingproject.filestorage.file.dto.RenameFileRequest;
 import org.nikita.spingproject.filestorage.file.exception.FileAlreadyExistsException;
 import org.nikita.spingproject.filestorage.file.exception.FileNameException;
 import org.nikita.spingproject.filestorage.file.exception.FileRemoveException;
 import org.nikita.spingproject.filestorage.file.exception.FileRenameException;
-import org.nikita.spingproject.filestorage.file.service.FileService;
-import org.nikita.spingproject.filestorage.file.service.FileServiceImpl;
+import org.nikita.spingproject.filestorage.service.FileService;
+import org.nikita.spingproject.filestorage.service.FileServiceImpl;
 import org.nikita.spingproject.filestorage.utils.NameFileValidator;
 import org.nikita.spingproject.filestorage.utils.PathEncoderUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,7 +66,7 @@ public class FileController {
 
             NameFileValidator.checkFileName(newName);
             fileService.renameFile(
-                    new FileRenameDto(
+                    new RenameFileRequest(
                             path,
                             newName.trim()));
         } catch (FileAlreadyExistsException | FileRenameException | FileNameException | UnsupportedEncodingException e) {

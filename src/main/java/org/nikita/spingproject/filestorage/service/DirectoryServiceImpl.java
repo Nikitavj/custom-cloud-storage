@@ -1,4 +1,4 @@
-package org.nikita.spingproject.filestorage.directory.service;
+package org.nikita.spingproject.filestorage.service;
 
 import org.apache.commons.io.FileUtils;
 import org.nikita.spingproject.filestorage.commons.ObjectStorageDto;
@@ -100,7 +100,7 @@ public class DirectoryServiceImpl implements DirectoryService {
     private ObjectStorageDto mapFileToObjStorage(File file) {
         return ObjectStorageDto.builder()
                 .name(file.getName())
-                .relativePath(file.getRelativePath())
+                .relativePath(file.getPath())
                 .date(DateFormatUtil.format(file.getDate()))
                 .size(FileUtils.byteCountToDisplaySize(file.getSize()))
                 .isDir(false)
@@ -126,7 +126,7 @@ public class DirectoryServiceImpl implements DirectoryService {
         }
 
         for (File file : files) {
-            File fileWithIS = fileDao.get(file.getAbsolutePath());
+            File fileWithIS = fileDao.get(file.getPathS3());
 
             try (InputStream is = fileWithIS.getInputStream()) {
                 ZipEntry zipEntry = new ZipEntry(prefixPath + "/" + file.getName());

@@ -1,7 +1,9 @@
-package org.nikita.spingproject.filestorage.commons.searchfiles;
+package org.nikita.spingproject.filestorage.controller;
 
 import org.nikita.spingproject.filestorage.commons.ObjectStorageDto;
 import org.nikita.spingproject.filestorage.directory.exception.DirectorySearchFilesException;
+import org.nikita.spingproject.filestorage.service.SearchFileService;
+import org.nikita.spingproject.filestorage.commons.SearchRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;

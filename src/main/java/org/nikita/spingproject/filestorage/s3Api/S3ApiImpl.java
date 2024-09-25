@@ -1,4 +1,4 @@
-package org.nikita.spingproject.filestorage.commons.s3Api;
+package org.nikita.spingproject.filestorage.s3Api;
 
 import io.minio.MinioClient;
 import io.minio.RemoveObjectArgs;
@@ -12,7 +12,7 @@ import java.security.NoSuchAlgorithmException;
 
 public abstract class S3ApiImpl<T> implements S3Api<T> {
     private static final String BUCKET_NAME = "user-files";
-    private MinioClient minioClient;
+    private final MinioClient minioClient;
 
     public S3ApiImpl(MinioClient minioClient) {
         this.minioClient = minioClient;
@@ -25,7 +25,7 @@ public abstract class S3ApiImpl<T> implements S3Api<T> {
                 .bucket(BUCKET_NAME)
                 .object(path)
                 .build());
-    };
+    }
 
     @Override
     public StatObjectResponse getInfo(String path) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
