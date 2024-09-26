@@ -12,19 +12,32 @@ import org.springframework.stereotype.Component;
 import java.io.UnsupportedEncodingException;
 
 @Component
-public class S3FilePathBuilder {
+public class S3DirectoryPathBuilder {
     private final UserRepository userRepository;
+    private static final String POSTFIX = "_meta";
 
     @Autowired
-    public S3FilePathBuilder(UserRepository userRepository) {
+    public S3DirectoryPathBuilder(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    public String buildPath(String path) throws UnsupportedEncodingException {
-        String pathS3 =  String.format("%s/%s",
+    public String buildPathMeta(String path) throws UnsupportedEncodingException {
+        String pathS3 =  String.format("%s/%s%s",
                 rootPathForUser(),
-                path);
+                path,
+                POSTFIX);
         return PathEncoderUtil.encode(pathS3);
+    }
+
+    public String buildPath(String path) throws UnsupportedEncodingException {
+        if(path == null || path.isBlank()) {
+            return PathEncoderUtil.encode(rootPathForUser());
+        } else {
+            String pathS3 =  String.format("%s/%s",
+                    rootPathForUser(),
+                    path);
+            return PathEncoderUtil.encode(pathS3);
+        }
     }
 
     public String rootPathForUser() {

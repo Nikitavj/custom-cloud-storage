@@ -16,8 +16,7 @@ import java.util.List;
 @Builder
 public class Directory{
     private String name;
-    private String absolutePath;
-    private String relativePath;
+    private String path;
     private ZonedDateTime date;
     private List<Directory> directories;
     private List<File> files;
@@ -28,10 +27,9 @@ public class Directory{
         this.files = new ArrayList<>();
     }
 
-    public Directory(String name, String absolutePath, String relativePath, ZonedDateTime date) {
+    public Directory(String name, String path, ZonedDateTime date) {
         this.name = name;
-        this.absolutePath = absolutePath;
-        this.relativePath = relativePath;
+        this.path = path;
         this.date = date;
     }
 

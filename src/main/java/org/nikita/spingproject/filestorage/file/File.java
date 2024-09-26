@@ -15,8 +15,7 @@ import java.time.ZonedDateTime;
 public class File{
     private InputStream inputStream;
     private String name;
-    private String absolutePath;
-    private String relativePath;
+    private String path;
     private ZonedDateTime date;
     private long size;
 }

@@ -59,7 +59,7 @@ public class SearchFileServiceImpl implements SearchFileService {
     }
 
     private ObjectStorageDto mapDirToObjStorage(Directory directory) {
-        String link = linkObjectIncludeInDirectory(directory.getRelativePath());
+        String link = linkObjectIncludeInDirectory(directory.getPath());
         return ObjectStorageDto.builder()
                 .name(directory.getName())
                 .relativePath(link)

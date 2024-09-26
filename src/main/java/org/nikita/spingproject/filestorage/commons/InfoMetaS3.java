@@ -11,7 +11,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class InfoMetaS3 {
     String name;
-    String relativePath;
-    String absPath;
+    String path;
     boolean isDir;
 }

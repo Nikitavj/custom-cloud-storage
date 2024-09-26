@@ -16,11 +16,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class DirectoryUtil {
-    public static Map<String, String> createMetaDataDir(String name, String relPath, String absPath) {
+    public static Map<String, String> createMetaDataDir(String name, String relPath) {
         Map<String, String> metaData = new HashMap<>();
         metaData.put("name", name);
-        metaData.put("rel_path", relPath);
-        metaData.put("abs_path", absPath);
+        metaData.put("path", relPath);
         metaData.put("dir", "");
         return metaData;
     }
@@ -36,16 +35,14 @@ public class DirectoryUtil {
         InfoMetaS3 info = buildInfo(item.userMetadata());
         return new Directory(
                 info.getName(),
-                info.getAbsPath(),
-                info.getRelativePath(),
+                info.getPath(),
                 item.lastModified());
     }
 
     private static InfoMetaS3 buildInfo(Map<String, String> metaData) {
         return InfoMetaS3.builder()
                 .name(metaData.get("X-Amz-Meta-Name"))
-                .relativePath(metaData.get("X-Amz-Meta-Rel_path"))
-                .absPath(metaData.get("X-Amz-Meta-Abs_path"))
+                .path(metaData.get("X-Amz-Meta-Path"))
                 .isDir(metaData.containsKey("X-Amz-Meta-Dir"))
                 .build();
     }

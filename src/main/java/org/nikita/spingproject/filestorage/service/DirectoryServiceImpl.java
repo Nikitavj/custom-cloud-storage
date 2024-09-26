@@ -74,7 +74,7 @@ public class DirectoryServiceImpl implements DirectoryService {
         String relativePath = pathDirectoryService.relativePath(dto.getCurrentPath(), dto.getName());
         Directory directory = Directory.builder()
                 .name(dto.getName())
-                .relativePath(relativePath)
+                .path(relativePath)
                 .build();
         directoryDao.add(directory);
 
@@ -110,7 +110,7 @@ public class DirectoryServiceImpl implements DirectoryService {
     private ObjectStorageDto mapDirToObjStorage(Directory dir) {
         return ObjectStorageDto.builder()
                 .name(dir.getName())
-                .relativePath(dir.getRelativePath())
+                .relativePath(dir.getPath())
                 .date(DateFormatUtil.format(dir.getDate()))
                 .isDir(true)
                 .build();
@@ -126,7 +126,7 @@ public class DirectoryServiceImpl implements DirectoryService {
         }
 
         for (File file : files) {
-            File fileWithIS = fileDao.get(file.getPathS3());
+            File fileWithIS = fileDao.get(file.getPath());
 
             try (InputStream is = fileWithIS.getInputStream()) {
                 ZipEntry zipEntry = new ZipEntry(prefixPath + "/" + file.getName());
