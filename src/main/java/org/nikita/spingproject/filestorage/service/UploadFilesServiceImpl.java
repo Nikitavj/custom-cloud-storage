@@ -34,7 +34,7 @@ public class UploadFilesServiceImpl implements UploadFilesService {
 
         if (isDirectory(firstFile.getOriginalFilename())) {
             String nameRootDir = StringUtils.substringBefore(firstFile.getOriginalFilename(), "/");
-            directoryService.createNewDirectory(
+            directoryService.create(
                     new NewDirRequest(dto.getPath(), nameRootDir));
             uploadFileOfDir(firstFile, dto.getPath());
             multFiles.removeFirst();
@@ -47,7 +47,7 @@ public class UploadFilesServiceImpl implements UploadFilesService {
 
         } else {
             for (MultipartFile mFile : multFiles) {
-                fileService.uploadFile(
+                fileService.upload(
                         new FileUploadDto(
                                 mFile.getInputStream(),
                                 dto.getPath(),
@@ -61,7 +61,7 @@ public class UploadFilesServiceImpl implements UploadFilesService {
         String pathNewDir = currentPath;
         for (String nameDir : namesDir) {
             try {
-                directoryService.createNewDirectory(
+                directoryService.create(
                         new NewDirRequest(pathNewDir, nameDir));
             } catch (DirectoryAlreadyExistsException e) {
             }
@@ -82,7 +82,7 @@ public class UploadFilesServiceImpl implements UploadFilesService {
         if (!path.isBlank()) {
             newCurrentPath = path + "/" + postfixPath;
         }
-        fileService.uploadFile(
+        fileService.upload(
                 new FileUploadDto(
                         mFile.getInputStream(),
                         newCurrentPath,

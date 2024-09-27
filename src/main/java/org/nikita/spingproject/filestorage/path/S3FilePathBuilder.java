@@ -12,25 +12,17 @@ import org.springframework.stereotype.Component;
 import java.io.UnsupportedEncodingException;
 
 @Component
-public class S3FilePathBuilder {
-    private final UserRepository userRepository;
-
+public class S3FilePathBuilder extends S3PathBuilder{
     @Autowired
     public S3FilePathBuilder(UserRepository userRepository) {
-        this.userRepository = userRepository;
+        super(userRepository);
     }
 
+    @Override
     public String buildPath(String path) throws UnsupportedEncodingException {
         String pathS3 =  String.format("%s/%s",
                 rootPathForUser(),
                 path);
         return PathEncoderUtil.encode(pathS3);
-    }
-
-    public String rootPathForUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User user = userRepository.findUserByEmail(auth.getName())
-                .orElseThrow(() -> new EntityNotFoundException("User " + auth.getName() + "not exist"));
-        return String.format("user-%s-files", user.getId());
     }
 }

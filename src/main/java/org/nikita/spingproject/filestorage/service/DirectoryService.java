@@ -7,10 +7,10 @@ import java.io.IOException;
 import java.util.List;
 
 public interface DirectoryService {
-    DownloadDirResponse downloadDirectory(DownloadDirRequest request) throws IOException;
-    List<ObjectStorageDto> getObjectsDirectory(ObjectsDirDto dto);
-    DirDto createNewDirectory(NewDirRequest dto);
-    void deleteDirectory(DeleteDirRequest dto);
-    void renameDirectory(RenameDirRequest dto);
+    DownloadDirResponse download(DownloadDirRequest request) throws IOException;
+    List<ObjectStorageDto> getObjectsOfDir(ObjectsDirDto dto);
+    DirDto create(NewDirRequest dto);
+    void delete(DeleteDirRequest dto);
+    void rename(RenameDirRequest dto);
 }
 

@@ -1,4 +1,4 @@
-package org.nikita.spingproject.filestorage.dao;
+package org.nikita.spingproject.filestorage.s3manager;
 
 import io.minio.Result;
 import io.minio.StatObjectResponse;
@@ -24,12 +24,12 @@ import java.util.List;
 
 @Slf4j
 @Repository
-public class FileDaoImpl implements FileDao {
+public class S3FileManagerImpl implements S3FileManager {
     private final FileS3Api fileS3Api;
     private final S3FilePathBuilder s3pathBuilder;
 
     @Autowired
-    public FileDaoImpl(FileS3Api fileS3Api, S3FilePathBuilder s3pathBuilder) {
+    public S3FileManagerImpl(FileS3Api fileS3Api, S3FilePathBuilder s3pathBuilder) {
         this.fileS3Api = fileS3Api;
         this.s3pathBuilder = s3pathBuilder;
     }
@@ -113,7 +113,7 @@ public class FileDaoImpl implements FileDao {
     @Override
     public List<File> getAll() {
         try {
-            String pathS3 = s3pathBuilder.rootPathForUser();
+            String pathS3 = s3pathBuilder.rootPath();
             Iterable<Result<Item>> results = fileS3Api
                     .getObjectsRecursive(pathS3 + "/");
             List<Item> items = DirectoryUtil.getListItemsNoIsMinioDir(results);
@@ -128,11 +128,11 @@ public class FileDaoImpl implements FileDao {
     }
 
     private void checkExistsFile(String pathS3) {
-        StatObjectResponse stat = null;
+        StatObjectResponse stat;
         try {
             stat = fileS3Api.getInfo(pathS3);
         } catch (Exception e) {
-
+            return;
         }
 
         if(stat != null) {

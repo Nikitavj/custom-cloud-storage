@@ -36,7 +36,7 @@ public class FileController {
     @GetMapping
     public ResponseEntity<InputStreamResource> downloadFile(@RequestParam String path) {
         FileDownloadDto dto = fileService
-                .downloadFile(new FileDto(path));
+                .download(new FileDto(path));
 
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + dto.getName());
@@ -65,7 +65,7 @@ public class FileController {
             }
 
             NameFileValidator.checkFileName(newName);
-            fileService.renameFile(
+            fileService.rename(
                     new RenameFileRequest(
                             path,
                             newName.trim()));
@@ -86,7 +86,7 @@ public class FileController {
                 redirectPath = "/?path=" + PathEncoderUtil.encode(currentPath);
             }
 
-            fileService.deleteFile(new FileDto(path));
+            fileService.delete(new FileDto(path));
         } catch (FileRemoveException | UnsupportedEncodingException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }

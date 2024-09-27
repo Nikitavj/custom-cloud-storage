@@ -6,8 +6,8 @@ import org.nikita.spingproject.filestorage.file.dto.RenameFileRequest;
 import org.nikita.spingproject.filestorage.file.dto.FileUploadDto;
 
 public interface FileService {
-    void uploadFile(FileUploadDto dto);
-    void deleteFile(FileDto dto);
-    FileDownloadDto downloadFile(FileDto dto);
-    void renameFile(RenameFileRequest dto);
+    void upload(FileUploadDto dto);
+    void delete(FileDto dto);
+    FileDownloadDto download(FileDto dto);
+    void rename(RenameFileRequest dto);
 }

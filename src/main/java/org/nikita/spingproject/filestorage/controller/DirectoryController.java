@@ -35,7 +35,7 @@ public class DirectoryController {
             @RequestParam String path) {
         try {
             DownloadDirResponse response = directoryService
-                    .downloadDirectory(new DownloadDirRequest(path));
+                    .download(new DownloadDirRequest(path));
 
             HttpHeaders responseHeaders = new HttpHeaders();
             responseHeaders.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + response.getName());
@@ -67,7 +67,7 @@ public class DirectoryController {
 
             NameFileValidator.checkDirectoryName(nameFolder);
             DirDto newDirectory = directoryService
-                    .createNewDirectory(new NewDirRequest(
+                    .create(new NewDirRequest(
                             currentPath,
                             nameFolder.trim()));
 
@@ -91,7 +91,7 @@ public class DirectoryController {
                 redirectPath = "/?path=" + PathEncoderUtil.encode(currentPath);
             }
 
-            directoryService.deleteDirectory(
+            directoryService.delete(
                     new DeleteDirRequest(relativePath));
         } catch (DirectoryRemoveException | UnsupportedEncodingException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
@@ -117,7 +117,7 @@ public class DirectoryController {
             }
 
             NameFileValidator.checkDirectoryName(newName);
-           directoryService.renameDirectory(
+           directoryService.rename(
                     new RenameDirRequest(
                             relativePath,
                             newName.trim()));

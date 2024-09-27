@@ -2,9 +2,9 @@ package org.nikita.spingproject.filestorage.service;
 
 import org.apache.commons.io.FileUtils;
 import org.nikita.spingproject.filestorage.commons.ObjectStorageDto;
-import org.nikita.spingproject.filestorage.dao.FileDao;
+import org.nikita.spingproject.filestorage.s3manager.S3FileManager;
 import org.nikita.spingproject.filestorage.directory.Directory;
-import org.nikita.spingproject.filestorage.dao.DirectoryDao;
+import org.nikita.spingproject.filestorage.s3manager.S3DirectoryManager;
 import org.nikita.spingproject.filestorage.directory.dto.*;
 import org.nikita.spingproject.filestorage.file.File;
 
@@ -25,33 +25,33 @@ import java.util.zip.ZipOutputStream;
 @Service
 public class DirectoryServiceImpl implements DirectoryService {
     private final PathDirectoryService pathDirectoryService;
-    private final DirectoryDao directoryDao;
-    private final FileDao fileDao;
+    private final S3DirectoryManager s3DirectoryManager;
+    private final S3FileManager s3FileManager;
 
     @Autowired
-    public DirectoryServiceImpl(PathDirectoryService pathDirectoryService, DirectoryDao directoryDao, FileDao fileDao) {
+    public DirectoryServiceImpl(PathDirectoryService pathDirectoryService, S3DirectoryManager s3DirectoryManager, S3FileManager s3FileManager) {
         this.pathDirectoryService = pathDirectoryService;
-        this.directoryDao = directoryDao;
-        this.fileDao = fileDao;
+        this.s3DirectoryManager = s3DirectoryManager;
+        this.s3FileManager = s3FileManager;
     }
 
     @Override
-    public DownloadDirResponse downloadDirectory(DownloadDirRequest request) throws IOException {
-        Directory directory = directoryDao.get(request.getPath());
+    public DownloadDirResponse download(DownloadDirRequest request) throws IOException {
+        Directory directory = s3DirectoryManager.get(request.getPath());
 
         String nameZipFile = directory.getName() + ".zip";
         Path zipPath = Files.createTempFile(directory.getName(), ".zip");
 
         try (ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(zipPath))) {
-            zipDirectory(directory, directory.getName(), zos);
+            zip(directory, directory.getName(), zos);
             FileInputStream fis = new FileInputStream(zipPath.toFile());
             return new DownloadDirResponse(fis, nameZipFile);
         }
     }
 
     @Override
-    public List<ObjectStorageDto> getObjectsDirectory(ObjectsDirDto dto) {
-        Directory directory = directoryDao.get(dto.getRelativePath());
+    public List<ObjectStorageDto> getObjectsOfDir(ObjectsDirDto dto) {
+        Directory directory = s3DirectoryManager.get(dto.getRelativePath());
 
         List<ObjectStorageDto> objects = new ArrayList<>();
         for (Directory dir : directory.getDirectories()) {
@@ -70,28 +70,31 @@ public class DirectoryServiceImpl implements DirectoryService {
     }
 
     @Override
-    public DirDto createNewDirectory(NewDirRequest dto) {
+    public DirDto create(NewDirRequest dto) {
         String relativePath = pathDirectoryService.relativePath(dto.getCurrentPath(), dto.getName());
         Directory directory = Directory.builder()
                 .name(dto.getName())
                 .path(relativePath)
                 .build();
-        directoryDao.add(directory);
+        s3DirectoryManager.add(directory);
 
         return new DirDto(dto.getName(), relativePath);
     }
 
     @Override
-    public void deleteDirectory(DeleteDirRequest dto) {
+    public void delete(DeleteDirRequest dto) {
 
-        directoryDao.remove(dto.getRelativePath());
+        s3DirectoryManager.remove(dto.getRelativePath());
     }
 
     @Override
-    public void renameDirectory(RenameDirRequest dto) {
+    public void rename(RenameDirRequest dto) {
+
+
+
         String newRelativePath = pathDirectoryService.renameRelativePath(dto.getPreviousPath(), dto.getNewName());
 
-        directoryDao.rename(
+        s3DirectoryManager.rename(
                 dto.getPreviousPath(),
                 newRelativePath,
                 dto.getNewName());
@@ -116,17 +119,17 @@ public class DirectoryServiceImpl implements DirectoryService {
                 .build();
     }
 
-    private void zipDirectory(Directory dir, String prefixPath, ZipOutputStream zos) throws IOException {
+    private void zip(Directory dir, String prefixPath, ZipOutputStream zos) throws IOException {
         List<File> files = dir.getFiles();
         List<Directory> directories = dir.getDirectories();
 
         for (Directory directory : directories) {
             String basePath = prefixPath + "/" + directory.getName();
-            zipDirectory(directory, basePath, zos);
+            zip(directory, basePath, zos);
         }
 
         for (File file : files) {
-            File fileWithIS = fileDao.get(file.getPath());
+            File fileWithIS = s3FileManager.get(file.getPath());
 
             try (InputStream is = fileWithIS.getInputStream()) {
                 ZipEntry zipEntry = new ZipEntry(prefixPath + "/" + file.getName());

@@ -1,6 +1,6 @@
 package org.nikita.spingproject.filestorage.service;
 
-import org.nikita.spingproject.filestorage.dao.FileDao;
+import org.nikita.spingproject.filestorage.s3manager.S3FileManager;
 import org.nikita.spingproject.filestorage.file.File;
 
 import org.nikita.spingproject.filestorage.file.dto.FileDownloadDto;
@@ -14,22 +14,22 @@ import java.io.UnsupportedEncodingException;
 
 @Service
 public class FileServiceImpl implements FileService {
-    private PathFileService pathFileService;
-    private FileDao fileDao;
+    private final PathFileService pathFileService;
+    private final S3FileManager s3FileManager;
 
     @Autowired
-    public FileServiceImpl(PathFileService pathFileService, FileDao fileDao) {
+    public FileServiceImpl(PathFileService pathFileService, S3FileManager s3FileManager) {
         this.pathFileService = pathFileService;
-        this.fileDao = fileDao;
+        this.s3FileManager = s3FileManager;
     }
 
     @Override
-    public void uploadFile(FileUploadDto dto) {
+    public void upload(FileUploadDto dto) {
         try {
             String relativePath = pathFileService
                     .createRelativePath(dto.getPath(), dto.getName());
 
-            fileDao.add(File.builder()
+            s3FileManager.add(File.builder()
                     .path(relativePath)
                     .name(dto.getName())
                     .inputStream(dto.getInputStream())
@@ -41,22 +41,22 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public void deleteFile(FileDto dto) {
-        fileDao.remove(dto.getPath());
+    public void delete(FileDto dto) {
+        s3FileManager.remove(dto.getPath());
     }
 
     @Override
-    public FileDownloadDto downloadFile(FileDto dto) {
+    public FileDownloadDto download(FileDto dto) {
 
-        File file = fileDao.get(dto.getPath());
+        File file = s3FileManager.get(dto.getPath());
         return new FileDownloadDto(file.getInputStream(), file.getName());
     }
 
     @Override
-    public void renameFile(RenameFileRequest dto) {
+    public void rename(RenameFileRequest dto) {
         try {
             String newRelativePath = pathFileService.renameRelPath(dto.getPath(), dto.getNewName());
-            fileDao.rename(
+            s3FileManager.rename(
                     dto.getPath(),
                     newRelativePath,
                     dto.getNewName());

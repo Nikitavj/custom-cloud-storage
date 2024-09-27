@@ -50,7 +50,7 @@ public class StorageController {
         }
 
         List<ObjectStorageDto> entities = directoryService
-                .getObjectsDirectory(new ObjectsDirDto(path));
+                .getObjectsOfDir(new ObjectsDirDto(path));
         model.addAttribute("objects_dir", entities);
         model.addAttribute("current_path", path);
         model.addAttribute("bread_crumbs", BreadcrumbsUtil.createBreadcrumbs(path));

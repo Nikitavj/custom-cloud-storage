@@ -4,9 +4,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.nikita.spingproject.filestorage.commons.ObjectStorageDto;
 import org.nikita.spingproject.filestorage.commons.SearchRequest;
-import org.nikita.spingproject.filestorage.dao.FileDao;
-import org.nikita.spingproject.filestorage.dao.DirectoryDao;
-import org.nikita.spingproject.filestorage.dao.DirectoryDaoImpl;
+import org.nikita.spingproject.filestorage.s3manager.S3FileManager;
+import org.nikita.spingproject.filestorage.s3manager.S3DirectoryManager;
+import org.nikita.spingproject.filestorage.s3manager.S3DirectoryManagerImpl;
 import org.nikita.spingproject.filestorage.directory.Directory;
 import org.nikita.spingproject.filestorage.file.File;
 
@@ -19,20 +19,20 @@ import java.util.List;
 
 @Service
 public class SearchFileServiceImpl implements SearchFileService {
-    private final DirectoryDao directoryDao;
-    private  final FileDao fileDao;
+    private final S3DirectoryManager s3DirectoryManager;
+    private  final S3FileManager s3FileManager;
 
     @Autowired
-    public SearchFileServiceImpl(DirectoryDaoImpl directoryDao, FileDao fileDao) {
-        this.directoryDao = directoryDao;
-        this.fileDao = fileDao;
+    public SearchFileServiceImpl(S3DirectoryManagerImpl directoryDao, S3FileManager s3FileManager) {
+        this.s3DirectoryManager = directoryDao;
+        this.s3FileManager = s3FileManager;
     }
 
     @Override
     public List<ObjectStorageDto> search(SearchRequest dto) {
         List<ObjectStorageDto> findObjects = new ArrayList<>();
-        List<Directory> directories = directoryDao.getAll();
-        List<File> files = fileDao.getAll();
+        List<Directory> directories = s3DirectoryManager.getAll();
+        List<File> files = s3FileManager.getAll();
 
         for (Directory dir: directories) {
             if(dir.getName().contains(dto.getName())) {
