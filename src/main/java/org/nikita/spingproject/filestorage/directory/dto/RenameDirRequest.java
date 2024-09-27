@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RenameDirRequest {
-    private String previousPath;
+    private String path;
     private String newName;
 }

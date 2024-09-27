@@ -59,7 +59,7 @@ public class FileS3ApiImpl extends S3ApiImpl<File> implements FileS3Api {
     }
 
     @Override
-    public Iterable<Result<Item>> getObjectsRecursive(String path) {
+    public Iterable<Result<Item>> listObjectsRecursive(String path) {
         return minioClient.listObjects(ListObjectsArgs
                 .builder()
                 .bucket(BUCKET_NAME)

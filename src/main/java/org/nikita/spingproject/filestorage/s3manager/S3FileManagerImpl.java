@@ -88,7 +88,7 @@ public class S3FileManagerImpl implements S3FileManager {
     }
 
     @Override
-    public void rename(String prevPath, String targPath, String name) {
+    public void copy(String prevPath, String targPath, String name) {
         try {
             String prevPathS3 = s3pathBuilder.buildPath(prevPath);
             String targPathS3 = s3pathBuilder.buildPath(targPath);
@@ -115,7 +115,7 @@ public class S3FileManagerImpl implements S3FileManager {
         try {
             String pathS3 = s3pathBuilder.rootPath();
             Iterable<Result<Item>> results = fileS3Api
-                    .getObjectsRecursive(pathS3 + "/");
+                    .listObjectsRecursive(pathS3 + "/");
             List<Item> items = DirectoryUtil.getListItemsNoIsMinioDir(results);
             return FileUtil.getFilesFromItems(items);
 

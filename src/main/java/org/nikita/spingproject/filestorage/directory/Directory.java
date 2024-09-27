@@ -33,6 +33,11 @@ public class Directory{
         this.date = date;
     }
 
+    public Directory(String name, String path) {
+        this.name = name;
+        this.path = path;
+    }
+
     public void putDirectory(Directory directory) {
         directories.add(directory);
     }

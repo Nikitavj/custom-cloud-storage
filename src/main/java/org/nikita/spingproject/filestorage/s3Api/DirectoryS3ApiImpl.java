@@ -28,7 +28,7 @@ public class DirectoryS3ApiImpl extends S3ApiImpl<Directory> implements Director
     }
 
     @Override
-    public void create(Map<String, String> metaData, String path) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    public void put(Map<String, String> metaData, String path) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
             minioClient.putObject(PutObjectArgs
                     .builder()
                     .bucket(BUCKET_NAME)
@@ -39,7 +39,7 @@ public class DirectoryS3ApiImpl extends S3ApiImpl<Directory> implements Director
     }
 
     @Override
-    public Iterable<Result<Item>> getObjects(String path) {
+    public Iterable<Result<Item>> listObjects(String path) {
         return minioClient.listObjects(ListObjectsArgs
                 .builder()
                 .bucket(BUCKET_NAME)
@@ -50,7 +50,7 @@ public class DirectoryS3ApiImpl extends S3ApiImpl<Directory> implements Director
     }
 
     @Override
-    public Iterable<Result<Item>> getObjectsRecursive(String path) {
+    public Iterable<Result<Item>> listObjectsRecursive(String path) {
         return minioClient.listObjects(ListObjectsArgs
                 .builder()
                 .bucket(BUCKET_NAME)
@@ -61,7 +61,7 @@ public class DirectoryS3ApiImpl extends S3ApiImpl<Directory> implements Director
     }
 
     @Override
-    public void deleteObjects(List<DeleteObject> objects) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    public void removeObjects(List<DeleteObject> objects) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         Iterable<Result<DeleteError>> results = minioClient.removeObjects(RemoveObjectsArgs
                 .builder()
                 .bucket(BUCKET_NAME)

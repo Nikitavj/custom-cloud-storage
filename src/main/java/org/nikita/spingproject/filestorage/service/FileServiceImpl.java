@@ -56,7 +56,7 @@ public class FileServiceImpl implements FileService {
     public void rename(RenameFileRequest dto) {
         try {
             String newRelativePath = pathFileService.renameRelPath(dto.getPath(), dto.getNewName());
-            s3FileManager.rename(
+            s3FileManager.copy(
                     dto.getPath(),
                     newRelativePath,
                     dto.getNewName());
