@@ -1,7 +1,6 @@
 package org.nikita.spingproject.filestorage.s3Api;
 
 import io.minio.errors.*;
-import org.nikita.spingproject.filestorage.s3Api.S3Api;
 import org.nikita.spingproject.filestorage.file.File;
 
 import java.io.IOException;

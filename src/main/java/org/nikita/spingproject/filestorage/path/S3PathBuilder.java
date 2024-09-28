@@ -4,15 +4,15 @@ import jakarta.persistence.EntityNotFoundException;
 import org.nikita.spingproject.filestorage.account.User;
 import org.nikita.spingproject.filestorage.account.UserRepository;
 import org.nikita.spingproject.filestorage.utils.PathEncoderUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
 
 
 public abstract class S3PathBuilder {
+    private static final String USER_ROOT_PATH_FORMAT = "user-%s-files";
+    private static final String SEPARATOR = "/";
     protected final UserRepository userRepository;
 
     public S3PathBuilder(UserRepository userRepository) {
@@ -21,14 +21,15 @@ public abstract class S3PathBuilder {
 
     abstract String buildPath(String path) throws UnsupportedEncodingException;
 
-    public String rootPath() throws UnsupportedEncodingException {
-        return PathEncoderUtil.encode(rootPathForUser());
+    public String userPath() throws UnsupportedEncodingException {
+        String rootPath = PathEncoderUtil.encode(rootPathForUser());
+        return String.format("%s/%s", rootPath, SEPARATOR);
     }
 
     protected String rootPathForUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userRepository.findUserByEmail(auth.getName())
                 .orElseThrow(() -> new EntityNotFoundException("User " + auth.getName() + "not exist"));
-        return String.format("user-%s-files", user.getId());
+        return String.format(USER_ROOT_PATH_FORMAT, user.getId());
     }
 }

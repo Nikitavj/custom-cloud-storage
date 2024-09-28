@@ -1,7 +1,6 @@
 package org.nikita.spingproject.filestorage.service;
 
 import org.apache.commons.lang3.StringUtils;
-
 import org.nikita.spingproject.filestorage.directory.dto.NewDirRequest;
 import org.nikita.spingproject.filestorage.directory.exception.DirectoryAlreadyExistsException;
 import org.nikita.spingproject.filestorage.file.dto.FileUploadDto;
@@ -9,7 +8,6 @@ import org.nikita.spingproject.filestorage.file.dto.FilesUploadDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 
 import java.io.IOException;
 import java.util.Arrays;

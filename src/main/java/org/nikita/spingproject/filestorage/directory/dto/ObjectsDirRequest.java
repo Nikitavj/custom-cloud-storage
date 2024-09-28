@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ObjectsDirDto {
+public class ObjectsDirRequest {
     private String relativePath;
 }

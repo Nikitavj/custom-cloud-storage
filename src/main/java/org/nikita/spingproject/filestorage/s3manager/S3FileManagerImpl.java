@@ -5,10 +5,8 @@ import io.minio.StatObjectResponse;
 import io.minio.errors.*;
 import io.minio.messages.Item;
 import lombok.extern.slf4j.Slf4j;
-import org.nikita.spingproject.filestorage.directory.exception.DirectorySearchFilesException;
 import org.nikita.spingproject.filestorage.file.File;
 import org.nikita.spingproject.filestorage.file.exception.*;
-
 import org.nikita.spingproject.filestorage.path.S3FilePathBuilder;
 import org.nikita.spingproject.filestorage.s3Api.FileS3Api;
 import org.nikita.spingproject.filestorage.utils.DirectoryUtil;
@@ -113,9 +111,8 @@ public class S3FileManagerImpl implements S3FileManager {
     @Override
     public List<File> getAll() {
         try {
-            String pathS3 = s3pathBuilder.rootPath();
             Iterable<Result<Item>> results = fileS3Api
-                    .listObjectsRecursive(pathS3 + "/");
+                    .listObjectsRecursive(s3pathBuilder.userPath());
             List<Item> items = DirectoryUtil.getListItemsNoIsMinioDir(results);
             return FileUtil.getFilesFromItems(items);
 
@@ -123,7 +120,7 @@ public class S3FileManagerImpl implements S3FileManager {
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
                  InternalException e) {
             log.warn("Dont get all objects");
-            throw new DirectorySearchFilesException("File search error");
+            throw new SearchFilesException("File search error");
         }
     }
 

@@ -1,9 +1,9 @@
 package org.nikita.spingproject.filestorage.controller;
 
 import org.nikita.spingproject.filestorage.commons.ObjectStorageDto;
-import org.nikita.spingproject.filestorage.directory.exception.DirectorySearchFilesException;
-import org.nikita.spingproject.filestorage.service.SearchFileService;
 import org.nikita.spingproject.filestorage.commons.SearchRequest;
+import org.nikita.spingproject.filestorage.file.exception.SearchFilesException;
+import org.nikita.spingproject.filestorage.service.SearchFileService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,7 +41,7 @@ public class SearchController {
             } else {
                 model.addAttribute("find_objects", findObjects);
             }
-        } catch (DirectorySearchFilesException e) {
+        } catch (SearchFilesException e) {
             model.addAttribute("errorMessage", e.getMessage());
         }
         return "search";

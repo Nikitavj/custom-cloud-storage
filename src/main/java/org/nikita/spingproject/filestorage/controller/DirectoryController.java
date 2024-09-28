@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 @Controller
@@ -45,7 +44,7 @@ public class DirectoryController {
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
                     .body(new InputStreamResource(response.getInputStream()));
 
-        } catch (GetDirectoryObjectsExcepton | IOException e) {
+        } catch (DirectoryExcepton e) {
             throw new DirectoryDownloadException("Folder download error");
         }
     }
@@ -66,7 +65,7 @@ public class DirectoryController {
             }
 
             NameFileValidator.checkDirectoryName(nameFolder);
-            DirDto newDirectory = directoryService
+            DirectoryDto newDirectory = directoryService
                     .create(new NewDirRequest(
                             currentPath,
                             nameFolder.trim()));

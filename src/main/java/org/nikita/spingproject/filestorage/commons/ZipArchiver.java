@@ -1,7 +1,6 @@
 package org.nikita.spingproject.filestorage.commons;
 
 import org.nikita.spingproject.filestorage.directory.Directory;
-import org.nikita.spingproject.filestorage.directory.exception.DirectoryDownloadException;
 import org.nikita.spingproject.filestorage.file.File;
 import org.nikita.spingproject.filestorage.s3manager.S3FileManager;
 import org.springframework.beans.factory.annotation.Autowired;

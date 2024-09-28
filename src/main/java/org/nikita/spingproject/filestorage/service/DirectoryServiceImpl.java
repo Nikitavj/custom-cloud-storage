@@ -2,27 +2,21 @@ package org.nikita.spingproject.filestorage.service;
 
 import org.nikita.spingproject.filestorage.commons.ObjectStorageDto;
 import org.nikita.spingproject.filestorage.commons.ZipArchiver;
-import org.nikita.spingproject.filestorage.directory.exception.DirectoryDownloadException;
-import org.nikita.spingproject.filestorage.s3manager.S3FileManager;
 import org.nikita.spingproject.filestorage.directory.Directory;
-import org.nikita.spingproject.filestorage.s3manager.S3DirectoryManager;
 import org.nikita.spingproject.filestorage.directory.dto.*;
-import org.nikita.spingproject.filestorage.file.File;
-
-import org.nikita.spingproject.filestorage.utils.PathDirectoryUtil;
+import org.nikita.spingproject.filestorage.directory.exception.DirectoryDownloadException;
+import org.nikita.spingproject.filestorage.path.PathDirectoryUtil;
+import org.nikita.spingproject.filestorage.s3manager.S3DirectoryManager;
 import org.nikita.spingproject.filestorage.utils.ToObjectStorageMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 @Service
@@ -59,7 +53,7 @@ public class DirectoryServiceImpl implements DirectoryService {
     }
 
     @Override
-    public List<ObjectStorageDto> getObjectsOfDir(ObjectsDirDto dto) {
+    public List<ObjectStorageDto> getObjectsOfDir(ObjectsDirRequest dto) {
         Directory directory = s3DirManager.get(dto.getRelativePath());
         List<ObjectStorageDto> objects = new ArrayList<>();
 
@@ -81,14 +75,14 @@ public class DirectoryServiceImpl implements DirectoryService {
     }
 
     @Override
-    public DirDto create(NewDirRequest dto) {
+    public DirectoryDto create(NewDirRequest dto) {
         String path = PathDirectoryUtil.createPath(dto.getCurrentPath(), dto.getName());
         s3DirManager.add(
                 new Directory(
                         dto.getName(),
                         path));
 
-        return new DirDto(dto.getName(), path);
+        return new DirectoryDto(dto.getName(), path);
     }
 
     @Override

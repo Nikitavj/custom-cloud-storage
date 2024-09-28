@@ -57,4 +57,11 @@ public class DirectoryUtil {
         }
         return items;
     }
+
+    public static InfoMetaS3 convertMetaToObject(Map<String, String> metaData) {
+        return new InfoMetaS3(
+                metaData.get("name"),
+                metaData.get("path"),
+                metaData.containsKey("dir"));
+    }
 }
