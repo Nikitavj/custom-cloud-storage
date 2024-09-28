@@ -1,7 +1,7 @@
 package org.nikita.spingproject.filestorage.utils;
 
 import org.apache.commons.io.FileUtils;
-import org.nikita.spingproject.filestorage.commons.ObjectStorageDto;
+import org.nikita.spingproject.filestorage.commons.dto.ObjectStorageDto;
 import org.nikita.spingproject.filestorage.directory.Directory;
 import org.nikita.spingproject.filestorage.file.File;
 

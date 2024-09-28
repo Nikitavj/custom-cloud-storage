@@ -1,6 +1,6 @@
 package org.nikita.spingproject.filestorage.service;
 
-import org.nikita.spingproject.filestorage.commons.ObjectStorageDto;
+import org.nikita.spingproject.filestorage.commons.dto.ObjectStorageDto;
 import org.nikita.spingproject.filestorage.directory.dto.*;
 
 import java.util.List;

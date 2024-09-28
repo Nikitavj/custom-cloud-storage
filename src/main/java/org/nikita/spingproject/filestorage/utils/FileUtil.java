@@ -1,7 +1,7 @@
 package org.nikita.spingproject.filestorage.utils;
 
 import io.minio.messages.Item;
-import org.nikita.spingproject.filestorage.commons.InfoMetaS3;
+import org.nikita.spingproject.filestorage.commons.dto.InfoMetaS3;
 import org.nikita.spingproject.filestorage.file.File;
 
 import java.util.HashMap;

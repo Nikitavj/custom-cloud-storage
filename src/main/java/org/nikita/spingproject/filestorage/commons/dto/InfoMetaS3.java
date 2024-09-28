@@ -1,4 +1,4 @@
-package org.nikita.spingproject.filestorage.commons;
+package org.nikita.spingproject.filestorage.commons.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

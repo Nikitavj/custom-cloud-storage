@@ -1,11 +1,11 @@
 package org.nikita.spingproject.filestorage.service;
 
-import org.nikita.spingproject.filestorage.commons.ObjectStorageDto;
+import org.nikita.spingproject.filestorage.commons.dto.ObjectStorageDto;
 import org.nikita.spingproject.filestorage.commons.ZipArchiver;
 import org.nikita.spingproject.filestorage.directory.Directory;
 import org.nikita.spingproject.filestorage.directory.dto.*;
 import org.nikita.spingproject.filestorage.directory.exception.DirectoryDownloadException;
-import org.nikita.spingproject.filestorage.path.PathDirectoryUtil;
+import org.nikita.spingproject.filestorage.path.PathUtil;
 import org.nikita.spingproject.filestorage.s3manager.S3DirectoryManager;
 import org.nikita.spingproject.filestorage.utils.ToObjectStorageMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,7 +76,7 @@ public class DirectoryServiceImpl implements DirectoryService {
 
     @Override
     public DirectoryDto create(NewDirRequest dto) {
-        String path = PathDirectoryUtil.createPath(dto.getCurrentPath(), dto.getName());
+        String path = PathUtil.createPath(dto.getCurrentPath(), dto.getName());
         s3DirManager.add(
                 new Directory(
                         dto.getName(),
@@ -93,7 +93,7 @@ public class DirectoryServiceImpl implements DirectoryService {
     @Override
     public void rename(RenameDirRequest dto) {
         Directory dir = s3DirManager.get(dto.getPath());
-        String targetPath = PathDirectoryUtil.renamePath(dir.getPath(), dto.getNewName());
+        String targetPath = PathUtil.renamePath(dir.getPath(), dto.getNewName());
         s3DirManager.copy(dir, targetPath, dto.getNewName());
         s3DirManager.remove(dir.getPath());
     }

@@ -1,6 +1,6 @@
 package org.nikita.spingproject.filestorage.controller;
 
-import org.nikita.spingproject.filestorage.commons.ObjectStorageDto;
+import org.nikita.spingproject.filestorage.commons.dto.ObjectStorageDto;
 import org.nikita.spingproject.filestorage.commons.breadcrumbs.BreadcrumbsUtil;
 import org.nikita.spingproject.filestorage.directory.dto.ObjectsDirRequest;
 import org.nikita.spingproject.filestorage.directory.exception.DirectoryAlreadyExistsException;

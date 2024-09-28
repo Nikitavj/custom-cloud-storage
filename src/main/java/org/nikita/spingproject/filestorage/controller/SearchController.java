@@ -1,9 +1,9 @@
 package org.nikita.spingproject.filestorage.controller;
 
-import org.nikita.spingproject.filestorage.commons.ObjectStorageDto;
-import org.nikita.spingproject.filestorage.commons.SearchRequest;
+import org.nikita.spingproject.filestorage.commons.dto.ObjectStorageDto;
+import org.nikita.spingproject.filestorage.commons.dto.SearchRequest;
 import org.nikita.spingproject.filestorage.file.exception.SearchFilesException;
-import org.nikita.spingproject.filestorage.service.SearchFileService;
+import org.nikita.spingproject.filestorage.service.SearchService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,10 +15,10 @@ import java.util.List;
 @Controller
 @RequestMapping("/search")
 public class SearchController {
-    private SearchFileService searchFileService;
+    private SearchService searchService;
 
-    public SearchController(SearchFileService searchFileService) {
-        this.searchFileService = searchFileService;
+    public SearchController(SearchService searchService) {
+        this.searchService = searchService;
     }
 
     @GetMapping
@@ -32,7 +32,7 @@ public class SearchController {
 
         try {
             model.addAttribute("query", query);
-            List<ObjectStorageDto> findObjects = searchFileService
+            List<ObjectStorageDto> findObjects = searchService
                     .search(new SearchRequest(query));
 
             model.addAttribute("query", query);

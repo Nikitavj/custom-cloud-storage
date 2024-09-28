@@ -6,12 +6,12 @@ import io.minio.errors.*;
 import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
 import lombok.extern.slf4j.Slf4j;
-import org.nikita.spingproject.filestorage.commons.InfoMetaS3;
+import org.nikita.spingproject.filestorage.commons.dto.InfoMetaS3;
 import org.nikita.spingproject.filestorage.directory.Directory;
 import org.nikita.spingproject.filestorage.directory.exception.*;
 import org.nikita.spingproject.filestorage.file.File;
 import org.nikita.spingproject.filestorage.file.exception.SearchFilesException;
-import org.nikita.spingproject.filestorage.path.PathDirectoryUtil;
+import org.nikita.spingproject.filestorage.path.PathUtil;
 import org.nikita.spingproject.filestorage.path.S3DirectoryPathBuilder;
 import org.nikita.spingproject.filestorage.s3Api.DirectoryS3Api;
 import org.nikita.spingproject.filestorage.utils.DirectoryUtil;
@@ -63,7 +63,7 @@ public class S3DirectoryManagerImpl implements S3DirectoryManager {
     public Directory get(String path) {
         Directory directory = new Directory();
         try {
-            if (!PathDirectoryUtil.isRoot(path)) {
+            if (!PathUtil.isRoot(path)) {
                 String pathS3Meta = S3pathBuilder.buildPathMeta(path);
                 StatObjectResponse stat = s3Api.getInfo(pathS3Meta);
                 InfoMetaS3 info = DirectoryUtil.convertMetaToObject(stat.userMetadata());

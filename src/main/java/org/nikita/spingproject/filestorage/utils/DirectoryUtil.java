@@ -3,7 +3,7 @@ package org.nikita.spingproject.filestorage.utils;
 import io.minio.Result;
 import io.minio.errors.*;
 import io.minio.messages.Item;
-import org.nikita.spingproject.filestorage.commons.InfoMetaS3;
+import org.nikita.spingproject.filestorage.commons.dto.InfoMetaS3;
 import org.nikita.spingproject.filestorage.directory.Directory;
 
 import java.io.IOException;

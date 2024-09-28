@@ -5,7 +5,7 @@ import org.nikita.spingproject.filestorage.file.dto.FileDownloadDto;
 import org.nikita.spingproject.filestorage.file.dto.FileDto;
 import org.nikita.spingproject.filestorage.file.dto.FileUploadDto;
 import org.nikita.spingproject.filestorage.file.dto.RenameFileRequest;
-import org.nikita.spingproject.filestorage.path.PathFileUtil;
+import org.nikita.spingproject.filestorage.path.PathUtil;
 import org.nikita.spingproject.filestorage.s3manager.S3FileManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public void upload(FileUploadDto dto) {
-            String path = PathFileUtil
+            String path = PathUtil
                     .createPath(dto.getPath(), dto.getName());
 
             s3FileManager.add(File.builder()
@@ -44,7 +44,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public void rename(RenameFileRequest dto) {
-            String path = PathFileUtil.renamePath(dto.getPath(), dto.getNewName());
+            String path = PathUtil.renamePath(dto.getPath(), dto.getNewName());
             s3FileManager.copy(
                     dto.getPath(),
                     path,
