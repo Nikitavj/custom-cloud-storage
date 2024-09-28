@@ -59,12 +59,12 @@ public class DirectoryServiceImpl implements DirectoryService {
 
         directory.getDirectories()
                 .stream()
-                .map(ToObjectStorageMapper::mapDirToObjStorage)
+                .map(ToObjectStorageMapper::map)
                 .forEach(objects::add);
 
         directory.getFiles()
                 .stream()
-                .map(ToObjectStorageMapper::mapFileToObjStorage)
+                .map(ToObjectStorageMapper::map)
                 .forEach(objects::add);
 
         long id = 1;

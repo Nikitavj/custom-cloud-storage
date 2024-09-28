@@ -83,6 +83,11 @@ public class S3DirectoryManagerImpl implements S3DirectoryManager {
     }
 
     @Override
+    public Directory get() {
+        return get("");
+    }
+
+    @Override
     public void remove(String path) {
         try {
             String pathS3 = S3pathBuilder.buildPathDirObjects(path);

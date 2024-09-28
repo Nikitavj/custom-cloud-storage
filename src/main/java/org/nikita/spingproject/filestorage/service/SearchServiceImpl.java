@@ -6,6 +6,7 @@ import org.nikita.spingproject.filestorage.commons.dto.ObjectStorageDto;
 import org.nikita.spingproject.filestorage.commons.dto.SearchRequest;
 import org.nikita.spingproject.filestorage.directory.Directory;
 import org.nikita.spingproject.filestorage.file.File;
+import org.nikita.spingproject.filestorage.path.PathUtil;
 import org.nikita.spingproject.filestorage.s3manager.S3DirectoryManager;
 import org.nikita.spingproject.filestorage.s3manager.S3DirectoryManagerImpl;
 import org.nikita.spingproject.filestorage.s3manager.S3FileManager;
@@ -32,50 +33,44 @@ public class SearchServiceImpl implements SearchService {
     public List<ObjectStorageDto> search(SearchRequest dto) {
         List<ObjectStorageDto> findObjects = new ArrayList<>();
 
+        Directory rootDir = s3DirectoryManager.get();
+
+
+
+
+
+
+
+
         List<Directory> directories = s3DirectoryManager.getAll();
         List<File> files = s3FileManager.getAll();
 
+
+
+
+
         for (Directory dir: directories) {
             if(dir.getName().contains(dto.getName())) {
-                findObjects.add(mapDirToObjStorage(dir));
+                String link = PathUtil.extractDirectoryPath(dir.getPath());
+                dir.setPath(link);
+                findObjects.add(ToObjectStorageMapper.map(dir));
             }
         }
         for (File file: files) {
             if(file.getName().contains(dto.getName())) {
-                findObjects.add(mapFileToObjStorage(file));
+                String link = PathUtil.extractDirectoryPath(file.getPath());
+                file.setPath(link);
+                findObjects.add(ToObjectStorageMapper.map(file));
             }
         }
         return findObjects;
+
+
+
     }
 
-    private ObjectStorageDto mapFileToObjStorage(File file) {
-        String link = linkObjectIncludeInDirectory(file.getPath());
 
-        return ToObjectStorageMapper.mapFileToObjStorage(file);
-//        return ObjectStorageDto.builder()
-//                .name(file.getName())
-//                .relativePath(link)
-//                .size(FileUtils.byteCountToDisplaySize(file.getSize()))
-//                .date(DateFormatUtil.format(file.getDate()))
-//                .isDir(false)
-//                .build();
-    }
 
-    private ObjectStorageDto mapDirToObjStorage(Directory directory) {
-        String link = linkObjectIncludeInDirectory(directory.getPath());
-        return ObjectStorageDto.builder()
-                .name(directory.getName())
-                .relativePath(link)
-                .date(DateFormatUtil.format(directory.getDate()))
-                .isDir(true)
-                .build();
-    }
 
-    private String linkObjectIncludeInDirectory(String relativePath) {
-        if(relativePath.contains("/")) {
-            return StringUtils.substringBeforeLast(relativePath, "/");
-        } else {
-            return "";
-        }
-    }
+
 }

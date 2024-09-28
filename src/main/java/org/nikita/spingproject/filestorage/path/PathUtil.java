@@ -24,4 +24,12 @@ public class PathUtil {
     public static boolean isRoot(String path) {
         return (path == null || path.isBlank());
     }
+
+    public static String extractDirectoryPath(String relativePath) {
+        if(relativePath.contains(SEPARATOR)) {
+            return StringUtils.substringBeforeLast(relativePath, SEPARATOR);
+        } else {
+            return "";
+        }
+    }
 }
