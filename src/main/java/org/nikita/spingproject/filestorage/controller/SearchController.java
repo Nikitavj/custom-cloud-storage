@@ -33,7 +33,7 @@ public class SearchController {
         try {
             model.addAttribute("query", query);
             List<ObjectStorageDto> findObjects = searchService
-                    .search(new SearchRequest(query));
+                    .search(new SearchRequest(query.trim()));
 
             model.addAttribute("query", query);
             if (findObjects.isEmpty()) {
