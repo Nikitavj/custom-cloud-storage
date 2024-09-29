@@ -21,6 +21,7 @@ import java.util.zip.ZipOutputStream;
 
 @Service
 public class DirectoryServiceImpl implements DirectoryService {
+    private static final String ZIP_SUFFIX = ".zip";
     private final S3DirectoryManager s3DirManager;
     private final ZipArchiver zipArchiver;
 
@@ -33,11 +34,11 @@ public class DirectoryServiceImpl implements DirectoryService {
     @Override
     public DownloadDirResponse download(DownloadDirRequest request) {
         Directory directory = s3DirManager.get(request.getPath());
-        String nameZipFile = directory.getName() + ".zip";
+        String nameZipFile = directory.getName() + ZIP_SUFFIX;
 
         Path zipPath = null;
         try {
-            zipPath = Files.createTempFile(directory.getName(), ".zip");
+            zipPath = Files.createTempFile(directory.getName(), ZIP_SUFFIX);
         } catch (IOException e) {
             throw new DirectoryDownloadException("Error download file");
         }

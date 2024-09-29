@@ -26,7 +26,7 @@ public class SearchServiceImpl implements SearchService {
     @Override
     public List<ObjectStorageDto> search(SearchRequest dto) {
         List<ObjectStorageDto> findObjects = new LinkedList<>();
-        Directory rootDir = s3DirectoryManager.get();
+        Directory rootDir = s3DirectoryManager.getRoot();
         searchRecursiveInDir(rootDir, dto.getName(), findObjects);
 
         return findObjects;

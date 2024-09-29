@@ -107,23 +107,6 @@ public class S3FileManagerImpl implements S3FileManager {
         }
     }
 
-
-    @Override
-    public List<File> getAll() {
-        try {
-            Iterable<Result<Item>> results = fileS3Api
-                    .listObjectsRecursive(s3pathBuilder.userPath());
-            List<Item> items = DirectoryUtil.getListItemsNoIsMinioDir(results);
-            return FileUtil.getFilesFromItems(items);
-
-        } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
-                 NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
-                 InternalException e) {
-            log.warn("Dont get all objects");
-            throw new SearchFilesException("File search error");
-        }
-    }
-
     private void checkExistsFile(String pathS3) {
         StatObjectResponse stat;
         try {

@@ -7,9 +7,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class PathEncoderUtil {
+    private static final String SEPARATOR = "/";
     public static String encode(String path) throws UnsupportedEncodingException {
-        if (path.contains("/")) {
-            String[] parts = path.split("/");
+        if (path.contains(SEPARATOR)) {
+            String[] parts = path.split(SEPARATOR);
             List<String> partsUTF = Arrays.stream(parts)
                     .map(part -> {
                         try {
@@ -20,7 +21,7 @@ public class PathEncoderUtil {
                     })
                     .collect(Collectors.toList());
 
-            return String.join("/", partsUTF);
+            return String.join(SEPARATOR, partsUTF);
         } else {
             return URLEncoder.encode(path, "UTF-8");
         }

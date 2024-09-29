@@ -10,7 +10,6 @@ import org.nikita.spingproject.filestorage.commons.dto.InfoMetaS3;
 import org.nikita.spingproject.filestorage.directory.Directory;
 import org.nikita.spingproject.filestorage.directory.exception.*;
 import org.nikita.spingproject.filestorage.file.File;
-import org.nikita.spingproject.filestorage.file.exception.SearchFilesException;
 import org.nikita.spingproject.filestorage.path.PathUtil;
 import org.nikita.spingproject.filestorage.path.S3DirectoryPathBuilder;
 import org.nikita.spingproject.filestorage.s3Api.DirectoryS3Api;
@@ -83,7 +82,7 @@ public class S3DirectoryManagerImpl implements S3DirectoryManager {
     }
 
     @Override
-    public Directory get() {
+    public Directory getRoot() {
         return get("");
     }
 
@@ -132,22 +131,6 @@ public class S3DirectoryManagerImpl implements S3DirectoryManager {
                  InternalException e) {
             log.warn("Directory {} dont rename", dir.getPath());
             throw new DirectoryRenameException("Directory dont rename");
-        }
-    }
-
-    @Override
-    public List<Directory> getAll() {
-        try {
-            Iterable<Result<Item>> results = s3Api
-                    .listObjectsRecursive(S3pathBuilder.userPath());
-            List<Item> items = DirectoryUtil.getListItemsNoIsMinioDir(results);
-            return DirectoryUtil.getDirFromItems(items);
-
-        } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
-                 NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
-                 InternalException e) {
-            log.warn("Dont get all objects from root");
-            throw new SearchFilesException("File search error");
         }
     }
 
