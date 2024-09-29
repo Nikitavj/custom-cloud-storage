@@ -14,6 +14,4 @@ public interface UserService {
 
     @Transactional(readOnly = true)
     boolean userExist(User user);
-
-    UserDto findUserByEmail(String email);
 }
