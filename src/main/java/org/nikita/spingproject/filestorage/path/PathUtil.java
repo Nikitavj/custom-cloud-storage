@@ -9,13 +9,19 @@ public class PathUtil {
         if (path == null || path.isBlank()) {
             return name;
         } else {
-            return String.format("%s/%s", path, name);
+            return String.join("",
+                    path,
+                    SEPARATOR,
+                    name);
         }
     }
 
     public static String renamePath(String oldPath, String newName) {
         if (oldPath.contains(SEPARATOR)) {
-            return StringUtils.substringBeforeLast(oldPath, SEPARATOR) + SEPARATOR + newName;
+            return String.join("",
+                    StringUtils.substringBeforeLast(oldPath, SEPARATOR),
+                    SEPARATOR,
+                    newName);
         } else {
             return newName;
         }
@@ -32,4 +38,6 @@ public class PathUtil {
             return "";
         }
     }
+
+
 }

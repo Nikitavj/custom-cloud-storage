@@ -1,6 +1,5 @@
 package org.nikita.spingproject.filestorage.account;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.nikita.spingproject.filestorage.account.exception.UserAlreadyExistException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,18 +11,22 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
+
+    public UserServiceImpl(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
-    public UserDto registerNewUserAccount(UserDto userDto) {
+    public void registerNewUserAccount(UserDto userDto) {
         User user = buildUser(userDto);
 
         if (userExist(user)) {
-            throw new UserAlreadyExistException("User " + userDto.getEmail() + " already exist");
+            throw new UserAlreadyExistException(
+                    "User " + userDto.getEmail() + " already exist");
         }
         user.setRole("ROLE_USER");
-        return builUserDto(userRepository.save(user));
+        buildUserDto(userRepository.save(user));
     }
 
     @Override
@@ -38,10 +41,9 @@ public class UserServiceImpl implements UserService {
                 .setPassword(passwordEncoder.encode(userDto.getPassword()));
     }
 
-    private UserDto builUserDto(User user) {
-        return new UserDto()
+    private void buildUserDto(User user) {
+        new UserDto()
                 .setId(user.getId())
                 .setEmail(user.getEmail());
     }
-
 }

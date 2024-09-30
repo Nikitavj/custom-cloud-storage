@@ -1,10 +1,10 @@
 package org.nikita.spingproject.filestorage.service;
 
 import org.apache.commons.lang3.StringUtils;
-import org.nikita.spingproject.filestorage.directory.dto.NewDirRequest;
+import org.nikita.spingproject.filestorage.directory.dto.CreateDirRequest;
 import org.nikita.spingproject.filestorage.directory.exception.DirectoryAlreadyExistsException;
-import org.nikita.spingproject.filestorage.file.dto.FileUploadDto;
-import org.nikita.spingproject.filestorage.file.dto.FilesUploadDto;
+import org.nikita.spingproject.filestorage.file.dto.UploadFileRequest;
+import org.nikita.spingproject.filestorage.file.dto.UploadFilesRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,6 +16,7 @@ import java.util.List;
 
 @Service
 public class UploadFilesServiceImpl implements UploadFilesService {
+    private static final String SEPARATOR = "/";
     private final FileService fileService;
     private final DirectoryService directoryService;
 
@@ -26,69 +27,88 @@ public class UploadFilesServiceImpl implements UploadFilesService {
     }
 
     @Override
-    public void upload(FilesUploadDto dto) throws IOException {
-        List<MultipartFile> multFiles = new LinkedList<>(Arrays.asList(dto.getMultipartFiles()));
-        MultipartFile firstFile = multFiles.getFirst();
+    public void upload(UploadFilesRequest req) throws IOException {
+        List<MultipartFile> files = new LinkedList<>(Arrays.asList(req.getMultipartFiles()));
+        MultipartFile firstFile = files.getFirst();
+        String fileName = firstFile.getOriginalFilename();
 
-        if (isDirectory(firstFile.getOriginalFilename())) {
-            String nameRootDir = StringUtils.substringBefore(firstFile.getOriginalFilename(), "/");
-            directoryService.create(
-                    new NewDirRequest(dto.getPath(), nameRootDir));
-            uploadFileOfDir(firstFile, dto.getPath());
-            multFiles.removeFirst();
+        if (fileName != null && isDirectory(fileName)) {
+            String pathForDir = StringUtils.substringBefore(
+                    firstFile.getOriginalFilename(),
+                    SEPARATOR);
+            directoryService.create(new CreateDirRequest(
+                    req.getPath(),
+                    pathForDir));
+            uploadFileOfDir(firstFile, req.getPath());
+            files.removeFirst();
 
-            for (MultipartFile mFile : multFiles) {
-                String prefixPathFile = StringUtils.substringBeforeLast(mFile.getOriginalFilename(), "/");
-                uploadFileOfDir(mFile, dto.getPath());
-                createDirectoriesForFile(dto.getPath(), prefixPathFile);
+            for (MultipartFile file : files) {
+                String prefixPathFile = StringUtils
+                        .substringBeforeLast(
+                                file.getOriginalFilename(),
+                                SEPARATOR);
+                uploadFileOfDir(file, req.getPath());
+                if (prefixPathFile != null) {
+                    createDirectoriesForFile(req.getPath(), prefixPathFile);
+                }
             }
 
         } else {
-            for (MultipartFile mFile : multFiles) {
-                fileService.upload(
-                        new FileUploadDto(
-                                mFile.getInputStream(),
-                                dto.getPath(),
-                                mFile.getOriginalFilename()));
+            for (MultipartFile file : files) {
+                fileService.upload(new UploadFileRequest(
+                                file.getInputStream(),
+                                req.getPath(),
+                                file.getOriginalFilename()));
             }
         }
     }
 
     private void createDirectoriesForFile(String currentPath, String prefixPathFile) {
-        String[] namesDir = prefixPathFile.split("/");
+        String[] namesDir = prefixPathFile.split(SEPARATOR);
         String pathNewDir = currentPath;
         for (String nameDir : namesDir) {
             try {
                 directoryService.create(
-                        new NewDirRequest(pathNewDir, nameDir));
-            } catch (DirectoryAlreadyExistsException e) {
+                        new CreateDirRequest(pathNewDir, nameDir));
+            } catch (DirectoryAlreadyExistsException ignored) {
             }
 
             if (pathNewDir.isBlank()) {
                 pathNewDir = nameDir;
             } else {
-                pathNewDir = pathNewDir + "/" + nameDir;
+                pathNewDir = String.join("",
+                        pathNewDir,
+                        SEPARATOR,
+                        nameDir);
             }
         }
     }
 
-    private void uploadFileOfDir(MultipartFile mFile, String path) throws IOException {
-        String nameFile = StringUtils.substringAfterLast(mFile.getOriginalFilename(), "/");
-        String postfixPath = StringUtils.substringBeforeLast(mFile.getOriginalFilename(), "/");
+    private void uploadFileOfDir(MultipartFile file, String path) throws IOException {
+        String nameFile = StringUtils
+                .substringAfterLast(
+                        file.getOriginalFilename(),
+                        SEPARATOR);
+        String postfixPath = StringUtils
+                .substringBeforeLast(
+                        file.getOriginalFilename(),
+                        SEPARATOR);
 
         String newCurrentPath = postfixPath;
         if (!path.isBlank()) {
-            newCurrentPath = path + "/" + postfixPath;
+            newCurrentPath = String.join("",
+                    path,
+                    SEPARATOR,
+                    postfixPath);
         }
-        fileService.upload(
-                new FileUploadDto(
-                        mFile.getInputStream(),
+        fileService.upload(new UploadFileRequest(
+                        file.getInputStream(),
                         newCurrentPath,
                         nameFile));
     }
 
     private boolean isDirectory(String nameFile) {
-        return nameFile.contains("/");
+        return nameFile.contains(SEPARATOR);
     }
 
 }

@@ -15,6 +15,7 @@ import java.util.zip.ZipOutputStream;
 @Component
 public class ZipArchiver {
     private final S3FileManager s3FileManager;
+    private static final String SEPARATOR = "/";
 
     @Autowired
     public ZipArchiver(S3FileManager s3FileManager) {
@@ -26,7 +27,10 @@ public class ZipArchiver {
         List<Directory> directories = dir.getDirectories();
 
         for (Directory directory : directories) {
-            String basePath = prefixPath + "/" + directory.getName();
+            String basePath = String.join("",
+                    prefixPath,
+                    SEPARATOR,
+                    directory.getName());
             zipDirectory(directory, basePath, zos);
         }
 
@@ -34,10 +38,14 @@ public class ZipArchiver {
             File fileWithIS = s3FileManager.get(file.getPath());
 
             try (InputStream is = fileWithIS.getInputStream()) {
-                ZipEntry zipEntry = new ZipEntry(prefixPath + "/" + file.getName());
+                String filePath = String.join("",
+                        prefixPath,
+                        SEPARATOR,
+                        file.getName());
+                ZipEntry zipEntry = new ZipEntry(filePath);
                 zos.putNextEntry(zipEntry);
                 byte[] bytes = new byte[1024];
-                int length;
+                int length = 0;
                 while ((length = is.read(bytes)) >= 0) {
                     zos.write(bytes);
                 }

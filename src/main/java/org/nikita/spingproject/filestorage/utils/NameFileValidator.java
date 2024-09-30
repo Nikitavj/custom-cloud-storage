@@ -15,12 +15,12 @@ public class NameFileValidator {
 
     public static void checkUploadName(String name) {
         if (!name.contains(SEPARATOR)) {
-                checkFileName(name);
+            checkFileName(name);
         }
         List<String> partsName = new LinkedList<>(Arrays.asList(name.split(SEPARATOR)));
         checkFileName(partsName.removeLast());
 
-        for (String part: partsName) {
+        for (String part : partsName) {
             checkDirectoryName(part);
         }
     }
@@ -29,15 +29,21 @@ public class NameFileValidator {
         Pattern pattern = Pattern.compile(REGEX_INVALID_NAME);
         Matcher matcher = pattern.matcher(name);
         if (matcher.find() || name.isBlank()) {
-            throw new FileNameException("Invalid file name: " + name + " (do not use <>:/\\|?*\")");
+            throw new FileNameException(
+                    "Invalid file name: "
+                            + name
+                            + " (do not use <>:/\\|?*\")");
         }
     }
 
     public static void checkDirectoryName(String name) {
         Pattern pattern = Pattern.compile(REGEX_INVALID_NAME);
         Matcher matcher = pattern.matcher(name);
-        if(matcher.find() || name.isBlank()) {
-            throw new DirectoryNameException("Invalid folder name: " + name + " (do not use <>:/\\|?*\")");
+        if (matcher.find() || name.isBlank()) {
+            throw new DirectoryNameException(
+                    "Invalid folder name: "
+                            + name
+                            + " (do not use <>:/\\|?*\")");
         }
     }
 }

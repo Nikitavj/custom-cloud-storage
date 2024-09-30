@@ -1,10 +1,7 @@
 package org.nikita.spingproject.filestorage.service;
 
 import org.nikita.spingproject.filestorage.file.File;
-import org.nikita.spingproject.filestorage.file.dto.FileDownloadDto;
-import org.nikita.spingproject.filestorage.file.dto.FileDto;
-import org.nikita.spingproject.filestorage.file.dto.FileUploadDto;
-import org.nikita.spingproject.filestorage.file.dto.RenameFileRequest;
+import org.nikita.spingproject.filestorage.file.dto.*;
 import org.nikita.spingproject.filestorage.path.PathUtil;
 import org.nikita.spingproject.filestorage.s3manager.S3FileManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +17,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public void upload(FileUploadDto dto) {
+    public void upload(UploadFileRequest dto) {
             String path = PathUtil
                     .createPath(dto.getPath(), dto.getName());
 
@@ -32,14 +29,14 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public void delete(FileDto dto) {
+    public void delete(DeleteFileRequest dto) {
         s3FileManager.remove(dto.getPath());
     }
 
     @Override
-    public FileDownloadDto download(FileDto dto) {
+    public DownloadFileResponse download(DownloadFileRequest dto) {
         File file = s3FileManager.get(dto.getPath());
-        return new FileDownloadDto(file.getInputStream(), file.getName());
+        return new DownloadFileResponse(file.getInputStream(), file.getName());
     }
 
     @Override

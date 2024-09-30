@@ -1,15 +1,12 @@
 package org.nikita.spingproject.filestorage.s3manager;
 
-import io.minio.Result;
 import io.minio.StatObjectResponse;
 import io.minio.errors.*;
-import io.minio.messages.Item;
 import lombok.extern.slf4j.Slf4j;
 import org.nikita.spingproject.filestorage.file.File;
 import org.nikita.spingproject.filestorage.file.exception.*;
 import org.nikita.spingproject.filestorage.path.S3FilePathBuilder;
 import org.nikita.spingproject.filestorage.s3Api.FileS3Api;
-import org.nikita.spingproject.filestorage.utils.DirectoryUtil;
 import org.nikita.spingproject.filestorage.utils.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -18,7 +15,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
 
 @Slf4j
 @Repository
@@ -57,8 +53,10 @@ public class S3FileManagerImpl implements S3FileManager {
             String pathS3 = s3pathBuilder.buildPath(path);
             fileS3Api.removeObject(pathS3);
 
-        } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
-                 NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
+        } catch (ServerException | InsufficientDataException |
+                 ErrorResponseException | IOException |
+                 NoSuchAlgorithmException | InvalidKeyException |
+                 InvalidResponseException | XmlParserException |
                  InternalException e) {
             log.warn("File {} dont remove", path);
             throw new FileRemoveException("File not deleted");
@@ -77,8 +75,10 @@ public class S3FileManagerImpl implements S3FileManager {
                     .name(stat.userMetadata().get("name"))
                     .build();
 
-        } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
-                 NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
+        } catch (ServerException | InsufficientDataException |
+                 ErrorResponseException | IOException |
+                 NoSuchAlgorithmException | InvalidKeyException |
+                 InvalidResponseException | XmlParserException |
                  InternalException e) {
             log.warn("File {} dont get", path);
             throw new FileDownloadException("File download error");
@@ -99,9 +99,11 @@ public class S3FileManagerImpl implements S3FileManager {
             this.remove(prevPath);
         }catch (FileAlreadyExistsException e) {
             throw new FileAlreadyExistsException(e.getMessage());
-        } catch (IllegalArgumentException | ServerException | InsufficientDataException | ErrorResponseException | IOException |
-                 NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
-                 InternalException e) {
+        } catch (IllegalArgumentException | ServerException |
+                 InsufficientDataException | ErrorResponseException |
+                 IOException | NoSuchAlgorithmException |
+                 InvalidKeyException | InvalidResponseException |
+                 XmlParserException | InternalException e) {
             log.warn("File {} dont rename", prevPath);
             throw new FileRenameException("File not rename");
         }

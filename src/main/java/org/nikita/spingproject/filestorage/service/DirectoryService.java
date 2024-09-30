@@ -8,7 +8,7 @@ import java.util.List;
 public interface DirectoryService {
     DownloadDirResponse download(DownloadDirRequest request);
     List<ObjectStorageDto> getObjectsOfDir(ObjectsDirRequest dto);
-    DirectoryDto create(NewDirRequest dto);
+    DirectoryDto create(CreateDirRequest dto);
     void delete(DeleteDirRequest dto);
     void rename(RenameDirRequest dto);
 }

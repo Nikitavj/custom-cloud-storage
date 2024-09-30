@@ -52,7 +52,8 @@ public class S3DirectoryManagerImpl implements S3DirectoryManager {
 
         } catch (DirectoryAlreadyExistsException e) {
             throw new DirectoryAlreadyExistsException(e.getMessage());
-        } catch (MinioException | IOException | NoSuchAlgorithmException | InvalidKeyException e) {
+        } catch (MinioException | IOException |
+                 NoSuchAlgorithmException | InvalidKeyException e) {
             log.warn("Directory {} dont create", dir.getPath());
             throw new DirectoryCreatedException("Directory not created");
         }
@@ -73,11 +74,13 @@ public class S3DirectoryManagerImpl implements S3DirectoryManager {
             fillDirectory(directory);
             return directory;
 
-        } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
-                 NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
+        } catch (ServerException | InsufficientDataException |
+                 ErrorResponseException | IOException |
+                 NoSuchAlgorithmException | InvalidKeyException |
+                 InvalidResponseException | XmlParserException |
                  InternalException e) {
             log.warn("Directory {} dont get", path);
-            throw new DirectoryExcepton("Unable to get directory objects");
+            throw new DirectoryException("Unable to get directory objects");
         }
     }
 
@@ -101,8 +104,10 @@ public class S3DirectoryManagerImpl implements S3DirectoryManager {
             }
             s3Api.removeObjects(deleteObjects);
 
-        } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
-                 NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
+        } catch (ServerException | InsufficientDataException |
+                 ErrorResponseException | IOException |
+                 NoSuchAlgorithmException | InvalidKeyException |
+                 InvalidResponseException | XmlParserException |
                  InternalException e) {
             log.warn("Directory {} dont remove", path);
             throw new DirectoryRemoveException("Directory not remove");
@@ -110,25 +115,26 @@ public class S3DirectoryManagerImpl implements S3DirectoryManager {
     }
 
     @Override
-    public void copy(Directory dir, String targPath, String newName) {
+    public void copy(Directory dir, String targetPath, String newName) {
         try {
             String prevPathS3Meta = S3pathBuilder.buildPathMeta(dir.getPath());
-            String targPathS3Meta = S3pathBuilder.buildPathMeta(targPath);
+            String targPathS3Meta = S3pathBuilder.buildPathMeta(targetPath);
 
             checkExistsDirectory(targPathS3Meta);
 
-            copyInsides(dir, dir.getPath(), targPath);
+            copyInsides(dir, dir.getPath(), targetPath);
             s3Api.copyObject(
                     prevPathS3Meta,
                     targPathS3Meta,
                     DirectoryUtil.createMetaDataDir(
                             newName,
-                            targPath));
+                            targetPath));
 
-        } catch (IllegalArgumentException | ServerException | InsufficientDataException | ErrorResponseException |
-                 IOException |
-                 NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
-                 InternalException e) {
+        } catch (IllegalArgumentException | ServerException |
+                 InsufficientDataException | ErrorResponseException |
+                 IOException | NoSuchAlgorithmException |
+                 InvalidKeyException | InvalidResponseException |
+                 XmlParserException | InternalException e) {
             log.warn("Directory {} dont rename", dir.getPath());
             throw new DirectoryRenameException("Directory dont rename");
         }

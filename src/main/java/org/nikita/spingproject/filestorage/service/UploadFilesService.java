@@ -1,9 +1,9 @@
 package org.nikita.spingproject.filestorage.service;
 
-import org.nikita.spingproject.filestorage.file.dto.FilesUploadDto;
+import org.nikita.spingproject.filestorage.file.dto.UploadFilesRequest;
 
 import java.io.IOException;
 
 public interface UploadFilesService {
-    void upload(FilesUploadDto dto) throws IOException;
+    void upload(UploadFilesRequest dto) throws IOException;
 }

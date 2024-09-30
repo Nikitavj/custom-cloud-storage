@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-public class UserdetailsServiceImpl implements UserDetailsService {
+public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
 
@@ -21,6 +21,7 @@ public class UserdetailsServiceImpl implements UserDetailsService {
         Optional<User> userOpt = userRepository.findUserByEmail(username);
 
         return userOpt.map(UserDetailsImpl::new)
-                .orElseThrow(() -> new EntityNotFoundException("User " + username + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "User " + username + " not found"));
     }
 }

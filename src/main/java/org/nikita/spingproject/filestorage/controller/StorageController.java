@@ -1,12 +1,12 @@
 package org.nikita.spingproject.filestorage.controller;
 
-import org.nikita.spingproject.filestorage.commons.dto.ObjectStorageDto;
 import org.nikita.spingproject.filestorage.commons.breadcrumbs.BreadcrumbsUtil;
+import org.nikita.spingproject.filestorage.commons.dto.ObjectStorageDto;
 import org.nikita.spingproject.filestorage.directory.dto.ObjectsDirRequest;
 import org.nikita.spingproject.filestorage.directory.exception.DirectoryAlreadyExistsException;
 import org.nikita.spingproject.filestorage.directory.exception.DirectoryCreatedException;
 import org.nikita.spingproject.filestorage.directory.exception.DirectoryNameException;
-import org.nikita.spingproject.filestorage.file.dto.FilesUploadDto;
+import org.nikita.spingproject.filestorage.file.dto.UploadFilesRequest;
 import org.nikita.spingproject.filestorage.file.exception.FileAlreadyExistsException;
 import org.nikita.spingproject.filestorage.file.exception.FileNameException;
 import org.nikita.spingproject.filestorage.file.exception.FileUploadException;
@@ -31,8 +31,8 @@ import java.util.List;
 
 @Controller
 public class StorageController {
-    private DirectoryService directoryService;
-    private UploadFilesServiceImpl uploadFilesService;
+    private final DirectoryService directoryService;
+    private final UploadFilesServiceImpl uploadFilesService;
 
     @Autowired
     public StorageController(DirectoryService directoryService, UploadFilesServiceImpl uploadFilesService) {
@@ -66,18 +66,21 @@ public class StorageController {
             if (path != null && !path.isBlank()) {
                 redirectPath = "/?path=" + PathEncoderUtil.encode(path);
             }
+
             for (MultipartFile multFile : multFiles) {
-                if (multFile.getOriginalFilename().isBlank()) {
+                String name = multFile.getOriginalFilename();
+                if (name == null || name.isBlank()) {
                     throw new FileUploadException();
                 }
                 NameFileValidator.checkUploadName(multFile.getOriginalFilename());
             }
             uploadFilesService.upload(
-                    new FilesUploadDto(multFiles, path));
+                    new UploadFilesRequest(multFiles, path));
 
         } catch (IOException | FileUploadException | DirectoryCreatedException e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Error upload object");
-        } catch (FileAlreadyExistsException | DirectoryAlreadyExistsException | DirectoryNameException | FileNameException e) {
+        } catch (FileAlreadyExistsException | DirectoryAlreadyExistsException |
+                 DirectoryNameException | FileNameException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
         return new RedirectView(redirectPath);

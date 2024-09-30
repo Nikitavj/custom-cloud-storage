@@ -1,20 +1,17 @@
 package org.nikita.spingproject.filestorage.directory;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.nikita.spingproject.filestorage.file.File;
 import org.nikita.spingproject.filestorage.s3manager.EntityS3;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Setter
+@Getter
 @Builder
 public class Directory extends EntityS3 {
     private String name;
@@ -22,7 +19,6 @@ public class Directory extends EntityS3 {
     private ZonedDateTime date;
     private List<Directory> directories;
     private List<File> files;
-
 
     {
         this.directories = new ArrayList<>();

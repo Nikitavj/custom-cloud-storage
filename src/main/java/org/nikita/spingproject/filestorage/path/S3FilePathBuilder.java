@@ -9,6 +9,7 @@ import java.io.UnsupportedEncodingException;
 
 @Component
 public class S3FilePathBuilder extends S3PathBuilder {
+    private static final String SEPARATOR = "/";
     @Autowired
     public S3FilePathBuilder(UserRepository userRepository) {
         super(userRepository);
@@ -16,8 +17,9 @@ public class S3FilePathBuilder extends S3PathBuilder {
 
     @Override
     public String buildPath(String path) throws UnsupportedEncodingException {
-        String pathS3 =  String.format("%s/%s",
+        String pathS3 =  String.join("",
                 rootPathForUser(),
+                SEPARATOR,
                 path);
         return PathEncoderUtil.encode(pathS3);
     }

@@ -1,7 +1,7 @@
 package org.nikita.spingproject.filestorage.service;
 
-import org.nikita.spingproject.filestorage.commons.dto.ObjectStorageDto;
 import org.nikita.spingproject.filestorage.commons.ZipArchiver;
+import org.nikita.spingproject.filestorage.commons.dto.ObjectStorageDto;
 import org.nikita.spingproject.filestorage.directory.Directory;
 import org.nikita.spingproject.filestorage.directory.dto.*;
 import org.nikita.spingproject.filestorage.directory.exception.DirectoryDownloadException;
@@ -36,7 +36,7 @@ public class DirectoryServiceImpl implements DirectoryService {
         Directory directory = s3DirManager.get(request.getPath());
         String nameZipFile = directory.getName() + ZIP_SUFFIX;
 
-        Path zipPath = null;
+        Path zipPath;
         try {
             zipPath = Files.createTempFile(directory.getName(), ZIP_SUFFIX);
         } catch (IOException e) {
@@ -55,7 +55,7 @@ public class DirectoryServiceImpl implements DirectoryService {
 
     @Override
     public List<ObjectStorageDto> getObjectsOfDir(ObjectsDirRequest dto) {
-        Directory directory = s3DirManager.get(dto.getRelativePath());
+        Directory directory = s3DirManager.get(dto.getPath());
         List<ObjectStorageDto> objects = new ArrayList<>();
 
         directory.getDirectories()
@@ -76,7 +76,7 @@ public class DirectoryServiceImpl implements DirectoryService {
     }
 
     @Override
-    public DirectoryDto create(NewDirRequest dto) {
+    public DirectoryDto create(CreateDirRequest dto) {
         String path = PathUtil.createPath(dto.getCurrentPath(), dto.getName());
         s3DirManager.add(
                 new Directory(

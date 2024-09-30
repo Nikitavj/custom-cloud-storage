@@ -37,14 +37,16 @@ public class DirectoryController {
                     .download(new DownloadDirRequest(path));
 
             HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + response.getName());
+            responseHeaders.set(
+                    HttpHeaders.CONTENT_DISPOSITION,
+                    "attachment; filename=" + response.getName());
             return ResponseEntity
                     .ok()
                     .headers(responseHeaders)
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
                     .body(new InputStreamResource(response.getInputStream()));
 
-        } catch (DirectoryExcepton e) {
+        } catch (DirectoryException e) {
             throw new DirectoryDownloadException("Folder download error");
         }
     }
@@ -66,14 +68,14 @@ public class DirectoryController {
 
             NameFileValidator.checkDirectoryName(nameFolder);
             DirectoryDto newDirectory = directoryService
-                    .create(new NewDirRequest(
+                    .create(new CreateDirRequest(
                             currentPath,
                             nameFolder.trim()));
 
             redirectPath = "/?path=" + PathEncoderUtil.encode(newDirectory.getRelativePath());
 
-        } catch (UnsupportedEncodingException | DirectoryCreatedException | DirectoryNameException |
-                 DirectoryAlreadyExistsException e) {
+        } catch (UnsupportedEncodingException | DirectoryCreatedException |
+                 DirectoryNameException | DirectoryAlreadyExistsException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
         return new RedirectView(redirectPath);
@@ -116,11 +118,12 @@ public class DirectoryController {
             }
 
             NameFileValidator.checkDirectoryName(newName);
-           directoryService.rename(
+            directoryService.rename(
                     new RenameDirRequest(
                             relativePath,
                             newName.trim()));
-        } catch (DirectoryAlreadyExistsException | DirectoryRenameException | DirectoryNameException e) {
+        } catch (DirectoryAlreadyExistsException | DirectoryRenameException |
+                 DirectoryNameException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);

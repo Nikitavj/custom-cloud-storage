@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class Breadcrumbs {
+public class Breadcrumb {
     private String name;
     private String link;
 }

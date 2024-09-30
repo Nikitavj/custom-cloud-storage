@@ -12,6 +12,8 @@ import java.io.UnsupportedEncodingException;
 
 public abstract class S3PathBuilder {
     private static final String USER_ROOT_PATH_FORMAT = "user-%s-files";
+    private static final String SEPARATOR = "/";
+
     protected final UserRepository userRepository;
 
     public S3PathBuilder(UserRepository userRepository) {
@@ -22,13 +24,16 @@ public abstract class S3PathBuilder {
 
     public String userPath() throws UnsupportedEncodingException {
         String rootPath = PathEncoderUtil.encode(rootPathForUser());
-        return String.format("%s/", rootPath);
+        return String.join("",
+                rootPath,
+                SEPARATOR);
     }
 
     protected String rootPathForUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userRepository.findUserByEmail(auth.getName())
-                .orElseThrow(() -> new EntityNotFoundException("User " + auth.getName() + "not exist"));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "User " + auth.getName() + "not exist"));
         return String.format(USER_ROOT_PATH_FORMAT, user.getId());
     }
 }

@@ -2,6 +2,7 @@ package org.nikita.spingproject.filestorage.utils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,18 +13,12 @@ public class PathEncoderUtil {
         if (path.contains(SEPARATOR)) {
             String[] parts = path.split(SEPARATOR);
             List<String> partsUTF = Arrays.stream(parts)
-                    .map(part -> {
-                        try {
-                            return URLEncoder.encode(part, "UTF-8");
-                        } catch (UnsupportedEncodingException e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
+                    .map(part -> URLEncoder.encode(part, StandardCharsets.UTF_8))
                     .collect(Collectors.toList());
 
             return String.join(SEPARATOR, partsUTF);
         } else {
-            return URLEncoder.encode(path, "UTF-8");
+            return URLEncoder.encode(path, StandardCharsets.UTF_8);
         }
     }
 }

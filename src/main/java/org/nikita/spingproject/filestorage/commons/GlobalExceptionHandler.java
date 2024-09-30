@@ -1,5 +1,6 @@
 package org.nikita.spingproject.filestorage.commons;
 
+import org.nikita.spingproject.filestorage.commons.exception.StorageException;
 import org.nikita.spingproject.filestorage.directory.exception.DirectoryDownloadException;
 import org.nikita.spingproject.filestorage.file.exception.FileDownloadException;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +27,14 @@ public class GlobalExceptionHandler {
     public String handleMaxSizeUploadFile(Model model) {
         model.addAttribute("errorMessage", "Upload size exceeded maximum: " + maxSize);
         model.addAttribute("statusCode", HttpStatus.BAD_REQUEST.value());
+        return "error";
+    }
+
+    @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(StorageException.class)
+    public String handleStorageError(Model model) {
+        model.addAttribute("errorMessage", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        model.addAttribute("statusCode", HttpStatus.INTERNAL_SERVER_ERROR.value());
         return "error";
     }
 }

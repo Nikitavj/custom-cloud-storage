@@ -1,6 +1,9 @@
 package org.nikita.spingproject.filestorage.s3manager;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.ZonedDateTime;
 

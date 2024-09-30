@@ -4,15 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.io.InputStream;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class FileUploadDto {
-    private InputStream inputStream;
+public class UploadFilesRequest {
+    private MultipartFile[] multipartFiles;
     private String path;
-    private String name;
 }

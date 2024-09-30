@@ -1,6 +1,5 @@
 package org.nikita.spingproject.filestorage.service;
 
-import io.minio.errors.*;
 import org.junit.jupiter.api.Test;
 import org.nikita.spingproject.filestorage.account.User;
 import org.nikita.spingproject.filestorage.account.UserDto;
@@ -15,9 +14,6 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -44,7 +40,7 @@ class UserServiceImplTest {
     private UserRepository userRepository;
 
     @Test
-    void registerNewUserAccount() throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    void registerNewUserAccount() {
         final String EMAIL = "user@gmail.com";
         final String PASSWORD = "root";
 
@@ -54,11 +50,8 @@ class UserServiceImplTest {
                 .setMatchingPassword(PASSWORD);
 
         userService.registerNewUserAccount(userDto);
-
         Optional<User> userOpt = userRepository.findUserByEmail(EMAIL);
-
         assumeTrue(userOpt.isPresent());
-
         assertEquals(EMAIL, userOpt.get().getEmail());
     }
 }

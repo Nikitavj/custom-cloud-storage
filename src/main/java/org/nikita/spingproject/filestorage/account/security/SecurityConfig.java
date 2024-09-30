@@ -1,5 +1,6 @@
 package org.nikita.spingproject.filestorage.account.security;
 
+import org.nikita.spingproject.filestorage.account.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -17,7 +18,7 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return new UserdetailsServiceImpl();
+        return new UserDetailsServiceImpl();
     }
 
     @Bean
@@ -33,7 +34,8 @@ public class SecurityConfig {
         return http
                 .authorizeHttpRequests(
                         auth -> auth
-                                .requestMatchers("/file", "/directory", "/search").hasAnyRole("ADMIN", "USER")
+                                .requestMatchers("/file", "/directory", "/search")
+                                .hasAnyRole("ADMIN", "USER")
                                 .anyRequest().permitAll()
                 )
                 .formLogin(login -> login.loginPage("/log-in")

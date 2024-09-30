@@ -10,6 +10,7 @@ import java.io.UnsupportedEncodingException;
 @Component
 public class S3DirectoryPathBuilder extends S3PathBuilder {
     private static final String POSTFIX = "_meta";
+    private static final String SEPARATOR = "/";
 
     @Autowired
     public S3DirectoryPathBuilder(UserRepository userRepository) {
@@ -21,22 +22,26 @@ public class S3DirectoryPathBuilder extends S3PathBuilder {
         if(path == null || path.isBlank()) {
             return PathEncoderUtil.encode(rootPathForUser());
         } else {
-            String pathS3 =  String.format("%s/%s",
+            String pathS3 =  String.join("",
                     rootPathForUser(),
+                    SEPARATOR,
                     path);
             return PathEncoderUtil.encode(pathS3);
         }
     }
 
     public String buildPathMeta(String path) throws UnsupportedEncodingException {
-        String pathS3 =  String.format("%s/%s%s",
+        String pathS3 =  String.join("",
                 rootPathForUser(),
+                SEPARATOR,
                 path,
                 POSTFIX);
         return PathEncoderUtil.encode(pathS3);
     }
 
     public String buildPathDirObjects(String path) throws UnsupportedEncodingException {
-            return String.format("%s/", buildPath(path));
+        return String.join("",
+                buildPath(path),
+                SEPARATOR);
     }
 }
