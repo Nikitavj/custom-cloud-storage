@@ -41,13 +41,6 @@
             </properties>
         </profile>
         <profile>
-            <id>test</id>
-            <properties>
-                <build.profile.id>test</build.profile.id>
-                <profileActive>test</profileActive>
-            </properties>
-        </profile>
-        <profile>
             <id>prod</id>
             <properties>
                 <build.profile.id>prod</build.profile.id>
@@ -128,6 +121,10 @@
         <dependency>
             <groupId>org.springframework.session</groupId>
             <artifactId>spring-session-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
         </dependency>
 
     </dependencies>
