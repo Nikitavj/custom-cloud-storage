@@ -1,12 +1,10 @@
 package org.nikita.spingproject.filestorage.service;
 
 import org.junit.jupiter.api.Test;
-import org.nikita.spingproject.filestorage.account.User;
-import org.nikita.spingproject.filestorage.account.UserDto;
-import org.nikita.spingproject.filestorage.account.UserRepository;
-import org.nikita.spingproject.filestorage.account.UserServiceImpl;
+import org.nikita.spingproject.filestorage.account.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.MySQLContainer;
@@ -19,7 +17,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @Testcontainers
 class UserServiceImplTest {
 
@@ -34,7 +32,7 @@ class UserServiceImplTest {
     }
 
     @Autowired
-    private UserServiceImpl userService;
+    private UserService userService;
 
     @Autowired
     private UserRepository userRepository;
