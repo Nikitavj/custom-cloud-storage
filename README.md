@@ -32,17 +32,19 @@
 
 # Installation
 1. Указать переменные окружения:
-   + SPRING_PROFILES_ACTIVE=prod
-+ MYSQL_URL=jdbc:mysql://mysql:3306/storage_db
-+ MYSQL_USER=user
-+ MYSQL_PASSWORD=root
-+ MYSQL_ROOT_PASSWORD=root
-+ REDIS_HOST=redis
-+ MINIO_URL=http://minio:9000
-+ MINIO_USER=user
-+ MINIO_PASSWORD=rootroot
-2. Собрать c помощью Maven war артефакт приложения.
-3. Развернуть war артефакт в Tomcat.
+```
+SPRING_PROFILES_ACTIVE=prod
+MYSQL_URL=jdbc:mysql://mysql:3306/storage_db
+MYSQL_USER=user
+MYSQL_PASSWORD=root
+MYSQL_ROOT_PASSWORD=root
+REDIS_HOST=redis
+MINIO_URL=http://minio:9000
+MINIO_USER=user
+MINIO_PASSWORD=rootroot
+```
+
+2. Выполнить ```docker-compose -f docker-compose-prod.yml up```
 
 # Usage
 ### 1. Главная страница.
