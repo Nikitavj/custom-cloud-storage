@@ -48,42 +48,25 @@ MINIO_PASSWORD=rootroot
 
 # Usage
 ### 1. Главная страница.
-Адрес - /home.
+Адрес - ```/```
 
-![image](https://github.com/Nikitavj/WeatherForecast/assets/134765675/c1d0cad1-0a53-4e95-bd07-2d0dc8281072)
+![image](https://github.com/user-attachments/assets/816cfb7a-28a7-40f5-aff3-3f1a164c374d)
 
-### 2. Страница поиска локаций.
-Адрес - /locations.  
-GET параметр name содержит название запрашиваемой локации.
+### 2. Страница поиска файлов.
+Адрес - ```/search```  
 
-![image](https://github.com/Nikitavj/WeatherForecast/assets/134765675/10595404-4f92-4f10-a88b-65ce36539e7b)
+![image](https://github.com/user-attachments/assets/45a3f6f8-9600-4c61-8d3a-95ff2be0d13d)
 
-+ Добавление локации.  
-  Адрес - /locations.  
-  POST параметр name содержит название, latitude и longitude содержат координаты локации.
+### 3. Страница авторизации.
+  Адрес - ```/log-up```
 
-+ Удаление локации.   
-  Адрес - /locations.  
-  POST параметр id содержит порядковый номер локации юзера,  
-    _method содержит значение DELETE.
+![image](https://github.com/user-attachments/assets/fb228272-9252-4ed8-a182-cc2d74056c6b)
 
-### 3. Страница прогноза погоды для локации.
-  Адрес - /forecast.     
-  GET параметр id содержит порядковый номер локации юзера.
+### 4. Страница входа.
+  Адрес - ```/log-in```
 
-![image](https://github.com/Nikitavj/WeatherForecast/assets/134765675/b99eec27-aeef-436f-88e0-950c06e85315)
+![image](https://github.com/user-attachments/assets/ef8db1d1-3aef-4623-a677-e8594400c43d)
 
-### 4. Страница авторизации.
-  Адрес - /logup.  
-  POST параметр user_name сожержит email, password и repeat_password содержат пароли.
 
-![image](https://github.com/Nikitavj/WeatherForecast/assets/134765675/09a20c6f-ea05-4d1e-ab0c-44784eae8ca8)
-
-### 5. Страница входа.
-  Адрес - /login.  
-  POST параметр user_name сожержит email, password содержит пароль.
-
-![image](https://github.com/Nikitavj/WeatherForecast/assets/134765675/9a372bf1-f5b1-4bf8-82d3-0623b8b71011)
-
-### 6. Страница выхода.
-  Адрес - /logout.
+### 5. Страница выхода.
+  Адрес - ```/log-out```
