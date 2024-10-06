@@ -4,7 +4,7 @@ services:
   mysql:
     container_name: 'mysql'
     restart: always
-    image: mysql
+    image: mysql:9.0.1
     ports:
       - 3306:3306
     environment:
@@ -42,9 +42,9 @@ services:
       - minio:/data
 
   app:
-    container_name: 'cloud_strage'
+    container_name: 'cloud_storage'
     restart: always
-    image: cloud_image
+    image: nkdsnnv080/storage_image:0.0.1
     ports:
       - "8080:8080"
     environment:

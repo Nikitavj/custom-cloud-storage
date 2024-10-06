@@ -36,13 +36,15 @@ public class SearchServiceImpl implements SearchService {
         for (Directory dir : directory.getDirectories()) {
             searchRecursiveInDir(dir, searchName, list);
 
-            if (dir.getName().contains(searchName)) {
+            if (dir.getName().toUpperCase()
+                    .contains(searchName.toUpperCase())) {
                 dir.setPath(PathUtil.extractDirectoryPath(dir.getPath()));
                 list.add(ToObjectStorageMapper.map(dir));
             }
         }
         for (File file : directory.getFiles()) {
-            if (file.getName().contains(searchName)) {
+            if (file.getName().toUpperCase()
+                    .contains(searchName.toUpperCase())) {
                 file.setPath(PathUtil.extractDirectoryPath(file.getPath()));
                 list.add(ToObjectStorageMapper.map(file));
             }
