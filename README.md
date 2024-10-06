@@ -1,4 +1,4 @@
-# Weather Viewer
+# File cloud storage
 
 # Overview
 Многопользовательское файловое облако.
@@ -32,10 +32,15 @@
 
 # Installation
 1. Указать переменные окружения:
-   + KEY_API_WEATHER - ключ для внешнего API поиска погоды.
-   + JDBC_USER - имя пользователя для доступа к БД.
-   + JDBC_PASSWORD - пароль для доступа к БД.
-   + JDBC_URL - адрес подключения к БД (jdbc:postgresql://localhost:5432/weather). 
+   + SPRING_PROFILES_ACTIVE=prod
++ MYSQL_URL=jdbc:mysql://mysql:3306/storage_db
++ MYSQL_USER=user
++ MYSQL_PASSWORD=root
++ MYSQL_ROOT_PASSWORD=root
++ REDIS_HOST=redis
++ MINIO_URL=http://minio:9000
++ MINIO_USER=user
++ MINIO_PASSWORD=rootroot
 2. Собрать c помощью Maven war артефакт приложения.
 3. Развернуть war артефакт в Tomcat.
 
