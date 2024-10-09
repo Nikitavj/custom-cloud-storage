@@ -2,6 +2,7 @@ package org.nikita.spingproject.filestorage.controller;
 
 import org.nikita.spingproject.filestorage.directory.dto.*;
 import org.nikita.spingproject.filestorage.directory.exception.*;
+import org.nikita.spingproject.filestorage.file.exception.FileAlreadyExistsException;
 import org.nikita.spingproject.filestorage.service.DirectoryService;
 import org.nikita.spingproject.filestorage.utils.NameFileValidator;
 import org.nikita.spingproject.filestorage.utils.PathEncoderUtil;
@@ -75,7 +76,8 @@ public class DirectoryController {
             redirectPath = "/?path=" + PathEncoderUtil.encode(newDirectory.getRelativePath());
 
         } catch (UnsupportedEncodingException | DirectoryCreatedException |
-                 DirectoryNameException | DirectoryAlreadyExistsException e) {
+                 DirectoryNameException | DirectoryAlreadyExistsException |
+                 FileAlreadyExistsException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
         return new RedirectView(redirectPath);
@@ -123,7 +125,7 @@ public class DirectoryController {
                             relativePath,
                             newName.trim()));
         } catch (DirectoryAlreadyExistsException | DirectoryRenameException |
-                 DirectoryNameException e) {
+                 DirectoryNameException | FileAlreadyExistsException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);

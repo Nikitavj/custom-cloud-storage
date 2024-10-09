@@ -3,6 +3,7 @@ package org.nikita.spingproject.filestorage.service;
 import org.nikita.spingproject.filestorage.file.File;
 import org.nikita.spingproject.filestorage.file.dto.*;
 import org.nikita.spingproject.filestorage.path.PathUtil;
+import org.nikita.spingproject.filestorage.s3manager.S3DirectoryManager;
 import org.nikita.spingproject.filestorage.s3manager.S3FileManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,22 +11,26 @@ import org.springframework.stereotype.Service;
 @Service
 public class FileServiceImpl implements FileService {
     private final S3FileManager s3FileManager;
+    private final S3DirectoryManager s3DirectoryManager;
 
     @Autowired
-    public FileServiceImpl(S3FileManager s3FileManager) {
+    public FileServiceImpl(S3FileManager s3FileManager, S3DirectoryManager s3DirectoryManager) {
         this.s3FileManager = s3FileManager;
+        this.s3DirectoryManager = s3DirectoryManager;
     }
 
     @Override
     public void upload(UploadFileRequest dto) {
-            String path = PathUtil
-                    .createPath(dto.getPath(), dto.getName());
+        String path = PathUtil
+                .createPath(dto.getPath(), dto.getName());
 
-            s3FileManager.add(File.builder()
-                    .path(path)
-                    .name(dto.getName())
-                    .inputStream(dto.getInputStream())
-                    .build());
+        s3DirectoryManager.checkExists(path);
+
+        s3FileManager.add(File.builder()
+                .path(path)
+                .name(dto.getName())
+                .inputStream(dto.getInputStream())
+                .build());
     }
 
     @Override
@@ -41,17 +46,13 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public void rename(RenameFileRequest dto) {
-            String path = PathUtil.renamePath(dto.getPath(), dto.getNewName());
-            s3FileManager.copy(
-                    dto.getPath(),
-                    path,
-                    dto.getNewName());
-    }
+        String path = PathUtil.renamePath(dto.getPath(), dto.getNewName());
 
-    @Override
-    public void exist(ExistFileRequest req) {
-        String path = PathUtil
-                .createPath(req.getPath(), req.getName());
-        s3FileManager.checkExists(path);
+        s3DirectoryManager.checkExists(path);
+
+        s3FileManager.copy(
+                dto.getPath(),
+                path,
+                dto.getNewName());
     }
 }

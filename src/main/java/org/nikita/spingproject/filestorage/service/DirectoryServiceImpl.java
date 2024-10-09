@@ -7,6 +7,7 @@ import org.nikita.spingproject.filestorage.directory.dto.*;
 import org.nikita.spingproject.filestorage.directory.exception.DirectoryDownloadException;
 import org.nikita.spingproject.filestorage.path.PathUtil;
 import org.nikita.spingproject.filestorage.s3manager.S3DirectoryManager;
+import org.nikita.spingproject.filestorage.s3manager.S3FileManager;
 import org.nikita.spingproject.filestorage.utils.ToObjectStorageMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,11 +24,13 @@ import java.util.zip.ZipOutputStream;
 public class DirectoryServiceImpl implements DirectoryService {
     private static final String ZIP_SUFFIX = ".zip";
     private final S3DirectoryManager s3DirManager;
+    private final S3FileManager s3FileManager;
     private final ZipArchiver zipArchiver;
 
     @Autowired
-    public DirectoryServiceImpl(S3DirectoryManager s3DirManager, ZipArchiver zipArchiver) {
+    public DirectoryServiceImpl(S3DirectoryManager s3DirManager, S3FileManager s3FileManager, ZipArchiver zipArchiver) {
         this.s3DirManager = s3DirManager;
+        this.s3FileManager = s3FileManager;
         this.zipArchiver = zipArchiver;
     }
 
@@ -78,6 +81,9 @@ public class DirectoryServiceImpl implements DirectoryService {
     @Override
     public DirectoryDto create(CreateDirRequest dto) {
         String path = PathUtil.createPath(dto.getCurrentPath(), dto.getName());
+
+        s3FileManager.checkExists(path);
+
         s3DirManager.add(
                 new Directory(
                         dto.getName(),
@@ -95,13 +101,10 @@ public class DirectoryServiceImpl implements DirectoryService {
     public void rename(RenameDirRequest dto) {
         Directory dir = s3DirManager.get(dto.getPath());
         String targetPath = PathUtil.renamePath(dir.getPath(), dto.getNewName());
+
+        s3FileManager.checkExists(targetPath);
+
         s3DirManager.copy(dir, targetPath, dto.getNewName());
         s3DirManager.remove(dir.getPath());
-    }
-
-    @Override
-    public void exist(ExistDirectoryRequest req) {
-        String path = PathUtil.createPath(req.getPath(), req.getName());
-        s3DirManager.checkExists(path);
     }
 }

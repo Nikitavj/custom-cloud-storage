@@ -39,10 +39,6 @@ public class UploadFilesServiceImpl implements UploadFilesService {
                     firstFile.getOriginalFilename(),
                     SEPARATOR);
 
-            fileService.exist(new ExistFileRequest(
-                    req.getPath(),
-                    nameDir));
-
             directoryService.create(new CreateDirRequest(
                     req.getPath(),
                     nameDir));
@@ -63,10 +59,6 @@ public class UploadFilesServiceImpl implements UploadFilesService {
 
         } else {
             for (MultipartFile file : files) {
-                directoryService.exist(new ExistDirectoryRequest(
-                        req.getPath(),
-                        file.getOriginalFilename()));
-
                 fileService.upload(new UploadFileRequest(
                         file.getInputStream(),
                         req.getPath(),

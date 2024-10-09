@@ -11,7 +11,5 @@ public interface DirectoryService {
     DirectoryDto create(CreateDirRequest dto);
     void delete(DeleteDirRequest dto);
     void rename(RenameDirRequest dto);
-
-    void exist(ExistDirectoryRequest req);
 }
 
