@@ -47,4 +47,11 @@ public class FileServiceImpl implements FileService {
                     path,
                     dto.getNewName());
     }
+
+    @Override
+    public void exist(ExistFileRequest req) {
+        String path = PathUtil
+                .createPath(req.getPath(), req.getName());
+        s3FileManager.checkExists(path);
+    }
 }

@@ -11,6 +11,7 @@ import org.nikita.spingproject.filestorage.file.exception.FileAlreadyExistsExcep
 import org.nikita.spingproject.filestorage.file.exception.FileNameException;
 import org.nikita.spingproject.filestorage.file.exception.FileUploadException;
 import org.nikita.spingproject.filestorage.service.DirectoryService;
+import org.nikita.spingproject.filestorage.service.UploadFilesService;
 import org.nikita.spingproject.filestorage.service.UploadFilesServiceImpl;
 import org.nikita.spingproject.filestorage.utils.NameFileValidator;
 import org.nikita.spingproject.filestorage.utils.PathEncoderUtil;
@@ -32,7 +33,7 @@ import java.util.List;
 @Controller
 public class StorageController {
     private final DirectoryService directoryService;
-    private final UploadFilesServiceImpl uploadFilesService;
+    private final UploadFilesService uploadFilesService;
 
     @Autowired
     public StorageController(DirectoryService directoryService, UploadFilesServiceImpl uploadFilesService) {

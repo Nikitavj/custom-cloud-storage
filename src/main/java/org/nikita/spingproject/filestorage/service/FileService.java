@@ -7,4 +7,6 @@ public interface FileService {
     void delete(DeleteFileRequest dto);
     DownloadFileResponse download(DownloadFileRequest dto);
     void rename(RenameFileRequest dto);
+
+    void exist(ExistFileRequest req);
 }

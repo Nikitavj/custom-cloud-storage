@@ -7,6 +7,7 @@ import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
 import lombok.extern.slf4j.Slf4j;
 import org.nikita.spingproject.filestorage.commons.dto.InfoMetaS3;
+import org.nikita.spingproject.filestorage.commons.exception.StorageException;
 import org.nikita.spingproject.filestorage.directory.Directory;
 import org.nikita.spingproject.filestorage.directory.exception.*;
 import org.nikita.spingproject.filestorage.file.File;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -42,7 +44,7 @@ public class S3DirectoryManagerImpl implements S3DirectoryManager {
     public void add(Directory dir) {
         try {
             String pathS3 = S3pathBuilder.buildPathMeta(dir.getPath());
-            checkExistsDirectory(pathS3);
+            checkExists(dir.getPath());
 
             s3Api.put(
                     DirectoryUtil.createMetaDataDir(
@@ -120,7 +122,7 @@ public class S3DirectoryManagerImpl implements S3DirectoryManager {
             String prevPathS3Meta = S3pathBuilder.buildPathMeta(dir.getPath());
             String targPathS3Meta = S3pathBuilder.buildPathMeta(targetPath);
 
-            checkExistsDirectory(targPathS3Meta);
+            checkExists(targetPath);
 
             copyInsides(dir, dir.getPath(), targetPath);
             s3Api.copyObject(
@@ -137,6 +139,26 @@ public class S3DirectoryManagerImpl implements S3DirectoryManager {
                  XmlParserException | InternalException e) {
             log.warn("Directory {} dont rename", dir.getPath());
             throw new DirectoryRenameException("Directory dont rename");
+        }
+    }
+
+    @Override
+    public void checkExists(String path) {
+        try {
+            String pathS3 = S3pathBuilder.buildPathMeta(path);
+
+            StatObjectResponse stat;
+            try {
+                stat = s3Api.getInfo(pathS3);
+            } catch (Exception e) {
+                return;
+            }
+
+            if (stat != null) {
+                throw new DirectoryAlreadyExistsException("Directory already exists");
+            }
+        } catch (UnsupportedEncodingException e) {
+            throw new StorageException();
         }
     }
 
@@ -177,19 +199,6 @@ public class S3DirectoryManagerImpl implements S3DirectoryManager {
         }
         for (File file : files) {
             dir.putFile(file);
-        }
-    }
-
-    private void checkExistsDirectory(String absPath) {
-        StatObjectResponse stat;
-        try {
-            stat = s3Api.getInfo(absPath);
-        } catch (Exception e) {
-            return;
-        }
-
-        if (stat != null) {
-            throw new DirectoryAlreadyExistsException("Directory already exists");
         }
     }
 }

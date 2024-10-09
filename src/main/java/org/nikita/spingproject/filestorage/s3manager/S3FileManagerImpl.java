@@ -3,6 +3,7 @@ package org.nikita.spingproject.filestorage.s3manager;
 import io.minio.StatObjectResponse;
 import io.minio.errors.*;
 import lombok.extern.slf4j.Slf4j;
+import org.nikita.spingproject.filestorage.commons.exception.StorageException;
 import org.nikita.spingproject.filestorage.file.File;
 import org.nikita.spingproject.filestorage.file.exception.*;
 import org.nikita.spingproject.filestorage.path.S3FilePathBuilder;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
@@ -32,7 +34,7 @@ public class S3FileManagerImpl implements S3FileManager {
     public void add(File file) {
         try {
             String pathS3 = s3pathBuilder.buildPath(file.getPath());
-            checkExistsFile(pathS3);
+            checkExists(file.getPath());
             fileS3Api.putFile(
                     FileUtil.createMetaDataFile(
                             file.getName(),
@@ -90,7 +92,7 @@ public class S3FileManagerImpl implements S3FileManager {
         try {
             String prevPathS3 = s3pathBuilder.buildPath(prevPath);
             String targPathS3 = s3pathBuilder.buildPath(targPath);
-            checkExistsFile(targPathS3);
+            checkExists(targPath);
             fileS3Api.copyFile(
                     prevPathS3,
                     targPathS3,
@@ -109,16 +111,22 @@ public class S3FileManagerImpl implements S3FileManager {
         }
     }
 
-    private void checkExistsFile(String pathS3) {
-        StatObjectResponse stat;
+    @Override
+    public void checkExists(String path) {
         try {
-            stat = fileS3Api.getInfo(pathS3);
-        } catch (Exception e) {
-            return;
-        }
+            String pathS3 = s3pathBuilder.buildPath(path);
+            StatObjectResponse stat;
+            try {
+                stat = fileS3Api.getInfo(pathS3);
+            } catch (Exception e) {
+                return;
+            }
 
-        if(stat != null) {
-            throw new FileAlreadyExistsException("File already exists");
+            if(stat != null) {
+                throw new FileAlreadyExistsException("File already exists");
+            }
+        } catch (UnsupportedEncodingException e) {
+            throw new StorageException();
         }
     }
 }

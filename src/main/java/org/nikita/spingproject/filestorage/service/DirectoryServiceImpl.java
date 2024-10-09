@@ -98,4 +98,10 @@ public class DirectoryServiceImpl implements DirectoryService {
         s3DirManager.copy(dir, targetPath, dto.getNewName());
         s3DirManager.remove(dir.getPath());
     }
+
+    @Override
+    public void exist(ExistDirectoryRequest req) {
+        String path = PathUtil.createPath(req.getPath(), req.getName());
+        s3DirManager.checkExists(path);
+    }
 }

@@ -4,4 +4,5 @@ public interface S3Manager<T> {
     void add(T object);
     void remove(String path);
     T get(String path);
+    void checkExists(String path);
 }

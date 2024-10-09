@@ -2,7 +2,9 @@ package org.nikita.spingproject.filestorage.service;
 
 import org.apache.commons.lang3.StringUtils;
 import org.nikita.spingproject.filestorage.directory.dto.CreateDirRequest;
+import org.nikita.spingproject.filestorage.directory.dto.ExistDirectoryRequest;
 import org.nikita.spingproject.filestorage.directory.exception.DirectoryAlreadyExistsException;
+import org.nikita.spingproject.filestorage.file.dto.ExistFileRequest;
 import org.nikita.spingproject.filestorage.file.dto.UploadFileRequest;
 import org.nikita.spingproject.filestorage.file.dto.UploadFilesRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,12 +35,18 @@ public class UploadFilesServiceImpl implements UploadFilesService {
         String fileName = firstFile.getOriginalFilename();
 
         if (fileName != null && isDirectory(fileName)) {
-            String pathForDir = StringUtils.substringBefore(
+            String nameDir = StringUtils.substringBefore(
                     firstFile.getOriginalFilename(),
                     SEPARATOR);
+
+            fileService.exist(new ExistFileRequest(
+                    req.getPath(),
+                    nameDir));
+
             directoryService.create(new CreateDirRequest(
                     req.getPath(),
-                    pathForDir));
+                    nameDir));
+
             uploadFileOfDir(firstFile, req.getPath());
             files.removeFirst();
 
@@ -55,10 +63,14 @@ public class UploadFilesServiceImpl implements UploadFilesService {
 
         } else {
             for (MultipartFile file : files) {
+                directoryService.exist(new ExistDirectoryRequest(
+                        req.getPath(),
+                        file.getOriginalFilename()));
+
                 fileService.upload(new UploadFileRequest(
-                                file.getInputStream(),
-                                req.getPath(),
-                                file.getOriginalFilename()));
+                        file.getInputStream(),
+                        req.getPath(),
+                        file.getOriginalFilename()));
             }
         }
     }
@@ -102,9 +114,9 @@ public class UploadFilesServiceImpl implements UploadFilesService {
                     postfixPath);
         }
         fileService.upload(new UploadFileRequest(
-                        file.getInputStream(),
-                        newCurrentPath,
-                        nameFile));
+                file.getInputStream(),
+                newCurrentPath,
+                nameFile));
     }
 
     private boolean isDirectory(String nameFile) {
