@@ -47,7 +47,7 @@ public class ZipArchiver {
                 byte[] bytes = new byte[1024];
                 int length = 0;
                 while ((length = is.read(bytes)) >= 0) {
-                    zos.write(bytes);
+                    zos.write(bytes, 0, length);
                 }
                 zos.closeEntry();
             }

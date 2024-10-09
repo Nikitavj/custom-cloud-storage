@@ -2,9 +2,7 @@ package org.nikita.spingproject.filestorage.service;
 
 import org.apache.commons.lang3.StringUtils;
 import org.nikita.spingproject.filestorage.directory.dto.CreateDirRequest;
-import org.nikita.spingproject.filestorage.directory.dto.ExistDirectoryRequest;
 import org.nikita.spingproject.filestorage.directory.exception.DirectoryAlreadyExistsException;
-import org.nikita.spingproject.filestorage.file.dto.ExistFileRequest;
 import org.nikita.spingproject.filestorage.file.dto.UploadFileRequest;
 import org.nikita.spingproject.filestorage.file.dto.UploadFilesRequest;
 import org.springframework.beans.factory.annotation.Autowired;
