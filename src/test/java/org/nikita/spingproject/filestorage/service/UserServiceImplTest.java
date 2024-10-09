@@ -56,10 +56,10 @@ class UserServiceImplTest {
         final String EMAIL = "user@gmail.com";
         final String PASSWORD = "root";
 
-        UserDto userDto = new UserDto()
-                .setEmail(EMAIL)
-                .setPassword(PASSWORD)
-                .setMatchingPassword(PASSWORD);
+        UserDto userDto = new UserDto();
+        userDto.setEmail(EMAIL);
+        userDto.setPassword(PASSWORD);
+        userDto.setMatchingPassword(PASSWORD);
 
         userService.registerNewUserAccount(userDto);
         Optional<User> userOpt = userRepository.findUserByEmail(EMAIL);

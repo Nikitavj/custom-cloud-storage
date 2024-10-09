@@ -27,14 +27,14 @@ public class AccountController {
     public String registerUserAccount(HttpServletRequest request,
                                       @ModelAttribute("user") @Valid UserDto userDto,
                                       BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "logup";
+        }
 
         try {
             userService.registerNewUserAccount(userDto);
         } catch (UserAlreadyExistException e) {
             bindingResult.rejectValue("email", "", e.getMessage());
-        }
-
-        if (bindingResult.hasErrors()) {
             return "logup";
         }
 
@@ -49,11 +49,6 @@ public class AccountController {
 
     @GetMapping("/log-in")
     public String showLoginForm() {
-        return "login";
-    }
-
-    @PostMapping("/log-in")
-    public String errorLoginForm() {
         return "login";
     }
 }

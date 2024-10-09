@@ -1,7 +1,9 @@
 package org.nikita.spingproject.filestorage.account;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -9,7 +11,8 @@ import java.io.Serializable;
 
 @Setter
 @Getter
-@Accessors(chain = true)
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "users")
 public class User implements Serializable {
@@ -25,4 +28,9 @@ public class User implements Serializable {
 
     @Column(nullable = false)
     private String role;
+
+    public User(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
 }

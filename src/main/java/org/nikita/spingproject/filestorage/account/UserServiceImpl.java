@@ -26,7 +26,7 @@ public class UserServiceImpl implements UserService {
                     "User " + userDto.getEmail() + " already exist");
         }
         user.setRole("ROLE_USER");
-        buildUserDto(userRepository.save(user));
+        userRepository.save(user);
     }
 
     @Override
@@ -36,14 +36,8 @@ public class UserServiceImpl implements UserService {
     }
 
     private User buildUser(UserDto userDto) {
-        return new User()
-                .setEmail(userDto.getEmail())
-                .setPassword(passwordEncoder.encode(userDto.getPassword()));
-    }
-
-    private void buildUserDto(User user) {
-        new UserDto()
-                .setId(user.getId())
-                .setEmail(user.getEmail());
+        return new User(
+                userDto.getEmail(),
+                passwordEncoder.encode(userDto.getPassword()));
     }
 }
